@@ -1,4 +1,4 @@
-# PaletteVision
+# PalletVision
 Experimental pallet layout algorithm developed with Codex AI support. 
 
 This software is provided for planning and reference purposes only.
