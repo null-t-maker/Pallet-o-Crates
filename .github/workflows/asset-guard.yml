@@ -1,0 +1,52 @@
+name: Asset Guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Analyze PR changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          added_count="$(git diff --name-only --diff-filter=A "$base_sha" "$head_sha" | wc -l | tr -d ' ')"
+          deleted_count="$(git diff --name-only --diff-filter=D "$base_sha" "$head_sha" | wc -l | tr -d ' ')"
+          renamed_count="$(git diff --name-only --diff-filter=R "$base_sha" "$head_sha" | wc -l | tr -d ' ')"
+
+          critical_changed="$(git diff --name-only "$base_sha" "$head_sha" -- src-tauri/icons src/assets public | wc -l | tr -d ' ')"
+          critical_deleted="$(git diff --name-only --diff-filter=D "$base_sha" "$head_sha" -- src-tauri/icons src/assets public | wc -l | tr -d ' ')"
+          critical_renamed="$(git diff --name-only --diff-filter=R "$base_sha" "$head_sha" -- src-tauri/icons src/assets public | wc -l | tr -d ' ')"
+
+          deps_changed="$(git diff --name-only "$base_sha" "$head_sha" -- package.json package-lock.json pnpm-lock.yaml yarn.lock src-tauri/Cargo.toml src-tauri/Cargo.lock | wc -l | tr -d ' ')"
+
+          {
+            echo "## Asset Guard summary"
+            echo ""
+            echo "- Files added: $added_count"
+            echo "- Files deleted: $deleted_count"
+            echo "- Files renamed: $renamed_count"
+            echo "- Critical asset paths touched (src-tauri/icons, src/assets, public): $critical_changed"
+            echo "- Dependency manifests/locks touched: $deps_changed"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$critical_deleted" -gt 0 ] || [ "$critical_renamed" -gt 0 ]; then
+            echo "Asset Guard blocked this PR: detected deletion or rename in critical asset paths." >&2
+            echo "Please request explicit maintainer approval for asset structure changes." >&2
+            exit 1
+          fi

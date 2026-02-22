@@ -1,0 +1,11 @@
+# Default ownership
+* @null-t-maker
+
+# Critical repository controls
+/.github/workflows/** @null-t-maker
+/src-tauri/tauri.conf.json @null-t-maker
+/src-tauri/icons/** @null-t-maker
+
+# Core app logic
+/src/lib/** @null-t-maker
+/src/components/** @null-t-maker

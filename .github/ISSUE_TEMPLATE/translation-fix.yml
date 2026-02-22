@@ -1,0 +1,61 @@
+name: Translation fix
+description: Report a wording/translation problem in any UI language.
+title: "[i18n] <language>: <short description>"
+labels:
+  - i18n
+body:
+  - type: input
+    id: language_code
+    attributes:
+      label: Language code
+      description: Example: pl, en, es, uz, hy
+      placeholder: "es"
+    validations:
+      required: true
+
+  - type: input
+    id: translation_key
+    attributes:
+      label: Translation key
+      description: Example: calculatePacking, palletDimensions, infoBannerLine2
+      placeholder: "calculatePacking"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_text
+    attributes:
+      label: Current text
+      description: Paste the current wording shown in the app.
+      placeholder: "Current text shown in UI..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested_text
+    attributes:
+      label: Suggested text
+      description: Native-speaker improvement proposal.
+      placeholder: "Suggested replacement..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: UI context
+      description: Where this appears (screen/section/flow).
+      placeholder: "Sidebar -> Add carton type -> button label"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I confirmed this is a language/wording issue, not a layout bug.
+          required: true
+        - label: I provided enough context for maintainers to validate the change.
+          required: true
+
