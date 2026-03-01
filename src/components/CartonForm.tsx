@@ -82,27 +82,27 @@ export const CartonForm: React.FC<Props> = ({ onAdd, onEdit, editing, onCancelEd
     return (
         <>
             <div className="field" style={{ marginBottom: 10 }}>
-                <label>{t.cartonName}</label>
+                <label title={t.cartonName}>{t.cartonName}</label>
                 <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder={t.cartonNamePlaceholder} />
             </div>
 
             <div className="row">
-                <div className="field"><label>{t.cartonLength}</label><input type="number" value={length} onChange={e => setLength(+e.target.value)} min={1} /></div>
-                <div className="field"><label>{t.cartonWidth}</label><input type="number" value={width} onChange={e => setWidth(+e.target.value)} min={1} /></div>
-                <div className="field"><label>{t.cartonHeight}</label><input type="number" value={height} onChange={e => setHeight(+e.target.value)} min={1} /></div>
+                <div className="field"><label title={t.cartonLength}>{t.cartonLength}</label><input type="number" value={length} onChange={e => setLength(+e.target.value)} min={1} /></div>
+                <div className="field"><label title={t.cartonWidth}>{t.cartonWidth}</label><input type="number" value={width} onChange={e => setWidth(+e.target.value)} min={1} /></div>
+                <div className="field"><label title={t.cartonHeight}>{t.cartonHeight}</label><input type="number" value={height} onChange={e => setHeight(+e.target.value)} min={1} /></div>
             </div>
 
             <div className="row" style={{ marginTop: 10 }}>
-                <div className="field"><label>{t.cartonWeight}</label><input type="number" value={weight} onChange={e => setWeight(+e.target.value)} min={0.1} step={0.1} /></div>
-                <div className="field"><label>{t.cartonQuantity}</label><input type="number" value={quantity} onChange={e => setQuantity(+e.target.value)} min={1} /></div>
+                <div className="field"><label title={t.cartonWeight}>{t.cartonWeight}</label><input type="number" value={weight} onChange={e => setWeight(+e.target.value)} min={0.1} step={0.1} /></div>
+                <div className="field"><label title={t.cartonQuantity}>{t.cartonQuantity}</label><input type="number" value={quantity} onChange={e => setQuantity(+e.target.value)} min={1} /></div>
                 <div className="field" style={{ maxWidth: 60 }}>
-                    <label>{t.cartonColor}</label>
+                    <label title={t.cartonColor}>{t.cartonColor}</label>
                     <input type="color" value={color} onChange={e => setColor(e.target.value)} style={{ height: 36, padding: 2, borderRadius: 8 }} />
                 </div>
             </div>
             <div className="row" style={{ marginTop: 10 }}>
                 <div className="field">
-                    <label>{t.cartonAllowUpright}</label>
+                    <label title={t.cartonAllowUpright}>{t.cartonAllowUpright}</label>
                     <MenuSelect
                         value={uprightPolicy}
                         onChange={(value) => setUprightPolicy(value as CartonUprightPolicy)}
@@ -117,11 +117,11 @@ export const CartonForm: React.FC<Props> = ({ onAdd, onEdit, editing, onCancelEd
             </div>
 
             <div className="row" style={{ marginTop: 12, gap: 8 }}>
-                <button onClick={handleSubmit} style={{ flex: 1 }}>
+                <button onClick={handleSubmit} style={{ flex: 1 }} title={isEditing ? t.updateCarton : t.addCartons}>
                     {isEditing ? <><Check size={16} /> {t.updateCarton}</> : <><Plus size={16} /> {t.addCartons}</>}
                 </button>
                 {isEditing && (
-                    <button className="outline" onClick={onCancelEdit} style={{ flex: 0 }}>
+                    <button className="outline" onClick={onCancelEdit} style={{ flex: 0 }} title={t.cancel}>
                         {t.cancel}
                     </button>
                 )}

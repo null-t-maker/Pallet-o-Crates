@@ -1,0 +1,68 @@
+import type { RefObject } from "react";
+import type { CSSProperties } from "react";
+import type { MultiPackResult, PackedCarton, PalletInput } from "../../lib/packer";
+import type { Translations } from "../../i18n";
+import type { WorkflowMode } from "../Visualizer";
+import type { DiagnosticsSummary } from "../../lib/diagnostics";
+
+export interface ViewerStageProps {
+  pallet: PalletInput;
+  result: MultiPackResult | null;
+  visibleLayers: number;
+  setVisibleLayers: (value: number) => void;
+  t: Translations;
+  workflowMode: WorkflowMode;
+  manualCartons: PackedCarton[];
+  onManualCartonUpdate: (id: string, next: Partial<Pick<PackedCarton, "x" | "y" | "z" | "w" | "l" | "h">>) => void;
+  maxLayerCount: number;
+
+  uiAccessOpen: boolean;
+  uiAccessModalRef: RefObject<HTMLDivElement | null>;
+  uiAccessModalStyle: CSSProperties | undefined;
+  uiZoomAndScaleLabel: string;
+  closeLabel: string;
+  closeUiZoomAndScaleLabel: string;
+  uiScaleLabel: string;
+  uiZoomLabel: string;
+  uiScale: number;
+  uiZoom: number;
+  uiScaleMin: number;
+  uiScaleMax: number;
+  uiZoomMin: number;
+  uiZoomMax: number;
+  onSetUiScale: (value: number) => void;
+  onSetUiZoom: (value: number) => void;
+  onCloseUiAccess: () => void;
+
+  diagnosticsOpen: boolean;
+  diagnosticsModalRef: RefObject<HTMLDivElement | null>;
+  diagnosticsModalStyle: CSSProperties | undefined;
+  closeDiagnosticsLabel: string;
+  diagnostics: DiagnosticsSummary | null;
+  requestedUnitsLabel: string;
+  packedUnitsLabel: string;
+  overlapCountLabel: string;
+  boundsViolationsLabel: string;
+  windowResolutionLabel: string;
+  hardChecksLabel: string;
+  checksIssuesLabel: string;
+  checksOkLabel: string;
+  diagnosticsHint: string;
+  windowWidth: number;
+  windowHeight: number;
+  onCloseDiagnostics: () => void;
+
+  onBeginDragUiAccess: (event: React.PointerEvent<HTMLDivElement>) => void;
+  onBeginDragDiagnostics: (event: React.PointerEvent<HTMLDivElement>) => void;
+  onDragPointerMoveUiAccess: (event: React.PointerEvent<HTMLDivElement>) => void;
+  onDragPointerMoveDiagnostics: (event: React.PointerEvent<HTMLDivElement>) => void;
+  onEndDragPointer: (event: React.PointerEvent<HTMLDivElement>) => void;
+
+  updateCheckModalOpen: boolean;
+  updateCheckTitle: string;
+  updateCheckQuestion: string;
+  updateCheckYesLabel: string;
+  updateCheckNoLabel: string;
+  onConfirmUpdateCheck: () => void;
+  onCloseUpdateCheck: () => void;
+}

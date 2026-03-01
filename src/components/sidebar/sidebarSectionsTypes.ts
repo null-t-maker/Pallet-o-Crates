@@ -1,0 +1,78 @@
+import type React from "react";
+import type { CartonInput, PalletInput, SampleGuidanceFilter } from "../../lib/packer";
+import type { Language, Translations } from "../../i18n";
+import type { SidebarSectionKey } from "./useSidebarState";
+
+export interface SidebarSectionsLabelSet {
+  sampleDatabaseLabel: string;
+  sampleDatabaseFolderLabel: string;
+  sampleDatabaseChooseFolderLabel: string;
+  sampleDatabaseReloadLabel: string;
+  sampleDatabaseScanningLabel: string;
+  sampleDatabaseSummaryPrefix: string;
+  sampleDatabaseFolderNotSelectedLabel: string;
+  sampleGuidanceModeLabel: string;
+  sampleGuidanceModeOnLabel: string;
+  sampleGuidanceModeOffLabel: string;
+  sampleGuidanceStrengthLabel: string;
+  sampleGuidanceCfgScaleLabel: string;
+  sampleGuidanceStepsLabel: string;
+  sampleGuidanceSeedLabel: string;
+  sampleGuidanceFilterLabel: string;
+  sampleGuidanceFilterAllLabel: string;
+  sampleGuidanceFilterDimsLabel: string;
+  sampleGuidanceFilterShapeLabel: string;
+  sampleGuidanceFilterExactLabel: string;
+  sampleTemplateLockLabel: string;
+  sampleTemplateLockOnLabel: string;
+  sampleTemplateLockOffLabel: string;
+}
+
+export interface SidebarSectionsProps {
+  showLanguageSection: boolean;
+  showSampleDatabaseSection: boolean;
+  collapsedSections: Record<SidebarSectionKey, boolean>;
+  toggleSection: (key: SidebarSectionKey) => void;
+  language: Language;
+  setLanguage: (language: Language) => void;
+  t: Translations;
+  resolvedLabels: SidebarSectionsLabelSet;
+  sampleDatabaseFolderPath: string;
+  sampleDatabaseSummary: {
+    totalFiles: number;
+    validFiles: number;
+    invalidFiles: number;
+    firstDescriptors: string[];
+  } | null;
+  sampleDatabaseLoading: boolean;
+  sampleDatabaseError: string | null;
+  onChooseSampleDatabaseFolder?: () => void;
+  onReloadSampleDatabase?: () => void;
+  sampleDatabaseGuidanceSummary?: string;
+  sampleGuidanceEnabled?: boolean;
+  onSampleGuidanceEnabledChange?: (enabled: boolean) => void;
+  sampleGuidanceStrengthPercent?: number;
+  onSampleGuidanceStrengthPercentChange?: (value: number) => void;
+  sampleGuidanceCfgScalePercent?: number;
+  onSampleGuidanceCfgScalePercentChange?: (value: number) => void;
+  sampleGuidanceSteps?: number;
+  onSampleGuidanceStepsChange?: (value: number) => void;
+  sampleGuidanceSeed?: number;
+  onSampleGuidanceSeedChange?: (value: number) => void;
+  sampleGuidanceFilter?: SampleGuidanceFilter;
+  onSampleGuidanceFilterChange?: (value: SampleGuidanceFilter) => void;
+  sampleTemplateLockEnabled?: boolean;
+  onSampleTemplateLockEnabledChange?: (enabled: boolean) => void;
+  pallet: PalletInput;
+  setPallet: (pallet: PalletInput) => void;
+  showExtraPalletMode: boolean;
+  editing: CartonInput | null;
+  setEditing: React.Dispatch<React.SetStateAction<CartonInput | null>>;
+  handleAdd: (carton: CartonInput) => void;
+  handleEdit: (updated: CartonInput) => void;
+  cartons: CartonInput[];
+  totalCartons: number;
+  hasManyCartonRows: boolean;
+  handleStartEdit: (carton: CartonInput) => void;
+  handleRemoveCarton: (cartonId: string) => void;
+}

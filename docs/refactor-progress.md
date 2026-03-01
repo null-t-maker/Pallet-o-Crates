@@ -1,0 +1,330 @@
+﻿# Refactor Progress (Live)
+
+Last update: 2026-03-01
+
+## Status (%)
+- Core packing/template architecture (`src/lib`): **93%**
+- UI/app-shell refactor readiness (`src/components`, `src/hooks`, `src/App.tsx`): **99%**
+- Whole project readiness for future development (lib + UI + workflow consistency): **99%**
+
+## Quality Gates
+- `npm run build`: pass
+- `npm run test:regression` (18/18): pass
+
+## Recently Completed
+- Split packer pipeline/deps into smaller modules:
+  - `packerPackPalletPipeline.ts`
+  - `packerPackPalletDeps.ts`
+  - `packerPackPalletSharedDeps.ts`
+  - `packerPackPalletHeuristicDeps.ts`
+- Split candidate search flow:
+  - `packerCandidateSearch.ts`
+  - `packerCandidateSearchCore.ts`
+  - `packerCandidateSearchTypes.ts`
+  - `packerCandidateScoring.ts`
+- Split heuristic phases into separate modules:
+  - `packerHeuristicSeedPhase.ts`
+  - `packerHeuristicTopOffPhase.ts`
+  - `packerHeuristicGapFillPhase.ts`
+  - `packerHeuristicPhaseTypes.ts`
+  - `packerHeuristicTypes.ts`
+- Split deterministic packing:
+  - `packerDeterministicTypes.ts`
+  - `packerDeterministicInterchangeable.ts`
+  - `packerDeterministicSingleType.ts`
+- Split template lock orchestration:
+  - `templateLockAdaptive.ts`
+  - `templateLockMath.ts`
+  - `templateLock.ts` simplified
+- Split template lock parsing internals:
+  - `templateLockPlacementParsing.ts`
+  - `templateLockShapeState.ts`
+  - `templateLockParsing.ts` converted to barrel
+- Split template lock finalization internals:
+  - `templateLockFinalizationTypes.ts`
+  - `templateLockFinalizationQuota.ts`
+  - `templateLockFinalizationPallets.ts`
+  - `templateLockFinalizationUnpacked.ts`
+  - `templateLockFinalization.ts` converted to barrel
+- Split template lock selection internals:
+  - `templateLockSelectionCycling.ts`
+  - `templateLockSelectionValidation.ts`
+  - `templateLockSelection.ts` simplified to orchestrator
+- Split pattern library internals:
+  - `packerPatternTypes.ts`
+  - `packerPatternTransform.ts`
+  - `packerPatternGrid.ts`
+  - `packerPatternCandidates.ts`
+  - `packerPatternSelection.ts`
+  - `packerPatternLibrary.ts` converted to barrel
+- Split candidate evaluation internals:
+  - `packerCandidateEvaluationTypes.ts`
+  - `packerCandidateEvaluationSupport.ts`
+  - `packerCandidateEvaluation.ts` simplified and re-exporting deps/result types
+- Split topbar UI internals:
+  - `src/components/topbar/topbarPanelTypes.ts`
+  - `src/components/topbar/TopbarPanelContent.tsx`
+  - `src/components/AppTopbar.tsx` reduced to shell + panel wiring
+- Split visualizer internals (phase 1):
+  - `src/components/visualizer/visualizerHelpers.ts`
+  - `src/components/visualizer/CartonBox.tsx`
+  - `src/components/Visualizer.tsx` reduced by extracting movement/gizmo/math helpers and carton mesh component
+- Split visualizer internals (phase 2):
+  - `src/components/visualizer/VisualizerOverlays.tsx`
+  - `src/components/Visualizer.tsx` reduced by extracting hover/selection/stats overlays
+- Split visualizer internals (phase 3):
+  - `src/components/visualizer/visualizerSceneMetrics.ts`
+  - `src/components/Visualizer.tsx` reduced by extracting scene/carton/footprint/result metric derivations
+- Split visualizer internals (phase 4):
+  - `src/components/visualizer/useManualCartonEditing.ts`
+  - `src/components/Visualizer.tsx` reduced by extracting manual move/rotate/commit logic to dedicated hook
+- Split sidebar internals (phase 1):
+  - `src/components/sidebar/useSidebarState.ts`
+  - `src/components/Sidebar.tsx` reduced by extracting section/carton state handlers and label default resolver
+- Split visualizer internals (phase 5):
+  - `src/components/visualizer/useVisualizerCamera.ts`
+  - `src/components/Visualizer.tsx` reduced by extracting camera/zoom/viewport logic
+- Split topbar internals (phase 2):
+  - `src/components/topbar/AppTopbar.types.ts`
+  - `src/components/topbar/TopbarPrimitives.tsx`
+  - `src/components/AppTopbar.tsx` reduced from shell+types to focused composition layer
+- Split app-shell internals (phase 1):
+  - `src/hooks/useAppLanguage.ts`
+  - `src/hooks/useManualUndoRedoShortcuts.ts`
+  - `src/components/LayerVisibilityControl.tsx`
+  - `src/components/ViewerStage.tsx`
+  - `src/App.tsx` reduced by extracting language/session restore, manual undo/redo hotkeys, and viewer-stage rendering block
+- Updated i18n integrity check for refactored language restore path:
+  - `scripts/check-i18n-integrity.mjs` now accepts guard location in `src/hooks/useAppLanguage.ts`
+- Split sidebar internals (phase 2):
+  - `src/components/sidebar/SidebarSections.tsx`
+  - `src/components/Sidebar.tsx` reduced to container/wiring by extracting section JSX composition
+- Reduced app-shell wiring complexity:
+  - `src/App.tsx` now uses a single `labels` object from `useAppLabels` (instead of dozens of destructured label vars)
+  - `src/hooks/useSidebarProps.ts` now consumes `labels: AppLabels` (removes large label argument surface)
+  - `src/hooks/useAppTopbarProps.ts` now consumes `labels: AppLabels`
+  - `src/hooks/useViewerStageProps.ts` now consumes `labels: AppLabels` and derives diagnostics unit labels from `t`
+  - `src/App.tsx` reduced from ~565 lines to ~418 lines
+- Split visualizer internals (phase 6):
+  - `src/components/visualizer/VisualizerCanvasScene.tsx`
+  - `src/components/Visualizer.tsx` reduced by extracting canvas scene rendering (lights/grid/pallet/cartons/transform-controls)
+  - `src/components/Visualizer.tsx` reduced from ~310 lines to ~248 lines
+- Split app-shell state/picker helpers:
+  - `src/hooks/useAppWorkflowState.ts` for initial pallet/cartons/result/workflow/layer/sidebar-open state
+  - `src/hooks/usePickFolderPath.ts` for Tauri folder-picker callback
+  - `src/App.tsx` reduced from ~418 lines to ~402 lines
+- Split language-picker internals:
+  - `src/components/sidebar/languagePickerUtils.ts`
+  - `src/components/sidebar/LanguagePickerPanel.tsx` reduced by extracting display-name/sort/search helper logic
+  - kept i18n integrity sentinels in `LanguagePickerPanel.tsx` so `check:i18n` remains green
+- Split app-topbar bindings from App shell:
+  - `src/hooks/useAppTopbarBindings.ts`
+  - `src/App.tsx` now passes `topbarPanels`, `sampleSave`, and `uiOverlays` as hook outputs (instead of manually assembling huge prop objects inline)
+  - `src/App.tsx` reduced from ~401 lines to ~317 lines
+- Split sample database guidance controls:
+  - `src/components/sidebar/SampleGuidanceControls.tsx`
+  - `src/components/sidebar/SampleDatabasePanel.tsx` reduced from ~329 lines to ~206 lines by extracting guidance UI block
+- Split UI-overlay shortcut helpers:
+  - `src/hooks/uiOverlayShortcuts.ts`
+  - `src/hooks/useUiOverlays.ts` now focuses on overlay/window/drag state orchestration and re-exports shortcut utilities for compatibility
+- Split sample-intelligence logic/state:
+  - `src/hooks/sampleIntelligenceLogic.ts` (template-lock candidate selection, sample-guidance derivation, shared bounds helpers)
+  - `src/hooks/useSampleIntelligenceState.ts` (localStorage-backed state/persistence)
+  - `src/hooks/useSampleIntelligence.ts` reduced from ~410 lines to ~232 lines
+- Split UI-overlay drag mechanics:
+  - `src/hooks/useOverlayDrag.ts` (modal drag pointer tracking + modal positioning styles)
+  - `src/hooks/useUiOverlays.ts` reduced from ~396 lines to ~251 lines
+- Split topbar panel content by responsibility:
+  - `src/components/topbar/panelContent/WorkflowPanelContent.tsx`
+  - `src/components/topbar/panelContent/SaveSamplePanelContent.tsx`
+  - `src/components/topbar/panelContent/LanguagePanelContent.tsx`
+  - `src/components/topbar/panelContent/SettingsPanelContent.tsx`
+  - `src/components/topbar/TopbarPanelContent.tsx` converted to thin re-export barrel
+- Split overlay-shortcut state from `useUiOverlays`:
+  - `src/hooks/useOverlayShortcutsState.ts` (shortcut draft/commit, capture-mode key handling, persisted shortcut storage)
+  - `src/hooks/useUiOverlays.ts` reduced further from ~251 lines to ~146 lines
+- Split sidebar-props orchestration into focused helpers:
+  - `src/hooks/sidebarPropsActions.ts` (primary/secondary action decision tree for generation/manual modes)
+  - `src/hooks/sidebarPropsSampleDatabase.ts` (sample database + guidance + template-lock sidebar bindings)
+  - `src/hooks/useSidebarProps.ts` reduced from ~232 lines to ~201 lines
+- Split visualizer overlays into dedicated cards:
+  - `src/components/visualizer/CartonInfoStack.tsx`
+  - `src/components/visualizer/PackingStatsCard.tsx`
+  - `src/components/visualizer/VisualizerOverlays.tsx` now composes focused overlay components
+- Split visualizer scene-state derivations:
+  - `src/components/visualizer/useVisualizerSceneState.ts` (base pallets, scene cartons, selection, footprint, counters, label resolution)
+  - `src/components/Visualizer.tsx` reduced from ~248 lines to ~210 lines by removing metric derivation blocks
+- Split sidebar contract types from view implementation:
+  - `src/components/sidebar/sidebarTypes.ts` (single source of truth for `SidebarProps`)
+  - `src/components/Sidebar.tsx` reduced from ~246 lines to ~177 lines (render/wiring focused)
+- Split manual-carton editing core from hook effects:
+  - `src/components/visualizer/manualCartonEditingCore.ts` (candidate normalization, collision resolution, rotation patch builders)
+  - `src/components/visualizer/useManualCartonEditing.ts` reduced from ~247 lines to ~171 lines
+- Split sidebar section contract types from section renderer:
+  - `src/components/sidebar/sidebarSectionsTypes.ts` (`SidebarSectionsProps`, label set)
+  - `src/components/sidebar/SidebarSections.tsx` reduced from ~242 lines to ~166 lines
+- Split sample-guidance control primitives from panel composition:
+  - `src/components/sidebar/sampleGuidanceControlsPrimitives.tsx`
+  - `src/components/sidebar/SampleGuidanceControls.tsx` reduced from ~226 lines to ~160 lines
+- Split language-picker dropdown state/effects from panel composition:
+  - `src/components/sidebar/languagePicker/useLanguagePickerMenuState.ts`
+  - `src/components/sidebar/LanguagePickerPanel.tsx` keeps integrity sentinels and is reduced to menu composition + display-name derivation
+- Split sample-database scanning from sample-intelligence orchestration:
+  - `src/hooks/useSampleDatabaseScanner.ts` (request-id race guard, Tauri scan invoke, loading/error/data synchronization)
+  - `src/hooks/useSampleIntelligence.ts` reduced from ~232 lines to ~195 lines
+- Split visualizer helper internals into focused modules:
+  - `src/components/visualizer/visualizerCartonMath.ts` (geometry checks, quantization, collision/sweep snap math)
+  - `src/components/visualizer/visualizerGizmoPatch.ts` (TransformControls outward-arrow patch)
+  - `src/components/visualizer/visualizerHelpers.ts` converted to thin constants + re-export barrel (16 lines)
+- Split sample-intelligence internals:
+  - `src/hooks/useSampleIntelligenceDerivations.ts` (fingerprints, template lock candidate derivation, guidance derivation, lock status reset effect)
+  - `src/hooks/sampleIntelligenceTypes.ts` (hook args/result contract)
+  - `src/hooks/useSampleIntelligence.ts` reduced from ~195 lines to ~103 lines
+- Split viewer-stage props hook internals:
+  - `src/hooks/viewerStagePropsTypes.ts` (hook argument contract)
+  - `src/hooks/viewerStagePropsMapping.ts` (pure mapping from app state to `ViewerStageProps`)
+  - `src/hooks/useViewerStageProps.ts` reduced from ~212 lines to ~71 lines
+- Split topbar-panels internals:
+  - `src/hooks/topbarPanelStyle.ts` (dropdown position/style math)
+  - `src/hooks/useTopbarPanelState.ts` (open/close/toggle state machine)
+  - `src/hooks/useTopbarOutsideClose.ts` (outside-click close behavior)
+  - `src/hooks/useTopbarPanels.ts` reduced from ~212 lines to ~127 lines
+- Split sample-database panel internals:
+  - `src/components/sidebar/sampleDatabasePanelTypes.ts` (panel contract)
+  - `src/components/sidebar/SampleDatabaseFolderControls.tsx` (folder path + choose/reload controls)
+  - `src/components/sidebar/SampleDatabaseStatusBlock.tsx` (status/preview/guidance summary block)
+  - `src/components/sidebar/SampleDatabasePanel.tsx` reduced from ~206 lines to ~116 lines
+- Reduced `App.tsx` wiring via simplified viewer-stage hook contract:
+  - `src/hooks/viewerStagePropsTypes.ts` now accepts `uiOverlays` bindings directly
+  - `src/hooks/viewerStagePropsMapping.ts` now maps drag/modal/updateCheck wiring internally
+  - `src/hooks/useViewerStageProps.ts` reduced to thin delegator (7 lines)
+  - `src/App.tsx` reduced from ~317 lines to ~284 lines
+- Split viewer-stage component contract from render composition:
+  - `src/components/viewerStage/viewerStageTypes.ts` (full `ViewerStageProps` contract)
+  - `src/components/ViewerStage.tsx` reduced from ~216 lines to ~150 lines
+- Split App sample-database composition:
+  - `src/hooks/useAppSampleDatabaseBindings.ts` combines `useSampleIntelligence` + `useSampleDatabaseControls`
+  - `src/App.tsx` no longer wires sample-intelligence controls manually
+- Split App layout prop composition:
+  - `src/hooks/useAppLayoutBindings.ts` centralizes `topbarProps`, `viewerStageProps`, `sidebarProps` wiring
+  - `src/App.tsx` reduced from ~284 lines to ~173 lines
+- Split visualizer interaction internals:
+  - `src/components/visualizer/useVisualizerSelectionState.ts` (hover/selection/move-step/hint state + mode reset effects)
+  - `src/components/visualizer/useVisualizerTransformControls.ts` (TransformControls ref wiring + outward-gizmo patch lifecycle)
+  - `src/components/Visualizer.tsx` reduced from ~210 lines to ~199 lines
+- Split language-picker data derivation from panel composition:
+  - `src/components/sidebar/languagePicker/useLanguagePickerData.ts`
+  - `src/components/sidebar/LanguagePickerPanel.tsx` reduced from ~181 lines to ~132 lines (integrity sentinels preserved)
+- Split sidebar-props argument contract from hook body:
+  - `src/hooks/sidebarPropsTypes.ts`
+  - `src/hooks/useSidebarProps.ts` reduced from ~201 lines to ~158 lines
+- Split app-layout binding internals:
+  - `src/hooks/useAppLayoutBindingsTypes.ts` (binding contract)
+  - `src/hooks/useAppLayoutBindingsMaps.ts` (topbar/viewer/sidebar argument mapping helpers)
+  - `src/hooks/useAppLayoutBindings.ts` reduced from ~180 lines to ~23 lines
+- Split sample-intelligence logic internals:
+  - `src/hooks/sampleIntelligenceConstants.ts` (guidance limits, clamp/error/filter utilities)
+  - `src/hooks/sampleTemplateLockCandidate.ts` (template-lock candidate scoring/selection)
+  - `src/hooks/sampleGuidanceBuilder.ts` (sample-guidance vote/confidence builder)
+  - `src/hooks/sampleIntelligenceLogic.ts` converted to thin re-export barrel (13 lines)
+  - `src/hooks/useSampleDatabaseControls.ts` now consumes shared `clamp`/`toErrorMessage` helpers and is decoupled from `useSampleIntelligence` re-export imports
+- Split topbar action-with-dropdown composition:
+  - `src/components/topbar/TopbarActionWithPanel.tsx` (shared action-button + dropdown wrapper)
+  - `src/components/AppTopbar.tsx` reduced from ~172 lines to ~162 lines by removing repeated panel wrappers
+- Split sample-guidance field primitives into focused components:
+  - `src/components/sidebar/sampleGuidanceFields/ToggleField.tsx`
+  - `src/components/sidebar/sampleGuidanceFields/RangeField.tsx`
+  - `src/components/sidebar/sampleGuidanceFields/NumberField.tsx`
+  - `src/components/sidebar/sampleGuidanceFields/FilterField.tsx`
+  - `src/components/sidebar/sampleGuidanceControlsPrimitives.ts` converted to thin re-export barrel (6 lines)
+- Split sidebar sample-database prop mapping internals:
+  - `src/hooks/sidebarPropsSampleDatabaseTypes.ts` (binding contract)
+  - `src/hooks/sidebarPropsSampleDatabaseSummary.ts` (summary derivation)
+  - `src/hooks/sidebarPropsSampleDatabaseBindings.ts` (sidebar mapping logic)
+  - `src/hooks/sidebarPropsSampleDatabase.ts` converted to thin re-export barrel (6 lines)
+- Split layout-sample save storage/error helpers:
+  - `src/hooks/layoutSampleSaveStorage.ts` (localStorage bootstrap + persistence helpers)
+  - `src/hooks/layoutSampleSaveUtils.ts` (save-error message normalization)
+  - `src/hooks/useLayoutSampleSave.ts` reduced from ~167 lines to ~155 lines by delegating storage/utility concerns
+- Split overlay-shortcut internals:
+  - `src/hooks/overlayShortcutDefaults.ts` (storage keys + default shortcut definitions)
+  - `src/hooks/useGlobalOverlayShortcuts.ts` (global keydown listener for toggles)
+  - `src/hooks/useOverlayShortcutCapture.ts` (capture-mode key assignment listener)
+  - `src/hooks/useOverlayShortcutsState.ts` reduced from ~155 lines to ~92 lines
+- Split workflow action internals:
+  - `src/hooks/workflowActionsTypes.ts` (hook contract + manual update patch type)
+  - `src/hooks/workflowModeTransition.ts` (generation/manual switch transition logic)
+  - `src/hooks/useWorkflowActions.ts` reduced from ~153 lines to ~104 lines
+- Split sample-database controls internals:
+  - `src/hooks/sampleDatabaseControlsTypes.ts` (controls contract + status-summary contract)
+  - `src/hooks/sampleDatabaseStatusSummary.ts` (guidance/template-lock summary builder)
+  - `src/hooks/useSampleDatabaseControls.ts` reduced from ~152 lines to ~119 lines and re-exports its public types for compatibility
+- Split UI-overlay shell internals:
+  - `src/hooks/uiOverlaysTypes.ts` (`UseUiOverlaysResult` + `WindowSize` contract)
+  - `src/hooks/useViewportWindowSize.ts` (window resize observer state)
+  - `src/hooks/useOverlayWindowState.ts` (ui-access/diagnostics open-close-toggle state machine)
+  - `src/hooks/useUiOverlays.ts` reduced from ~146 lines to ~80 lines
+- Split sample-intelligence state storage internals:
+  - `src/hooks/sampleIntelligenceStateStorage.ts` (localStorage bootstrap + persistence helpers)
+  - `src/hooks/useSampleIntelligenceState.ts` reduced from ~142 lines to ~98 lines
+- Split sidebar-props hook internals:
+  - `src/hooks/useSidebarBindings.ts` (memoized action/sample-database binding composition)
+  - `src/hooks/useSidebarProps.ts` reduced from ~158 lines to ~105 lines (thin final sidebar props composition)
+- Split visualizer shell internals:
+  - `src/components/visualizer/visualizerTypes.ts` (shared visualizer mode/props contract)
+  - `src/components/visualizer/useVisualizerRuntime.ts` (hook orchestration for scene/camera/editing/selection runtime)
+  - `src/components/Visualizer.tsx` reduced from ~199 lines to ~77 lines (render composition only)
+- Split sidebar state/label responsibilities:
+  - `src/components/sidebar/sidebarLabelResolver.ts` (sidebar label fallback resolver)
+  - `src/components/sidebar/useSidebarState.ts` reduced from ~147 lines to ~72 lines (sidebar state + handlers only)
+- Split sidebar sections internals:
+  - `src/components/sidebar/SidebarSampleDatabaseSection.tsx` (sample database section wrapper + prop mapping)
+  - `src/components/sidebar/SidebarSections.tsx` reduced from ~166 lines to ~144 lines
+- Split layout-sample save hook internals:
+  - `src/hooks/useLayoutSampleSaveActions.ts` (folder pick + save callbacks)
+  - `src/hooks/useLayoutSampleSave.ts` reduced from ~155 lines to ~102 lines
+- Split sidebar bindings orchestration internals:
+  - `src/hooks/sidebarBindingsTypes.ts` (sidebar binding contract)
+  - `src/hooks/useSidebarActionBindings.ts` (memoized primary/secondary action bindings)
+  - `src/hooks/useSidebarSampleDatabaseBindings.ts` (memoized sample-database/guidance bindings)
+  - `src/hooks/useSidebarBindings.ts` reduced from ~161 lines to ~14 lines (thin orchestrator)
+- Split sidebar shell prop mapping:
+  - `src/components/sidebar/sidebarPropsMapping.ts` (class/labels/footer/sections prop mapping helpers)
+  - `src/components/Sidebar.tsx` reduced from ~178 lines to ~68 lines (render composition only)
+- Split topbar pallet-toggle primitive:
+  - `src/components/topbar/TopbarPalletToggleButton.tsx`
+  - `src/components/AppTopbar.tsx` reduced from ~162 lines to ~155 lines
+- Split layout-sample save shared contract types:
+  - `src/hooks/layoutSampleSaveTypes.ts` (args/result/status contracts for save flow)
+  - `src/hooks/useLayoutSampleSave.ts` reduced from ~102 lines to ~72 lines
+  - `src/hooks/useLayoutSampleSaveActions.ts` reduced from ~126 lines to ~102 lines
+- Split sidebar sample-database binding internals:
+  - `src/hooks/useSidebarSampleDatabaseSummary.ts` (summary derivation hook)
+  - `src/hooks/useSidebarSampleDatabaseBindingMemo.ts` (memoized mapping hook)
+  - `src/hooks/useSidebarSampleDatabaseBindings.ts` reduced from ~115 lines to ~11 lines (thin orchestrator)
+  - `src/hooks/sidebarBindingsTypes.ts` now includes shared `SidebarSampleDatabaseBindingArgs`
+- Split sidebar props-mapping internals:
+  - `src/components/sidebar/sidebarPropsMappingTypes.ts` (mapping contracts)
+  - `src/components/sidebar/sidebarLabelPropsResolver.ts` (label mapping from `SidebarProps`)
+  - `src/components/sidebar/sidebarFooterBindings.ts` (footer class/secondary-action mapping)
+  - `src/components/sidebar/sidebarSectionsPropsBuilder.ts` (sections prop builder)
+  - `src/components/sidebar/sidebarPropsMapping.ts` converted to thin barrel + className helper (8 lines)
+- Reduced topbar shell composition:
+  - `src/components/AppTopbar.tsx` now composes `TopbarCorePanels` instead of inlining workflow/save/language/settings blocks
+  - `src/components/AppTopbar.tsx` reduced from ~155 lines to ~100 lines
+- Split layout-sample save action internals:
+  - `src/hooks/layoutSampleSaveActionsCore.ts` (folder-pick + save invocation/error handling core)
+  - `src/hooks/useLayoutSampleSaveActions.ts` reduced from ~102 lines to ~77 lines (thin callback wrapper)
+
+## Highest-Priority Remaining Chunks
+- UI large files (next macro-stage):
+  - `src/components/topbar/TopbarCorePanels.tsx`
+  - `src/components/visualizer/visualizerCartonMath.ts`
+  - `src/components/visualizer/useManualCartonEditing.ts`
+  - `src/hooks/layoutSampleSaveActionsCore.ts`
+
+## Update Rule
+After each refactor batch:
+1. update percentages,
+2. append what was split/moved,
+3. keep build/regression status in sync.

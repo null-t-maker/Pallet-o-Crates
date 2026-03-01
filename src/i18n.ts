@@ -25,6 +25,8 @@ import { el } from "./i18n-locales/el";
 import { tr } from "./i18n-locales/tr";
 import { az } from "./i18n-locales/az";
 import { uk } from "./i18n-locales/uk";
+import { be } from "./i18n-locales/be";
+import { ru } from "./i18n-locales/ru";
 import { ro } from "./i18n-locales/ro";
 import { bg } from "./i18n-locales/bg";
 import { sl } from "./i18n-locales/sl";
@@ -49,17 +51,42 @@ import { et } from "./i18n-locales/et";
 import { ja } from "./i18n-locales/ja";
 import { ko } from "./i18n-locales/ko";
 import { th } from "./i18n-locales/th";
+import { km } from "./i18n-locales/km";
+import { kn } from "./i18n-locales/kn";
+import { lo } from "./i18n-locales/lo";
+import { my } from "./i18n-locales/my";
+import { ne } from "./i18n-locales/ne";
+import { si } from "./i18n-locales/si";
+import { ta } from "./i18n-locales/ta";
+import { tg } from "./i18n-locales/tg";
+import { te } from "./i18n-locales/te";
+import { tk } from "./i18n-locales/tk";
 import { vi } from "./i18n-locales/vi";
 import { fil } from "./i18n-locales/fil";
 import { ms } from "./i18n-locales/ms";
+import { ml } from "./i18n-locales/ml";
+import { or } from "./i18n-locales/or";
+import { as } from "./i18n-locales/as";
+import { dv } from "./i18n-locales/dv";
+import { dz } from "./i18n-locales/dz";
+import { bo } from "./i18n-locales/bo";
+import { ku } from "./i18n-locales/ku";
+import { ug } from "./i18n-locales/ug";
 import { id } from "./i18n-locales/id";
 import { ar } from "./i18n-locales/ar";
+import { fa } from "./i18n-locales/fa";
+import { bn } from "./i18n-locales/bn";
 import { ht } from "./i18n-locales/ht";
 import { hi } from "./i18n-locales/hi";
+import { gu } from "./i18n-locales/gu";
+import { pa } from "./i18n-locales/pa";
 import { ur } from "./i18n-locales/ur";
+import { ps } from "./i18n-locales/ps";
 import { he } from "./i18n-locales/he";
 import { mt } from "./i18n-locales/mt";
 import { mk } from "./i18n-locales/mk";
+import { mr } from "./i18n-locales/mr";
+import { mn } from "./i18n-locales/mn";
 import { ka } from "./i18n-locales/ka";
 import { kk } from "./i18n-locales/kk";
 import { ky } from "./i18n-locales/ky";
@@ -70,11 +97,11 @@ import { hu } from "./i18n-locales/hu";
 export type { Translations } from "./i18n-types";
 export { OPTIONAL_TRANSLATION_KEYS } from "./i18n-types";
 
-export const LANGUAGES = ["pl", "en", "de", "lb", "zh", "zt", "es", "es419", "ca", "cy", "gd", "gn", "qu", "ay", "pap", "pt", "ptbr", "ga", "nl", "fr", "frca", "it", "el", "tr", "az", "uk", "ro", "bg", "sl", "sk", "cs", "hr", "sr", "sc", "sq", "bs", "cnr", "sv", "fi", "da", "nb", "nn", "kl", "is", "lt", "lv", "et", "ja", "ko", "th", "vi", "fil", "ms", "id", "ar", "ht", "hi", "ur", "he", "mt", "mk", "ka", "kk", "ky", "uz", "hy", "hu"] as const;
+export const LANGUAGES = ["pl", "en", "de", "lb", "zh", "zt", "es", "es419", "ca", "cy", "gd", "gn", "qu", "ay", "pap", "pt", "ptbr", "ga", "nl", "fr", "frca", "it", "el", "tr", "az", "uk", "be", "ru", "ro", "bg", "sl", "sk", "cs", "hr", "sr", "sc", "sq", "bs", "cnr", "sv", "fi", "da", "nb", "nn", "kl", "is", "lt", "lv", "et", "ja", "ko", "th", "km", "kn", "lo", "my", "ne", "si", "ta", "tg", "te", "tk", "vi", "fil", "ms", "ml", "or", "as", "dv", "dz", "bo", "ku", "ug", "id", "ar", "fa", "bn", "ht", "hi", "gu", "mr", "pa", "ur", "ps", "he", "mt", "mk", "mn", "ka", "kk", "ky", "uz", "hy", "hu"] as const;
 
 export type Language = (typeof LANGUAGES)[number];
 
-export const DEFAULT_LANGUAGE: Language = "pl";
+export const DEFAULT_LANGUAGE: Language = "en";
 
 export function isLanguage(value: unknown): value is Language {
   return typeof value === "string" && (LANGUAGES as readonly string[]).includes(value);
@@ -107,6 +134,8 @@ export const translations: Record<Language, Translations> = {
   tr,
   az,
   uk,
+  be,
+  ru,
   ro,
   bg,
   sl,
@@ -131,17 +160,42 @@ export const translations: Record<Language, Translations> = {
   ja,
   ko,
   th,
+  km,
+  kn,
+  lo,
+  my,
+  ne,
+  si,
+  ta,
+  tg,
+  te,
+  tk,
   vi,
   fil,
   ms,
+  ml,
+  or,
+  as,
+  dv,
+  dz,
+  bo,
+  ku,
+  ug,
   id,
   ar,
+  fa,
+  bn,
   ht,
   hi,
+  gu,
+  pa,
   ur,
+  ps,
   he,
   mt,
   mk,
+  mr,
+  mn,
   ka,
   kk,
   ky,
@@ -151,5 +205,12 @@ export const translations: Record<Language, Translations> = {
 };
 
 export function resolveTranslation(language: Language): Translations {
-  return translations[language] ?? translations.en ?? translations.pl;
+  const englishBase = translations.en;
+  const selected = translations[language] ?? englishBase ?? translations.pl;
+  if (!englishBase) return selected;
+  if (language === "en") return englishBase;
+  return {
+    ...englishBase,
+    ...selected,
+  };
 }

@@ -14,6 +14,91 @@ export interface Translations {
   palletPackingStyle: string;
   packingStyleCenterCompact: string;
   packingStyleEdgeAligned: string;
+  palletExtraPalletMode?: string;
+  extraPalletModeNone?: string;
+  extraPalletModeLimitsOnly?: string;
+  extraPalletModeFull?: string;
+  workflowLabel?: string;
+  workflowModeGeneration?: string;
+  workflowModeManual?: string;
+  switchToManualEditing?: string;
+  generateCartons?: string;
+  generateMoreCartons?: string;
+  generateCartonsAgain?: string;
+  palletPanelLabel?: string;
+  manualRotateLabel?: string;
+  manualRotateHorizontal?: string;
+  manualRotateVerticalX?: string;
+  manualRotateVerticalY?: string;
+  manualMoveBlockedCollision?: string;
+  manualMoveStepLabel?: string;
+  saveLayoutSampleLabel?: string;
+  sampleFolderLabel?: string;
+  sampleChooseFolderLabel?: string;
+  sampleChangeFolderLabel?: string;
+  sampleFolderNotSelectedLabel?: string;
+  sampleNameLabel?: string;
+  sampleNamePlaceholder?: string;
+  sampleStrategyLabel?: string;
+  sampleStrategyBoth?: string;
+  sampleSaveActionLabel?: string;
+  sampleSavingLabel?: string;
+  sampleSavedPrefix?: string;
+  sampleSaveFailedPrefix?: string;
+  sampleDatabaseLabel?: string;
+  sampleDatabaseFolderLabel?: string;
+  sampleDatabaseChooseFolderLabel?: string;
+  sampleDatabaseReloadLabel?: string;
+  sampleDatabaseScanningLabel?: string;
+  sampleDatabaseSummaryPrefix?: string;
+  sampleGuidanceActiveLabel?: string;
+  sampleGuidanceCenterLabel?: string;
+  sampleGuidanceEdgeLabel?: string;
+  sampleGuidanceOffLabel?: string;
+  sampleGuidanceSwitchLabel?: string;
+  sampleGuidanceOnLabel?: string;
+  sampleGuidanceOffOptionLabel?: string;
+  sampleGuidanceOffManualLabel?: string;
+  sampleGuidanceOffNoDirectionalLabel?: string;
+  sampleGuidanceStrengthLabel?: string;
+  sampleTemplateLockLabel?: string;
+  sampleTemplateLockOnLabel?: string;
+  sampleTemplateLockOffLabel?: string;
+  sampleTemplateLockReadyLabel?: string;
+  sampleTemplateLockNoMatchLabel?: string;
+  sampleTemplateLockDisabledLabel?: string;
+  sampleTemplateLockExactMatchLabel?: string;
+  sampleTemplateLockShapeMatchLabel?: string;
+  sampleGuidanceCfgScaleLabel?: string;
+  sampleGuidanceStepsLabel?: string;
+  sampleGuidanceSeedLabel?: string;
+  sampleGuidanceFilterLabel?: string;
+  sampleGuidanceFilterAllLabel?: string;
+  sampleGuidanceFilterDimsLabel?: string;
+  sampleGuidanceFilterShapeLabel?: string;
+  sampleGuidanceFilterExactLabel?: string;
+  settingsLabel?: string;
+  settingsSaveLabel?: string;
+  settingsRestoreDefaultsLabel?: string;
+  uiZoomAndScaleLabel?: string;
+  uiAccessOpenLabel?: string;
+  uiAccessCloseLabel?: string;
+  uiScaleLabel?: string;
+  uiZoomLabel?: string;
+  shortcutActivationLabel?: string;
+  shortcutPressLabel?: string;
+  refreshAppLabel?: string;
+  closeLabel?: string;
+  closeUiZoomAndScaleLabel?: string;
+  closeDiagnosticsLabel?: string;
+  diagnosticsHintManual?: string;
+  diagnosticsHintGeneration?: string;
+  updateCheckTitle?: string;
+  updateCheckQuestion?: string;
+  updateCheckYesLabel?: string;
+  updateCheckNoLabel?: string;
+  manualPalletAreaLabel?: (width: number, length: number) => string;
+  manualClearSelectedCartonAriaLabel?: string;
 
   addCartonType: string;
   editCartonType: string;
@@ -63,9 +148,99 @@ export interface Translations {
   weight: string;
   height: string;
   layerCount: string;
+  palletCount?: string;
   unpacked: (count: number) => string;
   unpackedLimitExceeded?: (count: number) => string;
   windowResolution?: string;
 }
 
-export const OPTIONAL_TRANSLATION_KEYS = ["unpackedLimitExceeded", "windowResolution"] as const;
+export const OPTIONAL_TRANSLATION_KEYS = [
+  "palletExtraPalletMode",
+  "extraPalletModeNone",
+  "extraPalletModeLimitsOnly",
+  "extraPalletModeFull",
+  "workflowLabel",
+  "workflowModeGeneration",
+  "workflowModeManual",
+  "switchToManualEditing",
+  "generateCartons",
+  "generateMoreCartons",
+  "generateCartonsAgain",
+  "palletPanelLabel",
+  "manualRotateLabel",
+  "manualRotateHorizontal",
+  "manualRotateVerticalX",
+  "manualRotateVerticalY",
+  "manualMoveBlockedCollision",
+  "manualMoveStepLabel",
+  "saveLayoutSampleLabel",
+  "sampleFolderLabel",
+  "sampleChooseFolderLabel",
+  "sampleChangeFolderLabel",
+  "sampleFolderNotSelectedLabel",
+  "sampleNameLabel",
+  "sampleNamePlaceholder",
+  "sampleStrategyLabel",
+  "sampleStrategyBoth",
+  "sampleSaveActionLabel",
+  "sampleSavingLabel",
+  "sampleSavedPrefix",
+  "sampleSaveFailedPrefix",
+  "sampleDatabaseLabel",
+  "sampleDatabaseFolderLabel",
+  "sampleDatabaseChooseFolderLabel",
+  "sampleDatabaseReloadLabel",
+  "sampleDatabaseScanningLabel",
+  "sampleDatabaseSummaryPrefix",
+  "sampleGuidanceActiveLabel",
+  "sampleGuidanceCenterLabel",
+  "sampleGuidanceEdgeLabel",
+  "sampleGuidanceOffLabel",
+  "sampleGuidanceSwitchLabel",
+  "sampleGuidanceOnLabel",
+  "sampleGuidanceOffOptionLabel",
+  "sampleGuidanceOffManualLabel",
+  "sampleGuidanceOffNoDirectionalLabel",
+  "sampleGuidanceStrengthLabel",
+  "sampleTemplateLockLabel",
+  "sampleTemplateLockOnLabel",
+  "sampleTemplateLockOffLabel",
+  "sampleTemplateLockReadyLabel",
+  "sampleTemplateLockNoMatchLabel",
+  "sampleTemplateLockDisabledLabel",
+  "sampleTemplateLockExactMatchLabel",
+  "sampleTemplateLockShapeMatchLabel",
+  "sampleGuidanceCfgScaleLabel",
+  "sampleGuidanceStepsLabel",
+  "sampleGuidanceSeedLabel",
+  "sampleGuidanceFilterLabel",
+  "sampleGuidanceFilterAllLabel",
+  "sampleGuidanceFilterDimsLabel",
+  "sampleGuidanceFilterShapeLabel",
+  "sampleGuidanceFilterExactLabel",
+  "settingsLabel",
+  "settingsSaveLabel",
+  "settingsRestoreDefaultsLabel",
+  "uiZoomAndScaleLabel",
+  "uiAccessOpenLabel",
+  "uiAccessCloseLabel",
+  "uiScaleLabel",
+  "uiZoomLabel",
+  "shortcutActivationLabel",
+  "shortcutPressLabel",
+  "refreshAppLabel",
+  "closeLabel",
+  "closeUiZoomAndScaleLabel",
+  "closeDiagnosticsLabel",
+  "diagnosticsHintManual",
+  "diagnosticsHintGeneration",
+  "updateCheckTitle",
+  "updateCheckQuestion",
+  "updateCheckYesLabel",
+  "updateCheckNoLabel",
+  "manualPalletAreaLabel",
+  "manualClearSelectedCartonAriaLabel",
+  "palletCount",
+  "unpackedLimitExceeded",
+  "windowResolution",
+] as const;

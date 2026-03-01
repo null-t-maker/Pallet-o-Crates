@@ -1,0 +1,87 @@
+import { useMemo } from "react";
+import { buildSampleDatabaseSidebarBindings } from "./sidebarPropsSampleDatabase";
+import type { SidebarSampleDatabaseBindingArgs } from "./sidebarBindingsTypes";
+
+interface UseSidebarSampleDatabaseBindingMemoArgs extends SidebarSampleDatabaseBindingArgs {
+  sampleDatabaseSummary: ReturnType<typeof buildSampleDatabaseSidebarBindings>["sampleDatabaseSummary"];
+}
+
+export function useSidebarSampleDatabaseBindingMemo({
+  workflowMode,
+  sampleDatabaseFolderPath,
+  sampleDatabaseSummary,
+  sampleDatabaseLoading,
+  sampleDatabaseError,
+  handleChooseSampleDatabaseFolder,
+  handleReloadSampleDatabase,
+  sampleDatabaseStatusSummaryText,
+  sampleGuidanceEnabled,
+  setSampleGuidanceEnabled,
+  sampleGuidanceStrengthPercent,
+  setSampleGuidanceStrengthPercent,
+  sampleGuidanceCfgScalePercent,
+  handleSampleGuidanceCfgScalePercentChange,
+  sampleGuidanceSteps,
+  handleSampleGuidanceStepsChange,
+  sampleGuidanceSeed,
+  handleSampleGuidanceSeedChange,
+  sampleGuidanceFilter,
+  setSampleGuidanceFilter,
+  sampleTemplateLockEnabled,
+  setSampleTemplateLockEnabled,
+  labels,
+}: UseSidebarSampleDatabaseBindingMemoArgs): ReturnType<typeof buildSampleDatabaseSidebarBindings> {
+  return useMemo(
+    () =>
+      buildSampleDatabaseSidebarBindings({
+        workflowMode,
+        sampleDatabaseFolderPath,
+        sampleDatabaseSummary,
+        sampleDatabaseLoading,
+        sampleDatabaseError,
+        handleChooseSampleDatabaseFolder,
+        handleReloadSampleDatabase,
+        sampleDatabaseStatusSummaryText,
+        sampleGuidanceEnabled,
+        setSampleGuidanceEnabled,
+        sampleGuidanceStrengthPercent,
+        setSampleGuidanceStrengthPercent,
+        sampleGuidanceCfgScalePercent,
+        handleSampleGuidanceCfgScalePercentChange,
+        sampleGuidanceSteps,
+        handleSampleGuidanceStepsChange,
+        sampleGuidanceSeed,
+        handleSampleGuidanceSeedChange,
+        sampleGuidanceFilter,
+        setSampleGuidanceFilter,
+        sampleTemplateLockEnabled,
+        setSampleTemplateLockEnabled,
+        labels,
+      }),
+    [
+      handleChooseSampleDatabaseFolder,
+      handleReloadSampleDatabase,
+      handleSampleGuidanceCfgScalePercentChange,
+      handleSampleGuidanceSeedChange,
+      handleSampleGuidanceStepsChange,
+      labels,
+      sampleDatabaseError,
+      sampleDatabaseFolderPath,
+      sampleDatabaseLoading,
+      sampleDatabaseStatusSummaryText,
+      sampleDatabaseSummary,
+      sampleGuidanceCfgScalePercent,
+      sampleGuidanceEnabled,
+      sampleGuidanceFilter,
+      sampleGuidanceSeed,
+      sampleGuidanceSteps,
+      sampleGuidanceStrengthPercent,
+      sampleTemplateLockEnabled,
+      setSampleGuidanceEnabled,
+      setSampleGuidanceFilter,
+      setSampleGuidanceStrengthPercent,
+      setSampleTemplateLockEnabled,
+      workflowMode,
+    ],
+  );
+}

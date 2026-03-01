@@ -7,7 +7,9 @@ const i18nPath = path.resolve(root, "src/i18n.ts");
 const i18nTypesPath = path.resolve(root, "src/i18n-types.ts");
 const localeDirPath = path.resolve(root, "src/i18n-locales");
 const sidebarPath = path.resolve(root, "src/components/Sidebar.tsx");
+const languagePickerPath = path.resolve(root, "src/components/sidebar/LanguagePickerPanel.tsx");
 const appPath = path.resolve(root, "src/App.tsx");
+const appLanguageHookPath = path.resolve(root, "src/hooks/useAppLanguage.ts");
 
 // Known mojibake markers seen when UTF-8 text was accidentally re-saved via a legacy code page.
 const mojibakeMarkers = [
@@ -80,6 +82,19 @@ function collectObjectLiteralKeys(objectLiteral) {
   return keys;
 }
 
+function collectObjectLiteralStringValues(objectLiteral) {
+  const values = new Map();
+  for (const prop of objectLiteral.properties) {
+    if (!ts.isPropertyAssignment(prop)) continue;
+    const key = propertyNameText(prop.name);
+    if (!key) continue;
+    if (ts.isStringLiteral(prop.initializer) || ts.isNoSubstitutionTemplateLiteral(prop.initializer)) {
+      values.set(key, prop.initializer.text);
+    }
+  }
+  return values;
+}
+
 function findInterfaceDeclaration(sourceFile, name) {
   for (const stmt of sourceFile.statements) {
     if (ts.isInterfaceDeclaration(stmt) && stmt.name.text === name) {
@@ -115,6 +130,7 @@ checkMojibake([
   "src/i18n.ts",
   "src/i18n-types.ts",
   "src/components/Sidebar.tsx",
+  ...(fs.existsSync(languagePickerPath) ? ["src/components/sidebar/LanguagePickerPanel.tsx"] : []),
   ...localeFiles.map((name) => `src/i18n-locales/${name}`),
 ]);
 
@@ -203,6 +219,7 @@ for (const lang of declaredLanguages) {
   }
 
   const localeKeys = collectObjectLiteralKeys(localeDecl.initializer);
+  const localeStringValues = collectObjectLiteralStringValues(localeDecl.initializer);
   const missingRequired = requiredTranslationKeys.filter((key) => !localeKeys.includes(key));
   const unknownKeys = localeKeys.filter((key) => !allTranslationKeys.includes(key));
 
@@ -212,21 +229,46 @@ for (const lang of declaredLanguages) {
   if (unknownKeys.length > 0) {
     fail(`Locale '${lang}' has unknown keys: ${unknownKeys.join(", ")}`);
   }
+
+  // Guard against accidental regression where a curated locale falls back to raw English labels.
+  if (lang === "ku") {
+    const englishRegressionSentinels = new Map([
+      ["languageLabel", "Language"],
+      ["calculatePacking", "Calculate packing"],
+      ["diagnostics", "Diagnostics"],
+    ]);
+    for (const [key, englishValue] of englishRegressionSentinels.entries()) {
+      const actual = localeStringValues.get(key);
+      if (actual === englishValue) {
+        fail(`Locale 'ku' regressed to English at key '${key}' (${JSON.stringify(actual)}).`);
+      }
+    }
+  }
 }
 
 const sidebarContent = readText(sidebarPath);
-if (!sidebarContent.includes("const LANGUAGE_ORDER: readonly Language[] = LANGUAGES;")) {
-  fail("Sidebar language order is not sourced from LANGUAGES.");
+const languagePickerContent = fs.existsSync(languagePickerPath)
+  ? readText(languagePickerPath)
+  : sidebarContent;
+
+if (!languagePickerContent.includes("const LANGUAGE_ORDER: readonly Language[] = LANGUAGES;")) {
+  fail("Language picker order is not sourced from LANGUAGES.");
 }
-if (sidebarContent.includes("const LANGUAGE_NAME_BY_UI")) {
-  fail("Legacy LANGUAGE_NAME_BY_UI matrix is still present in Sidebar.");
+if (languagePickerContent.includes("const LANGUAGE_NAME_BY_UI")) {
+  fail("Legacy LANGUAGE_NAME_BY_UI matrix is still present in language picker.");
 }
-if (!sidebarContent.includes("new Intl.DisplayNames")) {
-  fail("Sidebar no longer uses Intl.DisplayNames for localized language names.");
+if (!languagePickerContent.includes("new Intl.DisplayNames")) {
+  fail("Language picker no longer uses Intl.DisplayNames for localized language names.");
 }
 
 const appContent = readText(appPath);
-if (!appContent.includes("return isLanguage(saved) ? saved : DEFAULT_LANGUAGE;")) {
+const appLanguageHookContent = fs.existsSync(appLanguageHookPath)
+  ? readText(appLanguageHookPath)
+  : "";
+const languageGuardPresent =
+  appContent.includes("return isLanguage(saved) ? saved : DEFAULT_LANGUAGE;")
+  || appLanguageHookContent.includes("return isLanguage(saved) ? saved : DEFAULT_LANGUAGE;");
+if (!languageGuardPresent) {
   fail("App language restore does not use isLanguage()/DEFAULT_LANGUAGE guard.");
 }
 

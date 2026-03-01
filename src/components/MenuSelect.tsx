@@ -112,6 +112,7 @@ export const MenuSelect: React.FC<Props> = ({
                 className="language-select-trigger"
                 aria-haspopup="listbox"
                 aria-expanded={open}
+                title={selectedOption?.label ?? ""}
                 onClick={() => setOpen((prev) => !prev)}
             >
                 <span className="language-select-primary">{selectedOption?.label ?? ""}</span>
@@ -132,6 +133,7 @@ export const MenuSelect: React.FC<Props> = ({
                                 type="button"
                                 role="option"
                                 aria-selected={isActive}
+                                title={option.label}
                                 className={`language-select-option${isActive ? " is-active" : ""}`}
                                 onClick={() => {
                                     onChange(option.value);

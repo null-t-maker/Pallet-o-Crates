@@ -8,6 +8,9 @@
     "check:i18n": "node scripts/check-i18n-integrity.mjs",
     "i18n:missing": "node scripts/i18n-missing.mjs",
     "build": "npm run check:i18n && tsc && vite build",
+    "test:regression": "vitest run src/lib/__tests__",
+    "test:regression:watch": "vitest src/lib/__tests__",
+    "test:template-lock": "vitest run src/lib/__tests__/templateLock.regression.test.ts",
     "preview": "vite preview",
     "tauri": "tauri"
   },
@@ -15,6 +18,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-opener": "^2",
     "@types/three": "^0.183.1",
     "@types/uuid": "^10.0.0",
@@ -30,6 +34,7 @@
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vitest": "^4.0.18"
   }
 }

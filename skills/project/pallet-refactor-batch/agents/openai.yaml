@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pallet Refactor Batch"
+  short_description: "Run safe refactor batches with validation and progress updates"
+  default_prompt: "Use this skill whenever you continue refactoring this project; apply one safe batch, run build+regression, and update progress docs."

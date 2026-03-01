@@ -1,0 +1,44 @@
+import type { WorkflowMode } from "../components/Visualizer";
+import type { Language, Translations } from "../i18n";
+import type { CartonInput, MultiPackResult, PackedCarton, PalletInput, SampleGuidanceFilter } from "../lib/packer";
+import type { ScanSampleDatabaseResponse } from "../lib/layoutSamples";
+import type { AppLabels } from "./useAppLabels";
+
+export interface UseSidebarPropsArgs {
+  pallet: PalletInput;
+  setPallet: (pallet: PalletInput) => void;
+  cartons: CartonInput[];
+  setCartons: (cartons: CartonInput[]) => void;
+  language: Language;
+  setLanguage: (language: Language) => void;
+  t: Translations;
+  labels: AppLabels;
+  workflowMode: WorkflowMode;
+  result: MultiPackResult | null;
+  manualCartons: PackedCarton[];
+  handleCalculate: () => void;
+  handleGenerateManualAgain: () => void;
+  handleGenerateManualMore: () => void;
+  switchWorkflowMode: (mode: WorkflowMode) => void;
+  sampleDatabaseFolderPath: string;
+  sampleDatabaseData: ScanSampleDatabaseResponse | null;
+  sampleDatabaseLoading: boolean;
+  sampleDatabaseError: string | null;
+  handleChooseSampleDatabaseFolder: () => Promise<void>;
+  handleReloadSampleDatabase: () => void;
+  sampleDatabaseStatusSummaryText: string;
+  sampleGuidanceEnabled: boolean;
+  setSampleGuidanceEnabled: (enabled: boolean) => void;
+  sampleGuidanceStrengthPercent: number;
+  setSampleGuidanceStrengthPercent: (value: number) => void;
+  sampleGuidanceCfgScalePercent: number;
+  handleSampleGuidanceCfgScalePercentChange: (value: number) => void;
+  sampleGuidanceSteps: number;
+  handleSampleGuidanceStepsChange: (value: number) => void;
+  sampleGuidanceSeed: number;
+  handleSampleGuidanceSeedChange: (value: number) => void;
+  sampleGuidanceFilter: SampleGuidanceFilter;
+  setSampleGuidanceFilter: (value: SampleGuidanceFilter) => void;
+  sampleTemplateLockEnabled: boolean;
+  setSampleTemplateLockEnabled: (enabled: boolean) => void;
+}

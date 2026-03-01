@@ -1,98 +1,171 @@
-import { useEffect, useMemo, useState } from "react";
 import { Sidebar } from "./components/Sidebar";
-import { Visualizer } from "./components/Visualizer";
-import { PalletInput, CartonInput, PackResult, packPallet } from "./lib/packer";
+import { ViewerStage } from "./components/ViewerStage";
+import { AppTopbar } from "./components/AppTopbar";
+import { useManualLayoutHistory } from "./hooks/useManualLayoutHistory";
+import { useUiOverlays } from "./hooks/useUiOverlays";
+import { useTopbarPanels } from "./hooks/useTopbarPanels";
+import { useLayoutSampleSave } from "./hooks/useLayoutSampleSave";
+import { UI_SCALE_MAX, UI_SCALE_MIN, UI_ZOOM_MAX, UI_ZOOM_MIN, useUiScale } from "./hooks/useUiScale";
+import { useAppLabels } from "./hooks/useAppLabels";
+import { useUpdateCheck } from "./hooks/useUpdateCheck";
+import { useWorkflowActions } from "./hooks/useWorkflowActions";
+import { useAppLanguage } from "./hooks/useAppLanguage";
+import { useManualUndoRedoShortcuts } from "./hooks/useManualUndoRedoShortcuts";
+import { useAppWorkflowState } from "./hooks/useAppWorkflowState";
+import { usePickFolderPath } from "./hooks/usePickFolderPath";
+import { useAppSampleDatabaseBindings } from "./hooks/useAppSampleDatabaseBindings";
+import { useAppLayoutBindings } from "./hooks/useAppLayoutBindings";
 import "./App.css";
-import { Layers } from "lucide-react";
-import { DEFAULT_LANGUAGE, Language, isLanguage, resolveTranslation } from "./i18n";
-import { MenuSelect } from "./components/MenuSelect";
 
-const LEGACY_LANGUAGE_STORAGE_KEY = "palettevision.language";
-const LEGACY_DIAGNOSTICS_STORAGE_KEY = "palettevision.showDiagnostics";
-const LANGUAGE_STORAGE_KEY = "palletocrates.language";
-const DIAGNOSTICS_STORAGE_KEY = "palletocrates.showDiagnostics";
+const MANUAL_HISTORY_LIMIT = 200;
+const RELEASES_PAGE_URL = (import.meta.env.VITE_RELEASES_PAGE_URL as string | undefined)?.trim()
+  || "https://github.com/null-t-maker/Pallet-o-Crates/releases";
 
 function App() {
-  const [pallet, setPallet] = useState<PalletInput>({
-    width: 800,
-    length: 1200,
-    maxHeight: 1800,
-    maxWeight: 1000,
-    packingStyle: "edgeAligned",
+  const {
+    pallet,
+    setPallet,
+    cartons,
+    setCartons,
+    result,
+    setResult,
+    workflowMode,
+    setWorkflowMode,
+    visibleLayers,
+    setVisibleLayers,
+    palletGenerationOpen,
+    setPalletGenerationOpen,
+  } = useAppWorkflowState();
+  const {
+    manualCartons,
+    applyManualCartons,
+    clearManualLayout,
+    undoManualEdit,
+    redoManualEdit,
+  } = useManualLayoutHistory(MANUAL_HISTORY_LIMIT);
+  const { uiScale, setUiScale, uiZoom, setUiZoom } = useUiScale();
+  const uiOverlays = useUiOverlays();
+  const {
+    windowSize,
+    capturingShortcutTarget,
+    setCapturingShortcutTarget,
+  } = uiOverlays;
+  const topbarPanels = useTopbarPanels({
+    viewportWidth: windowSize.width,
+    zoomFactor: uiZoom,
+    onClearTransientState: () => setCapturingShortcutTarget(null),
+  });
+  const { closeWorkflowPanel } = topbarPanels;
+  const {
+    updateCheckModalOpen,
+    openUpdateCheckModal,
+    closeUpdateCheckModal,
+    handleConfirmUpdateCheck,
+  } = useUpdateCheck({ releasesPageUrl: RELEASES_PAGE_URL });
+  const { language, setLanguage, t } = useAppLanguage();
+  const pickFolderPath = usePickFolderPath();
+
+  useManualUndoRedoShortcuts({
+    workflowMode,
+    capturingShortcutTarget,
+    undoManualEdit,
+    redoManualEdit,
   });
 
-  const [cartons, setCartons] = useState<CartonInput[]>([]);
-  const [result, setResult] = useState<PackResult | null>(null);
-  const [visibleLayers, setVisibleLayers] = useState(0);
-  const [showDiagnostics, setShowDiagnostics] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    const saved =
-      window.localStorage.getItem(DIAGNOSTICS_STORAGE_KEY) ??
-      window.localStorage.getItem(LEGACY_DIAGNOSTICS_STORAGE_KEY);
-    return saved === "1";
+  const labels = useAppLabels({ t, workflowMode });
+  const sampleDatabase = useAppSampleDatabaseBindings({
+    pallet,
+    cartons,
+    t,
+    labels,
+    pickFolderPath,
   });
-  const [language, setLanguage] = useState<Language>(() => {
-    if (typeof window === "undefined") return DEFAULT_LANGUAGE;
-    const saved =
-      window.localStorage.getItem(LANGUAGE_STORAGE_KEY) ??
-      window.localStorage.getItem(LEGACY_LANGUAGE_STORAGE_KEY);
-    return isLanguage(saved) ? saved : DEFAULT_LANGUAGE;
+
+  const sampleSave = useLayoutSampleSave({
+    workflowMode,
+    pallet,
+    cartons,
+    result,
+    manualCartons,
+    pickFolderPath,
+    sampleFolderNotSelectedLabel: labels.sampleFolderNotSelectedLabel,
+    sampleSavedPrefix: labels.sampleSavedPrefix,
+    sampleSaveFailedPrefix: labels.sampleSaveFailedPrefix,
   });
-  const t = useMemo(() => resolveTranslation(language), [language]);
 
-  useEffect(() => {
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-  }, [language]);
+  const {
+    switchWorkflowMode,
+    handleCalculate,
+    handleGenerateManualAgain,
+    handleGenerateManualMore,
+    handleManualCartonUpdate,
+  } = useWorkflowActions({
+    workflowMode,
+    setWorkflowMode,
+    result,
+    setResult,
+    pallet,
+    cartons,
+    manualCartons,
+    applyManualCartons,
+    clearManualLayout,
+    setVisibleLayers,
+    closeWorkflowPanel,
+    sampleGuidance: sampleDatabase.sampleGuidance,
+    sampleTemplateLockEnabled: sampleDatabase.sampleTemplateLockEnabled,
+    templateLockCandidate: sampleDatabase.templateLockCandidate,
+    setSampleTemplateLockStatus: sampleDatabase.setSampleTemplateLockStatus,
+  });
 
-  useEffect(() => {
-    window.localStorage.setItem(DIAGNOSTICS_STORAGE_KEY, showDiagnostics ? "1" : "0");
-  }, [showDiagnostics]);
-
-  const handleCalculate = () => {
-    const res = packPallet({ ...pallet }, cartons.map(c => ({ ...c })));
-    setResult(res);
-    setVisibleLayers(0);
-  };
+  const { topbarProps, viewerStageProps, sidebarProps } = useAppLayoutBindings({
+    t,
+    labels,
+    language,
+    setLanguage,
+    palletGenerationOpen,
+    setPalletGenerationOpen,
+    openUpdateCheckModal,
+    workflowMode,
+    switchWorkflowMode,
+    topbarPanels,
+    sampleSave,
+    uiOverlays,
+    setUiScale,
+    setUiZoom,
+    pallet,
+    setPallet,
+    cartons,
+    setCartons,
+    result,
+    manualCartons,
+    handleManualCartonUpdate,
+    visibleLayers,
+    setVisibleLayers,
+    uiScale,
+    uiZoom,
+    uiScaleMin: UI_SCALE_MIN,
+    uiScaleMax: UI_SCALE_MAX,
+    uiZoomMin: UI_ZOOM_MIN,
+    uiZoomMax: UI_ZOOM_MAX,
+    updateCheckModalOpen,
+    handleConfirmUpdateCheck,
+    closeUpdateCheckModal,
+    handleCalculate,
+    handleGenerateManualAgain,
+    handleGenerateManualMore,
+    sampleDatabase,
+  });
 
   return (
-    <div className="app">
-      <Sidebar
-        pallet={pallet}
-        setPallet={setPallet}
-        cartons={cartons}
-        setCartons={setCartons}
-        onCalculate={handleCalculate}
-        language={language}
-        setLanguage={setLanguage}
-        t={t}
-      />
-      <main className="viewer">
-        <Visualizer
-          pallet={pallet}
-          result={result}
-          visibleLayers={visibleLayers}
-          diagnosticsVisible={showDiagnostics}
-          onToggleDiagnostics={() => setShowDiagnostics((prev) => !prev)}
-          t={t}
-        />
+    <div className="app app-with-topbar">
+      <AppTopbar {...topbarProps} />
 
-        {result && result.layers.length > 0 && (
-          <div className="glass overlay layer-ctrl">
-            <Layers size={18} color="var(--accent)" />
-            <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{t.layers}:</label>
-            <MenuSelect
-              className="layer-ctrl-select"
-              value={String(visibleLayers)}
-              onChange={(value) => setVisibleLayers(Number(value))}
-              ariaLabel={t.layers}
-              options={[
-                { value: "0", label: t.allLayers(result.layers.length) },
-                ...result.layers.map((_, i) => ({ value: String(i + 1), label: t.upToLayer(i + 1) })),
-              ]}
-            />
-          </div>
+      <div className="app-body">
+        {palletGenerationOpen && (
+          <Sidebar {...sidebarProps} />
         )}
-      </main>
+        <ViewerStage {...viewerStageProps} />
+      </div>
     </div>
   );
 }

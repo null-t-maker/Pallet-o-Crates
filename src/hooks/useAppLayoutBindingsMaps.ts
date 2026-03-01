@@ -1,0 +1,87 @@
+import type { UseAppLayoutBindingsArgs } from "./useAppLayoutBindingsTypes";
+
+export function mapTopbarBindingsArgs(args: UseAppLayoutBindingsArgs) {
+  return {
+    t: args.t,
+    labels: args.labels,
+    language: args.language,
+    setLanguage: args.setLanguage,
+    palletGenerationOpen: args.palletGenerationOpen,
+    setPalletGenerationOpen: args.setPalletGenerationOpen,
+    openUpdateCheckModal: args.openUpdateCheckModal,
+    workflowMode: args.workflowMode,
+    switchWorkflowMode: args.switchWorkflowMode,
+    topbarPanels: args.topbarPanels,
+    sampleSave: args.sampleSave,
+    uiOverlays: args.uiOverlays,
+    setUiScale: args.setUiScale,
+    setUiZoom: args.setUiZoom,
+  };
+}
+
+export function mapViewerStageBindingsArgs(args: UseAppLayoutBindingsArgs) {
+  return {
+    pallet: args.pallet,
+    result: args.result,
+    visibleLayers: args.visibleLayers,
+    setVisibleLayers: args.setVisibleLayers,
+    t: args.t,
+    workflowMode: args.workflowMode,
+    manualCartons: args.manualCartons,
+    onManualCartonUpdate: args.handleManualCartonUpdate,
+    uiOverlays: args.uiOverlays,
+    uiScale: args.uiScale,
+    uiZoom: args.uiZoom,
+    uiScaleMin: args.uiScaleMin,
+    uiScaleMax: args.uiScaleMax,
+    uiZoomMin: args.uiZoomMin,
+    uiZoomMax: args.uiZoomMax,
+    onSetUiScale: args.setUiScale,
+    onSetUiZoom: args.setUiZoom,
+    updateCheckModalOpen: args.updateCheckModalOpen,
+    onConfirmUpdateCheck: args.handleConfirmUpdateCheck,
+    onCloseUpdateCheck: args.closeUpdateCheckModal,
+    labels: args.labels,
+  };
+}
+
+export function mapSidebarBindingsArgs(args: UseAppLayoutBindingsArgs) {
+  return {
+    pallet: args.pallet,
+    setPallet: args.setPallet,
+    cartons: args.cartons,
+    setCartons: args.setCartons,
+    language: args.language,
+    setLanguage: args.setLanguage,
+    t: args.t,
+    labels: args.labels,
+    workflowMode: args.workflowMode,
+    result: args.result,
+    manualCartons: args.manualCartons,
+    handleCalculate: args.handleCalculate,
+    handleGenerateManualAgain: args.handleGenerateManualAgain,
+    handleGenerateManualMore: args.handleGenerateManualMore,
+    switchWorkflowMode: args.switchWorkflowMode,
+    sampleDatabaseFolderPath: args.sampleDatabase.sampleDatabaseFolderPath,
+    sampleDatabaseData: args.sampleDatabase.sampleDatabaseData,
+    sampleDatabaseLoading: args.sampleDatabase.sampleDatabaseLoading,
+    sampleDatabaseError: args.sampleDatabase.sampleDatabaseError,
+    handleChooseSampleDatabaseFolder: args.sampleDatabase.handleChooseSampleDatabaseFolder,
+    handleReloadSampleDatabase: args.sampleDatabase.handleReloadSampleDatabase,
+    sampleDatabaseStatusSummaryText: args.sampleDatabase.sampleDatabaseStatusSummaryText,
+    sampleGuidanceEnabled: args.sampleDatabase.sampleGuidanceEnabled,
+    setSampleGuidanceEnabled: args.sampleDatabase.setSampleGuidanceEnabled,
+    sampleGuidanceStrengthPercent: args.sampleDatabase.sampleGuidanceStrengthPercent,
+    setSampleGuidanceStrengthPercent: args.sampleDatabase.setSampleGuidanceStrengthPercent,
+    sampleGuidanceCfgScalePercent: args.sampleDatabase.sampleGuidanceCfgScalePercent,
+    handleSampleGuidanceCfgScalePercentChange: args.sampleDatabase.handleSampleGuidanceCfgScalePercentChange,
+    sampleGuidanceSteps: args.sampleDatabase.sampleGuidanceSteps,
+    handleSampleGuidanceStepsChange: args.sampleDatabase.handleSampleGuidanceStepsChange,
+    sampleGuidanceSeed: args.sampleDatabase.sampleGuidanceSeed,
+    handleSampleGuidanceSeedChange: args.sampleDatabase.handleSampleGuidanceSeedChange,
+    sampleGuidanceFilter: args.sampleDatabase.sampleGuidanceFilter,
+    setSampleGuidanceFilter: args.sampleDatabase.setSampleGuidanceFilter,
+    sampleTemplateLockEnabled: args.sampleDatabase.sampleTemplateLockEnabled,
+    setSampleTemplateLockEnabled: args.sampleDatabase.setSampleTemplateLockEnabled,
+  };
+}
