@@ -5,8 +5,13 @@
   PackResult,
   PalletInput,
 } from "./packerTypes";
-import type { OrientationOption, Pattern, Rect, SelectionMode } from "./packerCoreTypes";
+import type { Pattern, SelectionMode } from "./packerCoreTypes";
 import type { DeterministicPackDeps } from "./packerDeterministicTypes";
+import {
+  computeSingleTypeStyleScore,
+  isBetterSingleTypePlan,
+  type SingleTypePlan,
+} from "./packerDeterministicSingleTypePlan";
 
 export function packSingleTypeDeterministic(
   pallet: PalletInput,
@@ -14,16 +19,6 @@ export function packSingleTypeDeterministic(
   deps: DeterministicPackDeps,
 ): PackResult | null {
   if (carton.quantity <= 0 || carton.weight <= 0) return null;
-
-  type SingleTypePlan = {
-    orientation: OrientationOption;
-    patternRects: Rect[];
-    capacity: number;
-    fitUnits: number;
-    layerCount: number;
-    totalHeight: number;
-    styleScore: number;
-  };
 
   const maxByWeight = Math.floor((pallet.maxWeight + deps.EPS) / carton.weight);
   if (maxByWeight <= 0) {
@@ -65,43 +60,19 @@ export function packSingleTypeDeterministic(
 
       const layerCount = Math.ceil(fitUnits / capacity);
       const totalHeight = layerCount * option.h;
-      const walls = deps.wallStats(rects, pallet.width, pallet.length);
-      const center = deps.centerStats(rects, pallet.width, pallet.length);
-      const gaps = deps.estimateGapStats(rects, pallet.width, pallet.length);
-      const fill = deps.layerFillRatio(rects);
+      const styleScore = computeSingleTypeStyleScore(style, rects, pallet, deps);
+      const plan: SingleTypePlan = {
+        orientation: option,
+        patternRects: rects,
+        capacity,
+        fitUnits,
+        layerCount,
+        totalHeight,
+        styleScore,
+      };
 
-      let styleScore = fill * 500 - gaps.largestGapRatio * 220 - gaps.emptyRatio * 120;
-      if (style === "centerCompact") {
-        styleScore += center.occupancy * 420 + center.axisCoverage * 260 + (1 - walls.coverage) * 120;
-      } else {
-        styleScore += walls.coverage * 430 + walls.balance * 160 + center.occupancy * 90;
-      }
-
-      if (
-        !best
-        || fitUnits > best.fitUnits
-        || (fitUnits === best.fitUnits && totalHeight < best.totalHeight)
-        || (
-          fitUnits === best.fitUnits
-          && Math.abs(totalHeight - best.totalHeight) <= deps.EPS
-          && capacity > best.capacity
-        )
-        || (
-          fitUnits === best.fitUnits
-          && Math.abs(totalHeight - best.totalHeight) <= deps.EPS
-          && capacity === best.capacity
-          && styleScore > best.styleScore
-        )
-      ) {
-        best = {
-          orientation: option,
-          patternRects: rects,
-          capacity,
-          fitUnits,
-          layerCount,
-          totalHeight,
-          styleScore,
-        };
+      if (isBetterSingleTypePlan(plan, best, deps.EPS)) {
+        best = plan;
       }
     }
   }

@@ -1,13 +1,14 @@
 ﻿# Refactor Progress (Live)
 
-Last update: 2026-03-01
+Last update: 2026-03-03
 
 ## Status (%)
-- Core packing/template architecture (`src/lib`): **93%**
+- Core packing/template architecture (`src/lib`): **99%**
 - UI/app-shell refactor readiness (`src/components`, `src/hooks`, `src/App.tsx`): **99%**
 - Whole project readiness for future development (lib + UI + workflow consistency): **99%**
 
 ## Quality Gates
+- `npm run check:i18n`: pass
 - `npm run build`: pass
 - `npm run test:regression` (18/18): pass
 
@@ -315,13 +316,259 @@ Last update: 2026-03-01
 - Split layout-sample save action internals:
   - `src/hooks/layoutSampleSaveActionsCore.ts` (folder-pick + save invocation/error handling core)
   - `src/hooks/useLayoutSampleSaveActions.ts` reduced from ~102 lines to ~77 lines (thin callback wrapper)
+- Split topbar core-panels internals:
+  - `src/components/topbar/TopbarCorePanels.types.ts` (shared contract for core-panel composition)
+  - `src/components/topbar/TopbarWorkflowPanelAction.tsx`
+  - `src/components/topbar/TopbarSaveSamplePanelAction.tsx`
+  - `src/components/topbar/TopbarLanguagePanelAction.tsx`
+  - `src/components/topbar/TopbarSettingsPanelAction.tsx`
+  - `src/components/topbar/TopbarCorePanels.tsx` reduced from ~166 lines to ~95 lines
+- Split visualizer carton-math internals:
+  - `src/components/visualizer/visualizerCartonCollision.ts` (collision checks + translation sweep-snap core)
+  - `src/components/visualizer/visualizerCartonMath.ts` reduced from ~180 lines to ~35 lines (utility math + re-exports)
+- Split manual-editing hook internals:
+  - `src/components/visualizer/manualCartonCommit.ts` (manual candidate/resolve/commit flow with hint handling)
+  - `src/components/visualizer/manualCartonMeshOps.ts` (mesh <-> patch transforms + pallet-top clamp)
+  - `src/components/visualizer/useManualCartonEditing.ts` reduced from ~171 lines to ~140 lines
+- Split layout-sample save-core internals:
+  - `src/hooks/layoutSampleChooseFolderAction.ts` (folder picker action + status handling)
+  - `src/hooks/layoutSamplePersistAction.ts` (Tauri save invoke + payload/status flow)
+  - `src/hooks/layoutSampleSaveActionsCore.ts` converted to thin re-export barrel (5 lines)
+- Split overlay-drag helper internals:
+  - `src/hooks/overlayDragHelpers.ts` (drag activation, viewport clamp math, modal style builder)
+  - `src/hooks/useOverlayDrag.ts` reduced from ~141 lines to ~112 lines
+- Split manual transform-end internals:
+  - `src/components/visualizer/manualCartonTransformEnd.ts` (mesh-to-patch commit orchestration)
+  - `src/components/visualizer/useManualCartonEditing.ts` reduced from ~140 lines to ~138 lines
+- Split manual-layout history internals:
+  - `src/hooks/manualLayoutHistoryCore.ts` (snapshot clone/signature, equality, history-transition rules)
+  - `src/hooks/useManualLayoutHistory.ts` reduced from ~134 lines to ~71 lines
+- Split topbar-panels helper internals:
+  - `src/hooks/useTopbarPanelRefs.ts` (topbar nav refs lifecycle)
+  - `src/hooks/useTopbarDropdownStyles.ts` (dropdown-style memoization per panel)
+  - `src/hooks/useTopbarPanels.ts` reduced from ~127 lines to ~123 lines
+- Split runtime-wrapper dependency internals:
+  - `src/lib/packerRuntimeSharedDeps.ts` (shape/metric/support deps + mirror-hash helper)
+  - `src/lib/packerRuntimeWrappers.ts` reduced from ~247 lines to ~148 lines
+- Split layer-stability internals:
+  - `src/lib/packerLayerStabilityTypes.ts` (support/bounds/deps contracts)
+  - `src/lib/packerLayerCenterShift.ts` (center-shift scoring and translation validation)
+  - `src/lib/packerLayerCumulativeLoad.ts` (cumulative stack load propagation and safety checks)
+  - `src/lib/packerLayerStability.ts` reduced from ~232 lines to ~14 lines (barrel + `findNextZBase`)
+- Split sample-guidance builder internals:
+  - `src/hooks/sampleGuidanceVoting.ts` (sample vote collection/filter/weighting)
+  - `src/hooks/sampleGuidanceParams.ts` (confidence/cfg/steps/seed derivation)
+  - `src/hooks/sampleGuidanceBuilder.ts` reduced from ~120 lines to ~68 lines
+- Split sample-database controls action internals:
+  - `src/hooks/sampleDatabaseControlActions.ts` (folder/reload actions + guidance value normalizers)
+  - `src/hooks/useSampleDatabaseControls.ts` reduced from ~119 lines to ~107 lines
+- Split gap-placement exhaustive scoring internals:
+  - `src/lib/packerGapPlacementScoring.ts` (gap placement heuristic scoring core)
+  - `src/lib/packerGapPlacementExhaustive.ts` reduced from ~217 lines to ~143 lines
+- Split shared-deps composition internals:
+  - `src/lib/packerPackPalletSharedDepsTypes.ts` (shared contract + constants)
+  - `src/lib/packerPackPalletSharedDepsBuilders.ts` (core dependency object builders)
+  - `src/lib/packerPackPalletSharedDeps.ts` reduced from ~217 lines to ~31 lines
+- Split topbar-panel state internals:
+  - `src/hooks/topbarPanelStateTypes.ts` (panel-state contracts)
+  - `src/hooks/useTopbarPanelStateActions.ts` (toggle/close callbacks with transient-state handling)
+  - `src/hooks/useTopbarPanelState.ts` reduced from ~116 lines to ~48 lines
+- Split topbar-panels contract types:
+  - `src/hooks/topbarPanelsTypes.ts` (`useTopbarPanels` args/result contracts)
+  - `src/hooks/useTopbarPanels.ts` reduced from ~123 lines to ~96 lines
+- Split heuristic-layer loop internals:
+  - `src/lib/packerHeuristicLayerStep.ts` (best-candidate resolution + seed/topoff/gapfill layer execution)
+  - `src/lib/packerHeuristicCore.ts` reduced from ~204 lines to ~86 lines
+- Split sample-intelligence storage internals:
+  - `src/hooks/sampleIntelligenceStorageKeys.ts` (storage key constants)
+  - `src/hooks/sampleIntelligenceStorageAccess.ts` (localStorage load/persist/remove accessors)
+  - `src/hooks/sampleIntelligenceStateStorage.ts` reduced from ~118 lines to ~115 lines
+- Split packing workflow orchestration internals:
+  - `src/lib/packingWorkflowTypes.ts` (workflow/template-lock contracts)
+  - `src/lib/packingWorkflowGuidance.ts` (guidance projection + guided fallback selection)
+  - `src/lib/packingWorkflowTemplateLock.ts` (template-lock load/apply/continuation path)
+  - `src/lib/packingWorkflow.ts` reduced from ~204 lines to ~29 lines
+- Split candidate-search helper internals:
+  - `src/lib/packerCandidateSearchSupport.ts` (supportability + critical-type derivation)
+  - `src/lib/packerCandidateSearchState.ts` (active-type and uniform-stack mode derivation)
+  - `src/lib/packerCandidateSearchSelectionOptions.ts` (count/mode option builders + mode skip rule)
+  - `src/lib/packerCandidateSearchHelpers.ts` reduced from ~193 lines to ~14 lines (barrel re-export)
+- Split candidate-search mode evaluation internals:
+  - `src/lib/packerCandidateSearchEvaluation.ts` (mode-level candidate evaluation + search context contract)
+  - `src/lib/packerCandidateSearchCore.ts` reduced from ~143 lines to ~124 lines
+- Split candidate-search pattern-loop internals:
+  - `src/lib/packerCandidateSearchPatternLoop.ts` (count/mode iteration + best-candidate update)
+  - `src/lib/packerCandidateSearchCore.ts` reduced from ~124 lines to ~83 lines
+- Split candidate-score internals:
+  - `src/lib/packerCandidateScoreTypes.ts` (score input contract)
+  - `src/lib/packerCandidateScorePackingStyle.ts` (packing-style-specific score adjustments)
+  - `src/lib/packerCandidateScore.ts` reduced from ~188 lines to ~107 lines
+- Split candidate-evaluation coverage internals:
+  - `src/lib/packerCandidateEvaluationCoverage.ts` (corner minimums, coverage penalties, and gap-constraint gates)
+  - `src/lib/packerCandidateEvaluation.ts` now delegates coverage/corner checks through shared helpers
+- Split heuristic-layer execution internals:
+  - `src/lib/packerHeuristicLayerExecution.ts` (seed/topoff/gap-fill execution + placement-context wiring)
+  - `src/lib/packerHeuristicLayerStep.ts` reduced from ~214 lines to ~153 lines
+- Split layer-metrics gap internals:
+  - `src/lib/packerLayerMetricsTypes.ts` (shared metrics dependency contract)
+  - `src/lib/packerLayerGapStats.ts` (grid flood-fill gap estimation)
+  - `src/lib/packerLayerMetrics.ts` reduced from ~187 lines to ~118 lines
+- Split language-picker utility internals:
+  - `src/components/sidebar/languagePicker/languagePickerDisplayNames.ts` (DisplayNames creation/reliability + translated-name fallback chain)
+  - `src/components/sidebar/languagePicker/languagePickerTextUtils.ts` (capitalization, native/translated display labels, search normalization)
+  - `src/components/sidebar/languagePickerUtils.ts` reduced from ~160 lines to ~53 lines
+- Split heuristic-placement internals:
+  - `src/lib/packerHeuristicPlacementTypes.ts` (placement context contract)
+  - `src/lib/packerHeuristicPlacementHelpers.ts` (prospective rect/carton builder helpers)
+  - `src/lib/packerHeuristicPlacement.ts` reduced from ~178 lines to ~149 lines
+- Split template-lock cycle internals:
+  - `src/lib/templateLockSelectionCycleEngine.ts` (cycle transform, per-cycle feasibility checks, and bonding score)
+  - `src/lib/templateLockSelectionCycling.ts` reduced from ~187 lines to ~65 lines
+- Split template-lock adaptive comparison internals:
+  - `src/lib/templateLockAdaptiveUnits.ts` (shared carton-unit counter)
+  - `src/lib/templateLockAdaptiveComparison.ts` (single-pallet and multi-pallet result comparators)
+  - `src/lib/templateLockAdaptive.ts` reduced from ~176 lines to ~149 lines
+- Split gap-placement score internals:
+  - `src/lib/packerGapPlacementScore.ts` (gap placement candidate scoring policy)
+  - `src/lib/packerGapPlacement.ts` reduced from ~176 lines to ~120 lines
+- Split sample-guidance controls contract types:
+  - `src/components/sidebar/sampleGuidanceControlsTypes.ts` (component prop contract)
+  - `src/components/sidebar/SampleGuidanceControls.tsx` reduced from ~160 lines to ~128 lines
+- Split candidate-evaluation preparation internals:
+  - `src/lib/packerCandidateEvaluationLayout.ts` (layer-bounds / support-envelope / protrusion validity gates)
+  - `src/lib/packerCandidateEvaluationDerived.ts` (derived metrics and profile flags for candidate scoring)
+  - `src/lib/packerCandidateEvaluation.ts` now delegates layout checks and derived-stat computation to helper modules
+- Split multi-pallet trial internals:
+  - `src/lib/packerMultiPalletHelpers.ts` (carton cloning/counting, pallet offsets, hard-limit checks)
+  - `src/lib/packerMultiPalletTrial.ts` (best single-pallet trial selection under guidance trialIndex)
+  - `src/lib/packerMultiPallet.ts` reduced from ~172 lines to ~93 lines
+- Split shared-deps builder internals:
+  - `src/lib/packerPackPalletSharedDepsFactories.ts` (no-collision/placement-safe/gap/evaluate/pattern/selection deps factories)
+  - `src/lib/packerPackPalletSharedDepsBuilders.ts` reduced from ~172 lines to ~94 lines
+- Split visualizer carton-info manual controls:
+  - `src/components/visualizer/ManualSelectedCartonControls.tsx` (manual move step, rotate actions, axis inputs, hint block)
+  - `src/components/visualizer/CartonInfoStack.tsx` reduced from ~173 lines to ~103 lines
+- Split deterministic single-type plan internals:
+  - `src/lib/packerDeterministicSingleTypePlan.ts` (style-score calculation + plan ranking comparator)
+  - `src/lib/packerDeterministicSingleType.ts` reduced from ~169 lines to ~140 lines
+- Split visualizer camera internals:
+  - `src/components/visualizer/useVisualizerCameraTypes.ts` (camera hook contracts)
+  - `src/components/visualizer/visualizerCameraMetrics.ts` (derived camera/grid/far/zoom/target metrics)
+  - `src/components/visualizer/useVisualizerCamera.ts` reduced from ~158 lines to ~144 lines
+- Split visualizer canvas-scene internals:
+  - `src/components/visualizer/VisualizerCanvasScene.types.ts` (canvas scene contract)
+  - `src/components/visualizer/VisualizerSceneStatics.tsx` (lights/environment/grid/pallet base mesh block)
+  - `src/components/visualizer/VisualizerCartonLayer.tsx` (carton mesh layer with manual mesh-ref wiring)
+  - `src/components/visualizer/VisualizerManualTransform.tsx` (manual transform-controls block)
+  - `src/components/visualizer/VisualizerCanvasScene.tsx` reduced from ~157 lines to ~95 lines
+- Split candidate-evaluation score-input mapping:
+  - `src/lib/packerCandidateEvaluationScoreInput.ts` (score input builder mapping from derived/support/state)
+  - `src/lib/packerCandidateEvaluation.ts` reduced from ~171 lines to ~115 lines
+- Split shared-deps factory internals (phase 2):
+  - `src/lib/packerPackPalletSharedDepsSpatialFactories.ts` (collision/placement safety + fill/pattern/selection deps factories)
+  - `src/lib/packerPackPalletSharedDepsPackingFactories.ts` (gap/evaluation deps factories)
+  - `src/lib/packerPackPalletSharedDepsFactories.ts` reduced from ~166 lines to ~11 lines
+- Split visualizer scene-metrics internals:
+  - `src/components/visualizer/visualizerFootprintBounds.ts` (scene/pallet footprint bounds resolver)
+  - `src/components/visualizer/visualizerResultCounters.ts` (packed/unpacked/layer/pallet counters + limit checks)
+  - `src/components/visualizer/visualizerSceneMetrics.ts` reduced from ~154 lines to ~79 lines
+- Split menu-select internals:
+  - `src/components/MenuSelect.types.ts` (menu-select props/options contracts)
+  - `src/components/MenuSelect.utils.ts` (selected-option lookup, placement resolver, className builder)
+  - `src/components/MenuSelect.tsx` now delegates option lookup and placement math to helpers
+- Split heuristic-layer step internals (phase 2):
+  - `src/lib/packerHeuristicLayerCandidate.ts` (strict/normal/rescue best-candidate resolver)
+  - `src/lib/packerHeuristicLayerStepTypes.ts` (layer-step args/result contracts)
+  - `src/lib/packerHeuristicLayerStep.ts` reduced from ~153 lines to ~77 lines
+- Split pack-pallet deps orchestration internals:
+  - `src/lib/packerPackPalletDeterministicDeps.ts` (deterministic deps factory extracted from mixed deps module)
+  - `src/lib/packerPackPalletCandidateSearchDeps.ts` (candidate-search deps factory extracted from mixed deps module)
+  - `src/lib/packerPackPalletDeps.ts` reduced from ~145 lines to ~9 lines (barrel exports only)
+- Split pack-pallet heuristic deps orchestration internals:
+  - `src/lib/packerPackPalletHeuristicCandidateDeps.ts` (candidate-search wrapper for heuristic runner deps)
+  - `src/lib/packerPackPalletHeuristicGapDeps.ts` (gap-placement wrapper set for heuristic runner deps)
+  - `src/lib/packerPackPalletHeuristicDeps.ts` reduced from ~144 lines to ~44 lines (composition/wiring only)
+- Split candidate-search context derivation internals:
+  - `src/lib/packerCandidateSearchContext.ts` (packing-style/sample-guidance/active-type/uniform/critical context derivation)
+  - `src/lib/packerCandidateSearch.ts` reduced from ~138 lines to ~105 lines (orchestration + fallback flow)
+- Split sidebar section composition internals:
+  - `src/components/sidebar/SidebarLanguageSection.tsx` (language section wrapper with devtool picker wiring)
+  - `src/components/sidebar/SidebarPalletSection.tsx` (pallet dimensions section wrapper)
+  - `src/components/sidebar/SidebarCartonTypeSection.tsx` (add/edit carton type section wrapper)
+  - `src/components/sidebar/SidebarCartonListSection.tsx` (carton list section wrapper with empty-list guard)
+  - `src/components/sidebar/SidebarSections.tsx` reduced from ~139 lines to ~118 lines (high-level section composition)
+- Split heuristic-placement apply internals:
+  - `src/lib/packerHeuristicPlacementCommit.ts` (density/placement commit/finalize helpers)
+  - `src/lib/packerHeuristicPlacementValidation.ts` (wrap/stack-load validation helpers)
+  - `src/lib/packerHeuristicPlacementBestCandidate.ts` (best-candidate apply flow)
+  - `src/lib/packerHeuristicPlacementGapCandidate.ts` (gap-candidate apply flow)
+  - `src/lib/packerHeuristicPlacement.ts` converted to thin barrel (3 lines)
+- Split manual-layout update internals:
+  - `src/lib/manualLayoutUpdate.ts` (manual-carton id-targeted patch/update flow)
+  - `src/lib/manualLayout.ts` reduced from ~132 lines to ~112 lines
+- Split visualizer collision internals:
+  - `src/components/visualizer/visualizerCartonCollisionCore.ts` (AABB overlap/collision checks + geometry validation)
+  - `src/components/visualizer/visualizerCartonCollisionSweep.ts` (sweep-time collision resolution + snap backoff)
+  - `src/components/visualizer/visualizerCartonCollision.ts` converted to thin barrel (2 lines)
+- Reduced visualizer scene-state memo duplication:
+  - `src/components/visualizer/useVisualizerSceneState.ts` combines manual totals/height derivation into a single memoized block
+  - `src/components/visualizer/useVisualizerSceneState.ts` reduced from ~131 lines to ~130 lines
+- Split app bootstrap orchestration:
+  - `src/hooks/useAppBootstrap.ts` (workflow/history/ui-scale/ui-overlays/topbar/update-check/language/picker bootstrapping)
+  - `src/App.tsx` reduced from ~163 lines to ~125 lines
+- Split shape-connectivity internals:
+  - `src/lib/packerShapeConnectivity.ts` (rect connectivity graph and connected-component counting)
+  - `src/lib/packerShapeAnalysis.ts` reduced from ~130 lines to ~102 lines
+- Split language-name fallback dictionaries out of i18n metadata:
+  - `src/i18n-language-fallbacks/index.ts` (single composition point for fallback maps by active UI language)
+  - `src/i18n-language-fallbacks/pl.ts` (full Polish language-name fallback map)
+  - `src/i18n-language-fallbacks/ay.ts`
+  - `src/i18n-language-fallbacks/bo.ts`
+  - `src/i18n-language-fallbacks/ku.ts`
+  - `src/i18n-language-fallbacks/ga.ts`
+  - `src/i18n-language-fallbacks/id.ts`
+  - `src/i18n-language-fallbacks/hy.ts`
+  - `src/i18n-language-metadata.ts` now re-exports fallback maps instead of storing all fallback dictionaries inline
+- Split core language-metadata dictionaries and removed hardcoded non-Intl language list:
+  - `src/i18n-language-metadata/nativeNames.ts` (`LANGUAGE_NATIVE_NAME`)
+  - `src/i18n-language-metadata/englishNames.ts` (`LANGUAGE_ENGLISH_NAME`)
+  - `src/i18n-language-metadata/collatorLocale.ts` (`LANGUAGE_COLLATOR_LOCALE`)
+  - `src/i18n-language-metadata/displayCode.ts` (`LANGUAGE_DISPLAY_CODE`)
+  - `src/i18n-language-metadata.ts` converted to thin barrel re-exporting metadata + fallback modules
+  - `src/components/sidebar/languagePicker/languagePickerDisplayNames.ts` now disables `Intl.DisplayNames` based on `LANGUAGE_NAME_FALLBACK_BY_UI` presence (no hardcoded language-code list)
+- Extended i18n integrity gate for fallback-map scalability:
+  - `scripts/check-i18n-integrity.mjs` now validates `src/i18n-language-fallbacks/index.ts` keys against `LANGUAGES`
+  - each fallback map file (`src/i18n-language-fallbacks/<uiLanguage>.ts`) is checked for full language coverage and unknown keys
+  - fallback files are now included in mojibake/encoding scan
+- Split i18n runtime entrypoint into focused modules:
+  - `src/i18n-languages.ts` (language union list, default language, type guard)
+  - `src/i18n-translations.ts` (locale imports, translation registry, resolveTranslation merge policy)
+  - `src/i18n.ts` reduced to thin compatibility barrel re-exporting types/language/runtime APIs
+  - `scripts/check-i18n-integrity.mjs` now reads `LANGUAGES` from `src/i18n-languages.ts` and `translations` from `src/i18n-translations.ts` (with fallback to legacy `src/i18n.ts`)
+- Split i18n type schema and optional-key registry:
+  - `src/i18n-translation-schema.ts` (full `Translations` interface contract)
+  - `src/i18n-optional-keys.ts` (optional translation key registry validated with `OptionalTranslationKey`)
+  - `src/i18n-types.ts` reduced to thin compatibility barrel for type + optional-key exports
+  - `scripts/check-i18n-integrity.mjs` now reads `Translations` interface from `src/i18n-translation-schema.ts` when present (with fallback to `src/i18n-types.ts`)
+- Added explicit i18n migration status report:
+  - `scripts/i18n-language-status.mjs` generates grouped language status (`full fallback` vs `Intl fallback`)
+  - `docs/i18n-language-status.md` is generated from source of truth (`src/i18n-languages.ts` + `src/i18n-language-fallbacks/index.ts`)
+  - `package.json` includes `npm run i18n:status`
 
 ## Highest-Priority Remaining Chunks
-- UI large files (next macro-stage):
-  - `src/components/topbar/TopbarCorePanels.tsx`
-  - `src/components/visualizer/visualizerCartonMath.ts`
-  - `src/components/visualizer/useManualCartonEditing.ts`
-  - `src/hooks/layoutSampleSaveActionsCore.ts`
+- Core/architecture hotspots above 130 lines:
+  - `src/i18n-translations.ts`
+  - `src/i18n-translation-schema.ts`
+- Next refinement band (127-130 lines):
+  - `src/components/visualizer/useVisualizerSceneState.ts`
+  - `src/components/visualizer/useVisualizerCamera.ts`
+  - `src/components/MenuSelect.tsx`
+  - `src/components/UiAccessWindow.tsx`
+  - `src/lib/packerRuntimeWrappers.ts`
+  - `src/lib/templateLockAdaptive.ts`
+  - `src/lib/packerGapPlacementExhaustive.ts`
+  - `src/lib/packerPatternCandidates.ts`
+  - `src/lib/layoutSamples.ts`
 
 ## Update Rule
 After each refactor batch:

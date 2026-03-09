@@ -1,25 +1,21 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import type { MenuSelectProps } from "./MenuSelect.types";
+import {
+    buildMenuSelectClassName,
+    getSelectedOption,
+    resolveMenuPlacement,
+} from "./MenuSelect.utils";
 
-export interface MenuSelectOption {
-    value: string;
-    label: string;
-}
+export type { MenuSelectOption } from "./MenuSelect.types";
 
-interface Props {
-    value: string;
-    options: readonly MenuSelectOption[];
-    onChange: (value: string) => void;
-    ariaLabel: string;
-    className?: string;
-}
-
-export const MenuSelect: React.FC<Props> = ({
+export const MenuSelect: React.FC<MenuSelectProps> = ({
     value,
     options,
     onChange,
     ariaLabel,
     className,
+    disabled = false,
 }) => {
     const [open, setOpen] = useState(false);
     const [openUpward, setOpenUpward] = useState(false);
@@ -43,6 +39,12 @@ export const MenuSelect: React.FC<Props> = ({
     }, []);
 
     useEffect(() => {
+        if (disabled) {
+            setOpen(false);
+        }
+    }, [disabled]);
+
+    useEffect(() => {
         if (!open) {
             return;
         }
@@ -53,14 +55,9 @@ export const MenuSelect: React.FC<Props> = ({
             }
 
             const triggerRect = rootRef.current.getBoundingClientRect();
-            const estimatedMenuHeight = Math.min(280, Math.max(120, options.length * 44 + 12));
-            const spaceBelow = Math.max(0, window.innerHeight - triggerRect.bottom - 12);
-            const spaceAbove = Math.max(0, triggerRect.top - 12);
-
-            const shouldOpenUpward = spaceBelow < Math.min(estimatedMenuHeight, 180) && spaceAbove > spaceBelow;
-            setOpenUpward(shouldOpenUpward);
-            const availableSpace = shouldOpenUpward ? spaceAbove : spaceBelow;
-            setMenuMaxHeight(Math.max(120, Math.min(280, availableSpace)));
+            const placement = resolveMenuPlacement(triggerRect, options.length, window.innerHeight);
+            setOpenUpward(placement.openUpward);
+            setMenuMaxHeight(placement.menuMaxHeight);
         };
 
         updateMenuPlacement();
@@ -98,13 +95,13 @@ export const MenuSelect: React.FC<Props> = ({
     }, [open]);
 
     const selectedOption = useMemo(
-        () => options.find((option) => option.value === value) ?? options[0],
+        () => getSelectedOption(options, value),
         [options, value],
     );
 
     return (
         <div
-            className={`language-select ${open ? "open" : ""}${openUpward ? " open-up" : ""}${className ? ` ${className}` : ""}`}
+            className={buildMenuSelectClassName(open, openUpward, className)}
             ref={rootRef}
         >
             <button
@@ -113,12 +110,18 @@ export const MenuSelect: React.FC<Props> = ({
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 title={selectedOption?.label ?? ""}
-                onClick={() => setOpen((prev) => !prev)}
+                onClick={() => {
+                    if (disabled) {
+                        return;
+                    }
+                    setOpen((prev) => !prev);
+                }}
+                disabled={disabled}
             >
                 <span className="language-select-primary">{selectedOption?.label ?? ""}</span>
                 <ChevronDown size={16} className="language-select-chevron" />
             </button>
-            {open && (
+            {open && !disabled && (
                 <div
                     className="language-select-menu"
                     role="listbox"

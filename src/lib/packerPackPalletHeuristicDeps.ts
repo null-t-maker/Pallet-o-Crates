@@ -1,14 +1,9 @@
-﻿import {
+import {
   cumulativeStackLoadSafe,
   findNextZBase,
   tryCenterShiftLayer,
 } from "./packerLayerStability";
-import {
-  findGapPlacement,
-  findGapPlacementExhaustive,
-  findLowestHeightGapPlacement,
-} from "./packerGapPlacement";
-import { tryFindBestCandidate, type TryFindBestCandidateDeps } from "./packerCandidateSearch";
+import { type TryFindBestCandidateDeps } from "./packerCandidateSearch";
 import { hashRects } from "./packerGeometryCore";
 import { updateStreakMaps } from "./packerFootprintTracking";
 import {
@@ -17,117 +12,26 @@ import {
 } from "./packerPolicy";
 import type { HeuristicRunnerDeps } from "./packerHeuristicCore";
 import type { PackPalletSharedDeps } from "./packerPackPalletSharedDeps";
+import { createHeuristicCandidateResolver } from "./packerPackPalletHeuristicCandidateDeps";
+import { createHeuristicGapPlacementResolvers } from "./packerPackPalletHeuristicGapDeps";
 
 export function createHeuristicRunnerDeps(
   shared: PackPalletSharedDeps,
   candidateSearchDeps: TryFindBestCandidateDeps,
 ): HeuristicRunnerDeps {
+  const candidateResolver = createHeuristicCandidateResolver(candidateSearchDeps);
+  const gapPlacementResolvers = createHeuristicGapPlacementResolvers(shared);
+
   return {
     hasAnyPreferredUprightCandidates,
     hasAnyNonNeverUprightCandidates,
-    tryFindBestCandidate: (
-      palletInput,
-      remainingCartons,
-      state,
-      remainingWeight,
-      patternCache,
-      profile,
-      zBase,
-      blockedRects,
-      avoidTypeId,
-    ) => tryFindBestCandidate(
-      palletInput,
-      remainingCartons,
-      state,
-      remainingWeight,
-      patternCache,
-      profile,
-      zBase,
-      blockedRects,
-      avoidTypeId ?? null,
-      null,
-      true,
-      true,
-      candidateSearchDeps,
-    ),
-    findLowestHeightGapPlacement: (
-      palletInput,
-      remainingCartons,
-      state,
-      remainingWeight,
-      blockedRects,
-      zBase,
-      currentLayerHeight,
-      allowUpright,
-      preferredDifferentTypeId,
-      usedTypeIds,
-      minHeightExclusive,
-    ) => findLowestHeightGapPlacement(
-      palletInput,
-      remainingCartons,
-      state,
-      remainingWeight,
-      blockedRects,
-      zBase,
-      currentLayerHeight,
-      allowUpright,
-      preferredDifferentTypeId,
-      usedTypeIds,
-      minHeightExclusive,
-      shared.gapPlacementDeps,
-    ),
-    findGapPlacementExhaustive: (
-      palletInput,
-      remainingCartons,
-      state,
-      remainingWeight,
-      blockedRects,
-      zBase,
-      currentLayerHeight,
-      allowUpright,
-      preferredDifferentTypeId,
-      usedTypeIds,
-      heightCeil,
-    ) => findGapPlacementExhaustive(
-      palletInput,
-      remainingCartons,
-      state,
-      remainingWeight,
-      blockedRects,
-      zBase,
-      currentLayerHeight,
-      allowUpright,
-      preferredDifferentTypeId,
-      usedTypeIds,
-      heightCeil,
-      shared.gapPlacementDeps,
-    ),
-    findGapPlacement: (
-      palletInput,
-      remainingCartons,
-      state,
-      remainingWeight,
-      blockedRects,
-      zBase,
-      currentLayerHeight,
-      allowUpright,
-      preferredDifferentTypeId,
-      usedTypeIds,
-      heightCeil,
-    ) => findGapPlacement(
-      palletInput,
-      remainingCartons,
-      state,
-      remainingWeight,
-      blockedRects,
-      zBase,
-      currentLayerHeight,
-      allowUpright,
-      preferredDifferentTypeId,
-      usedTypeIds,
-      heightCeil,
-      shared.gapPlacementDeps,
-    ),
+    tryFindCandidateOptions: candidateResolver.tryFindCandidateOptions,
+    tryFindBestCandidate: candidateResolver.tryFindBestCandidate,
+    findLowestHeightGapPlacement: gapPlacementResolvers.findLowestHeightGapPlacement,
+    findGapPlacementOptions: gapPlacementResolvers.findGapPlacementOptions,
+    findGapPlacementExhaustive: gapPlacementResolvers.findGapPlacementExhaustive,
+    findGapPlacementExhaustiveOptions: gapPlacementResolvers.findGapPlacementExhaustiveOptions,
+    findGapPlacement: gapPlacementResolvers.findGapPlacement,
     isRectSetPlacementSafe: shared.rectSetPlacementSafeOnPallet,
     isWrapFriendlyLayerShape: shared.isWrapFriendlyLayerShape,
     cumulativeStackLoadSafe: (cartonsInStack) => cumulativeStackLoadSafe(cartonsInStack, shared.stackLoadDeps),

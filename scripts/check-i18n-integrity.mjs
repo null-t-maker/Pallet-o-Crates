@@ -4,8 +4,14 @@ import ts from "typescript";
 
 const root = process.cwd();
 const i18nPath = path.resolve(root, "src/i18n.ts");
+const i18nLanguagesPath = path.resolve(root, "src/i18n-languages.ts");
+const i18nTranslationsPath = path.resolve(root, "src/i18n-translations.ts");
+const i18nTranslationSchemaPath = path.resolve(root, "src/i18n-translation-schema.ts");
+const i18nOptionalKeysPath = path.resolve(root, "src/i18n-optional-keys.ts");
 const i18nTypesPath = path.resolve(root, "src/i18n-types.ts");
 const localeDirPath = path.resolve(root, "src/i18n-locales");
+const languageFallbackDirPath = path.resolve(root, "src/i18n-language-fallbacks");
+const languageFallbackIndexPath = path.resolve(languageFallbackDirPath, "index.ts");
 const sidebarPath = path.resolve(root, "src/components/Sidebar.tsx");
 const languagePickerPath = path.resolve(root, "src/components/sidebar/LanguagePickerPanel.tsx");
 const appPath = path.resolve(root, "src/App.tsx");
@@ -51,6 +57,17 @@ function findVarDeclaration(sourceFile, name) {
       if (ts.isIdentifier(decl.name) && decl.name.text === name) {
         return decl;
       }
+    }
+  }
+  return null;
+}
+
+function findFirstObjectLiteralVarDeclaration(sourceFile) {
+  for (const stmt of sourceFile.statements) {
+    if (!ts.isVariableStatement(stmt)) continue;
+    for (const decl of stmt.declarationList.declarations) {
+      if (!decl.initializer || !ts.isObjectLiteralExpression(decl.initializer)) continue;
+      return decl;
     }
   }
   return null;
@@ -125,23 +142,38 @@ const localeFiles = fs.existsSync(localeDirPath)
       .filter((name) => name.endsWith(".ts"))
       .sort()
   : [];
+const languageFallbackFiles = fs.existsSync(languageFallbackDirPath)
+  ? fs
+      .readdirSync(languageFallbackDirPath)
+      .filter((name) => name.endsWith(".ts"))
+      .sort()
+  : [];
 
 checkMojibake([
   "src/i18n.ts",
+  ...(fs.existsSync(i18nLanguagesPath) ? ["src/i18n-languages.ts"] : []),
+  ...(fs.existsSync(i18nTranslationsPath) ? ["src/i18n-translations.ts"] : []),
+  ...(fs.existsSync(i18nTranslationSchemaPath) ? ["src/i18n-translation-schema.ts"] : []),
+  ...(fs.existsSync(i18nOptionalKeysPath) ? ["src/i18n-optional-keys.ts"] : []),
   "src/i18n-types.ts",
   "src/components/Sidebar.tsx",
   ...(fs.existsSync(languagePickerPath) ? ["src/components/sidebar/LanguagePickerPanel.tsx"] : []),
   ...localeFiles.map((name) => `src/i18n-locales/${name}`),
+  ...languageFallbackFiles.map((name) => `src/i18n-language-fallbacks/${name}`),
 ]);
 
-const { sourceFile: i18nSource } = parseTypeScriptFile(i18nPath);
+const languageSourcePath = fs.existsSync(i18nLanguagesPath) ? i18nLanguagesPath : i18nPath;
+const translationSourcePath = fs.existsSync(i18nTranslationsPath) ? i18nTranslationsPath : i18nPath;
 
-const languagesDecl = findVarDeclaration(i18nSource, "LANGUAGES");
+const { sourceFile: i18nLanguageSource } = parseTypeScriptFile(languageSourcePath);
+const { sourceFile: i18nTranslationSource } = parseTypeScriptFile(translationSourcePath);
+
+const languagesDecl = findVarDeclaration(i18nLanguageSource, "LANGUAGES");
 let declaredLanguages = [];
 if (!languagesDecl || !languagesDecl.initializer) {
-  fail("Missing LANGUAGES constant in src/i18n.ts");
+  fail(`Missing LANGUAGES constant in ${path.relative(root, languageSourcePath)}`);
 } else if (!ts.isAsExpression(languagesDecl.initializer) || !ts.isArrayLiteralExpression(languagesDecl.initializer.expression)) {
-  fail("LANGUAGES in src/i18n.ts is not an `as const` array literal.");
+  fail(`LANGUAGES in ${path.relative(root, languageSourcePath)} is not an \`as const\` array literal.`);
 } else {
   for (const element of languagesDecl.initializer.expression.elements) {
     if (!ts.isStringLiteral(element)) {
@@ -152,10 +184,10 @@ if (!languagesDecl || !languagesDecl.initializer) {
   }
 }
 
-const translationsDecl = findVarDeclaration(i18nSource, "translations");
+const translationsDecl = findVarDeclaration(i18nTranslationSource, "translations");
 let mappedLanguages = [];
 if (!translationsDecl || !translationsDecl.initializer || !ts.isObjectLiteralExpression(translationsDecl.initializer)) {
-  fail("Missing translations object in src/i18n.ts");
+  fail(`Missing translations object in ${path.relative(root, translationSourcePath)}`);
 } else {
   mappedLanguages = collectObjectLiteralKeys(translationsDecl.initializer);
 }
@@ -183,13 +215,53 @@ if (declaredLanguages.length > 0) {
   }
 }
 
-const { sourceFile: i18nTypesSource } = parseTypeScriptFile(i18nTypesPath);
+if (declaredLanguages.length > 0 && fs.existsSync(languageFallbackIndexPath)) {
+  const { sourceFile: fallbackIndexSource } = parseTypeScriptFile(languageFallbackIndexPath);
+  const fallbackByUiDecl = findVarDeclaration(fallbackIndexSource, "LANGUAGE_NAME_FALLBACK_BY_UI");
+  if (!fallbackByUiDecl || !fallbackByUiDecl.initializer || !ts.isObjectLiteralExpression(fallbackByUiDecl.initializer)) {
+    fail("Missing LANGUAGE_NAME_FALLBACK_BY_UI object in src/i18n-language-fallbacks/index.ts");
+  } else {
+    const fallbackUiLanguages = collectObjectLiteralKeys(fallbackByUiDecl.initializer);
+    const unknownFallbackUiLanguages = fallbackUiLanguages.filter((lang) => !declaredLanguages.includes(lang));
+    if (unknownFallbackUiLanguages.length > 0) {
+      fail(`LANGUAGE_NAME_FALLBACK_BY_UI has unknown UI languages: ${unknownFallbackUiLanguages.join(", ")}`);
+    }
+
+    for (const uiLanguage of fallbackUiLanguages) {
+      const fallbackFilePath = path.resolve(languageFallbackDirPath, `${uiLanguage}.ts`);
+      if (!fs.existsSync(fallbackFilePath)) {
+        fail(`Missing fallback map file for UI language '${uiLanguage}': src/i18n-language-fallbacks/${uiLanguage}.ts`);
+        continue;
+      }
+
+      const { sourceFile: fallbackSource } = parseTypeScriptFile(fallbackFilePath);
+      const fallbackDecl = findFirstObjectLiteralVarDeclaration(fallbackSource);
+      if (!fallbackDecl || !fallbackDecl.initializer || !ts.isObjectLiteralExpression(fallbackDecl.initializer)) {
+        fail(`Fallback file src/i18n-language-fallbacks/${uiLanguage}.ts is missing an exported object literal map.`);
+        continue;
+      }
+
+      const fallbackKeys = collectObjectLiteralKeys(fallbackDecl.initializer);
+      const missingFallbackEntries = declaredLanguages.filter((lang) => !fallbackKeys.includes(lang));
+      const extraFallbackEntries = fallbackKeys.filter((lang) => !declaredLanguages.includes(lang));
+      if (missingFallbackEntries.length > 0) {
+        fail(`Fallback map '${uiLanguage}' is missing language-name entries for: ${missingFallbackEntries.join(", ")}`);
+      }
+      if (extraFallbackEntries.length > 0) {
+        fail(`Fallback map '${uiLanguage}' has unknown language-name entries: ${extraFallbackEntries.join(", ")}`);
+      }
+    }
+  }
+}
+
+const i18nSchemaSourcePath = fs.existsSync(i18nTranslationSchemaPath) ? i18nTranslationSchemaPath : i18nTypesPath;
+const { sourceFile: i18nTypesSource } = parseTypeScriptFile(i18nSchemaSourcePath);
 const translationsInterface = findInterfaceDeclaration(i18nTypesSource, "Translations");
 const requiredTranslationKeys = [];
 const optionalTranslationKeys = [];
 
 if (!translationsInterface) {
-  fail("Missing Translations interface in src/i18n-types.ts");
+  fail(`Missing Translations interface in ${path.relative(root, i18nSchemaSourcePath)}`);
 } else {
   for (const member of translationsInterface.members) {
     if (!ts.isPropertySignature(member) || !member.name) continue;

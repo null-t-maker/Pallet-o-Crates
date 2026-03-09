@@ -12,9 +12,35 @@ import {
 } from "./packerGapHelpers";
 import {
   findGapPlacementExhaustive,
+  findGapPlacementExhaustiveOptions,
   findLowestHeightGapPlacement,
 } from "./packerGapPlacementExhaustive";
-export function findGapPlacement(
+import { countImmediateAdjacentSameFits } from "./packerGapPlacementPairing";
+import { scoreGapPlacementCandidate } from "./packerGapPlacementScore";
+
+function dedupeGapCandidates(
+  candidates: GapPlacementCandidate[],
+): GapPlacementCandidate[] {
+  const unique = new Map<string, GapPlacementCandidate>();
+  for (const candidate of candidates) {
+    const key = [
+      candidate.carton.id,
+      candidate.rect.x,
+      candidate.rect.y,
+      candidate.rect.w,
+      candidate.rect.l,
+      candidate.orientation.h,
+      candidate.orientation.upright ? "u" : "f",
+    ].join("|");
+    const existing = unique.get(key);
+    if (!existing || candidate.score > existing.score) {
+      unique.set(key, candidate);
+    }
+  }
+  return Array.from(unique.values()).sort((a, b) => b.score - a.score);
+}
+
+function collectGapPlacementCandidates(
   pallet: PalletInput,
   rem: CartonInput[],
   state: LayerState,
@@ -25,28 +51,36 @@ export function findGapPlacement(
   allowUpright: boolean,
   preferredDifferentTypeId: string | null,
   usedTypeIds: Set<string>,
-  heightCeil: number | null = null,
+  heightCeil: number | null,
   deps: GapPlacementDeps,
-): GapPlacementCandidate | null {
-  let best: GapPlacementCandidate | null = null;
+): GapPlacementCandidate[] {
+  const candidates: GapPlacementCandidate[] = [];
   const supportBounds = deps.boundsOfRects(state.prevPlacements);
   const packingStyle = deps.resolvePackingStyle(pallet);
   const sampleGuidance = deps.resolveSampleGuidance(pallet);
   const baseLayer = state.prevPlacements.length === 0;
+  const anchorRects = [
+    ...blockedRects,
+    ...state.prevPlacements.map((placement) => ({
+      x: placement.x,
+      y: placement.y,
+      w: placement.w,
+      l: placement.l,
+    })),
+  ];
 
   for (const carton of rem) {
     if (carton.quantity <= 0) continue;
     if (carton.weight <= 0 || remainingWeight + deps.EPS < carton.weight) continue;
 
-    const waitLayers = state.typeWaitById.get(carton.id) ?? 0;
     const options = deps.orientationOptions(carton, deps.canUseUprightNow(carton, allowUpright));
 
     for (const orientation of options) {
       if (zBase + orientation.h > pallet.maxHeight + deps.EPS) continue;
       if (heightCeil !== null && orientation.h > heightCeil + 0.25) continue;
 
-      const xs = anchorPositions(blockedRects, pallet.width, orientation.w, "x", deps);
-      const ys = anchorPositions(blockedRects, pallet.length, orientation.l, "y", deps);
+      const xs = anchorPositions(anchorRects, pallet.width, orientation.w, "x", deps);
+      const ys = anchorPositions(anchorRects, pallet.length, orientation.l, "y", deps);
 
       for (const x of xs) {
         for (const y of ys) {
@@ -80,97 +114,114 @@ export function findGapPlacement(
             / Math.max(Math.min(pallet.width, pallet.length) / 2, deps.EPS);
           const contactLen = lateralContactLength(rect, blockedRects, deps);
           const gapDist = nearestGapDistance(rect, blockedRects);
-          const maxPerimeter = Math.max(rect.w + rect.l, deps.EPS);
           const edgeTouch = deps.touchesWall(rect, pallet.width, pallet.length);
-          const contactNeed = Math.min(rect.w, rect.l) * 0.3;
-          const isolatedWall = edgeTouch && contactLen < contactNeed;
-          const deepGap = gapDist > Math.max(rect.w, rect.l) * 0.9;
-          const highLayer = state.layerIndex >= 3;
-          const tailBatch = carton.quantity <= 4;
+          const adjacentSameFitCount = countImmediateAdjacentSameFits({
+            pallet,
+            state,
+            blockedRects,
+            rect,
+            orientation,
+            weight: carton.weight,
+            deps,
+          });
+          const score = scoreGapPlacementCandidate({
+            carton,
+            rect,
+            orientation,
+            support,
+            state,
+            packingStyle,
+            sampleGuidance,
+            currentLayerHeight,
+            preferredDifferentTypeId,
+            usedTypeIds,
+            baseLayer,
+            centerDist,
+            wallDist,
+            edgeTouch,
+            contactLen,
+            gapDist,
+            adjacentSameFitCount,
+            guidanceTrialNoise: deps.guidanceTrialNoise,
+          });
 
-          let score = 0;
-          score += 320;
-          score += Math.min(8, waitLayers) * 90;
-          score += support.ratio * 150;
-          const bondLikeSupport = support.touching >= 2
-            && support.maxOverlapRatio >= 0.26
-            && support.maxOverlapRatio <= 0.84;
-          if (state.prevPlacements.length > 0) {
-            score += bondLikeSupport ? 180 : 0;
-            if (!bondLikeSupport && support.touching <= 1) score -= 140;
-          }
-          if (packingStyle === "centerCompact") {
-            const centerBoost = baseLayer
-              ? (state.centerGapStreak > 0 ? 220 : 175)
-              : (highLayer || tailBatch ? 260 : 210);
-            const wallPenalty = baseLayer ? 120 : (highLayer ? 150 : 115);
-            score += (1 - centerDist) * centerBoost;
-            score -= (1 - wallDist) * wallPenalty;
-          } else {
-            score += state.centerGapStreak > 0 ? (1 - centerDist) * 190 : (1 - wallDist) * 95;
-          }
-          score += (contactLen / maxPerimeter) * 210;
-          score -= gapDist * 0.55;
-          score += usedTypeIds.has(carton.id) ? -35 : 55;
-          if (orientation.upright) {
-            score += currentLayerHeight > 0 && orientation.h <= currentLayerHeight + 0.25 ? 60 : -40;
-          } else {
-            score += 20;
-          }
-          score -= orientation.h * (state.layerIndex > 2 ? 1.1 : 0.65);
-
-          if (isolatedWall) {
-            score -= 220;
-          }
-          if (highLayer && isolatedWall) score -= 180;
-          if (highLayer && isolatedWall && deepGap) score -= 260;
-          if (highLayer || tailBatch) {
-            score += (1 - centerDist) * 140;
-            score -= (1 - wallDist) * 90;
-          }
-
-          if (preferredDifferentTypeId) {
-            score += carton.id === preferredDifferentTypeId ? -190 : 95;
-          }
-
-          if (currentLayerHeight > 0) {
-            if (orientation.h > currentLayerHeight + 0.25) {
-              score -= (orientation.h - currentLayerHeight) * (state.layerIndex > 1 ? 4.2 : 2.4);
-            } else {
-              score += 40;
-            }
-          }
-
-          if (sampleGuidance) {
-            const guidanceWeight = 260 * sampleGuidance.confidence * sampleGuidance.cfgScale;
-            if (sampleGuidance.preferredMode === "center") {
-              score += (1 - centerDist) * guidanceWeight;
-              score -= (1 - wallDist) * (guidanceWeight * 0.55);
-            } else {
-              score += (1 - wallDist) * guidanceWeight;
-              score -= (1 - centerDist) * (guidanceWeight * 0.45);
-            }
-            const jitter = deps.guidanceTrialNoise(
-              sampleGuidance,
-              `${state.layerIndex}|gap|${carton.id}|${orientation.w.toFixed(1)}|${orientation.l.toFixed(1)}|${orientation.h.toFixed(1)}|${rect.x.toFixed(1)}|${rect.y.toFixed(1)}`,
-            );
-            score += jitter * (18 * sampleGuidance.cfgScale);
-          }
-
-          if (!best || score > best.score) {
-            best = {
-              carton,
-              rect,
-              orientation,
-              score,
-            };
-          }
+          candidates.push({
+            carton,
+            rect,
+            orientation,
+            score,
+          });
         }
       }
     }
   }
 
-  return best;
+  return dedupeGapCandidates(candidates);
 }
 
-export { findGapPlacementExhaustive, findLowestHeightGapPlacement };
+export function findGapPlacement(
+  pallet: PalletInput,
+  rem: CartonInput[],
+  state: LayerState,
+  remainingWeight: number,
+  blockedRects: Rect[],
+  zBase: number,
+  currentLayerHeight: number,
+  allowUpright: boolean,
+  preferredDifferentTypeId: string | null,
+  usedTypeIds: Set<string>,
+  heightCeil: number | null = null,
+  deps: GapPlacementDeps,
+): GapPlacementCandidate | null {
+  return collectGapPlacementCandidates(
+    pallet,
+    rem,
+    state,
+    remainingWeight,
+    blockedRects,
+    zBase,
+    currentLayerHeight,
+    allowUpright,
+    preferredDifferentTypeId,
+    usedTypeIds,
+    heightCeil,
+    deps,
+  )[0] ?? null;
+}
+
+export function findGapPlacementOptions(
+  pallet: PalletInput,
+  rem: CartonInput[],
+  state: LayerState,
+  remainingWeight: number,
+  blockedRects: Rect[],
+  zBase: number,
+  currentLayerHeight: number,
+  allowUpright: boolean,
+  preferredDifferentTypeId: string | null,
+  usedTypeIds: Set<string>,
+  heightCeil: number | null = null,
+  maxOptions = 6,
+  deps: GapPlacementDeps,
+): GapPlacementCandidate[] {
+  return collectGapPlacementCandidates(
+    pallet,
+    rem,
+    state,
+    remainingWeight,
+    blockedRects,
+    zBase,
+    currentLayerHeight,
+    allowUpright,
+    preferredDifferentTypeId,
+    usedTypeIds,
+    heightCeil,
+    deps,
+  ).slice(0, maxOptions);
+}
+
+export {
+  findGapPlacementExhaustive,
+  findGapPlacementExhaustiveOptions,
+  findLowestHeightGapPlacement,
+};

@@ -15,6 +15,7 @@
 .env.*
 !.env.example
 *.local
+/venv_tests/
 
 # Logs
 logs/

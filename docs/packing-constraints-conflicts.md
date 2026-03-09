@@ -1,92 +1,112 @@
-# Packing Constraints And Conflicts (Pallet-o-Crates)
+# Packing Constraints And Conflicts
 
-This document separates hard constraints from soft preferences and highlights known conflicts.
+This document describes the current high-level rule model used by the pallet packer.
 
-## 1) Hard Constraints (must never be violated)
+It is intentionally approximate. It explains the engine's priorities and safety model, not every scoring detail.
 
-1. Pallet bounds:
-- Each carton footprint must stay within pallet width/length.
+## Hard Constraints
 
-2. No collision:
-- No overlap between cartons on the same z level.
-- No 3D interpenetration between cartons across layers.
+These are the rules the engine should not violate.
 
-3. Max pallet limits:
-- Total packed weight <= `pallet.maxWeight`.
-- Any carton top (`z + h`) <= `pallet.maxHeight`.
+1. Pallet bounds
+- A carton footprint must stay inside pallet width and length.
 
-4. Support safety:
-- A carton above base layer must satisfy minimum support ratio rules.
-- Centroid support or stronger overlap rule must hold.
-- Pressure check must pass (`pressureSafe`).
+2. No collision
+- No overlap on the same level.
+- No 3D interpenetration across levels.
 
-5. Structural safety:
-- Heavy-on-light local block in `structuralSupportSafe`.
-- A heavier carton cannot transfer too much load to one/two lighter supporters.
+3. Maximum pallet limits
+- Total packed weight must stay within `pallet.maxWeight`.
+- Any carton top (`z + h`) must stay within `pallet.maxHeight`.
 
-6. Cumulative load safety:
-- Total carried load ratio limits (`cumulativeStackLoadSafe`).
-- Extra cap for load coming specifically from heavier cartons above.
+4. Support safety
+- A carton above the base layer must pass support validation.
+- Full footprint support is not required, but support must remain controlled.
+- The current model allows limited overhang when support ratio, support balance and pressure are still acceptable.
 
-7. Wrap safety:
-- Layer shape must pass `isWrapFriendlyLayerShape`.
-- Edge protrusion guard must pass (`hasWrapBlockingEdgeProtrusion`).
+5. Pressure and structural safety
+- Local support must pass pressure checks.
+- Heavy-on-light transfer is limited.
+- A larger or heavier carton cannot overload one or two weak supporters below.
 
-## 2) Soft Preferences (optimize, but can be sacrificed)
+6. Cumulative stack-load safety
+- Total carried load ratio is limited through the stack.
+- Extra caps apply to load coming from heavier cartons above.
+- Long staircase-like single-support towers are rejected when cumulative drift becomes unsafe.
 
-1. Packing style:
-- `edgeAligned`: prefer wall/corner coverage.
+7. Wrap / shippability safety
+- Layer shape must stay wrap-friendly.
+- Edge protrusions that create bad wrap behavior are rejected.
+
+## Soft Preferences
+
+These are optimization goals, not absolute rules.
+
+1. Packing style
+- `edgeAligned`: prefer wall and corner coverage.
 - `centerCompact`: prefer center occupancy and controlled edge setbacks.
 
-2. Layer compactness and reduced fragmentation:
+2. Layer compactness
 - Lower gap ratio.
-- Fewer disconnected components.
+- Fewer disconnected islands.
+- Avoid wasting usable shelf space.
 
-3. Height minimization:
-- Prefer lower total height and fewer layers where feasible.
+3. Height efficiency
+- Prefer fewer layers and lower total height when feasibility is unchanged.
 
-4. Type sequencing:
-- Prioritize base-critical types earlier when needed.
-- Rotate types to avoid pathological tower streaks.
+4. Better interlocking
+- Prefer bonded / interlock-ready layouts over clean column stacks when multiple layers are clearly coming.
 
-5. Upright policy:
-- `never`, `tailOnly`, `prefer` (orientation preference, not hard feasibility by itself).
+5. Type sequencing
+- Try not to strand large late-stage cartons.
+- Avoid pathological tower streaks and weak filler patterns.
 
-## 3) Known Conflict Zones
+6. Upright policy
+- `never`, `tailOnly`, `prefer` affect orientation preference.
+- They are not a guarantee that one orientation will always be chosen.
 
-1. `centerCompact` vs wrap safety:
-- Strong center bias can reduce wall support and increase fragile "islands".
-- Wrap constraints can force center mode toward edge-like layouts.
+## Known Conflict Zones
 
-2. Height minimization vs structural safety:
-- Lower stack by forcing dense top fill can overload weak supporters below.
+1. `centerCompact` vs wrap safety
+- Strong center bias can create fragile islands.
+- Wrap constraints can push center mode toward more edge-like results.
 
-3. Max fill vs no-collision after transforms:
-- Re-centering/transforming candidate footprints can invalidate earlier free-space assumptions.
+2. Height minimization vs structural safety
+- Dense top fill can reduce height but overload support below.
 
-4. Cross-type mixing vs support reliability:
-- Better area utilization from mixing types may create unsafe load paths.
+3. Cross-type mixing vs support reliability
+- Better area use can create worse load paths.
 
-5. Tail optimization vs global compactness:
-- Aggressive tail placement can create local holes or staircase artifacts.
+4. Local fit vs future shelf quality
+- A move that looks good immediately can damage later layers by fragmenting usable shelf space.
 
-## 4) Constraint Priority Order (recommended)
+5. Controlled overhang vs staircase artifacts
+- Small overhang can help bridge shelves.
+- Repeated one-direction offsets can become physically bad, so cumulative staircase drift is blocked.
 
-Use this order when constraints conflict:
+## Priority Order
 
-1. Safety + validity:
-- No collision, bounds, maxWeight/maxHeight, support/pressure/structural/cumulative load.
+When goals conflict, the intended order is:
 
-2. Operational integrity:
-- Wrap-friendly layer shape, no wrap-blocking protrusions.
+1. Safety and validity
+- bounds
+- collision
+- max weight / max height
+- support / pressure / structural / cumulative-load checks
 
-3. Feasibility:
-- Minimize unpacked units.
+2. Operational integrity
+- wrap-friendly layer shape
+- no bad edge protrusions
 
-4. Efficiency:
-- Minimize layers / total height.
+3. Feasibility
+- minimize unpacked units
 
-5. Style preference:
-- `centerCompact` or `edgeAligned` characteristics.
+4. Efficiency
+- minimize pallet count
+- minimize layers
+- minimize total height
 
-If style preference would increase unpacked units or layers versus another valid layout, prefer feasibility/efficiency.
+5. Style preference
+- `edgeAligned` vs `centerCompact`
+
+In practice this is a guiding rule order, not a single central switch statement.

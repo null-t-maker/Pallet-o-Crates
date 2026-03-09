@@ -6,20 +6,6 @@ import type {
   SelectionMode,
   WallStats,
 } from "./packerCoreTypes";
-import { transformRects } from "./packerPatternLibrary";
-import { isWithinSupportEnvelope } from "./packerLayerBounds";
-import {
-  areaOf,
-  boundsOfRects,
-  coversPoint,
-  distanceToNearestWall,
-  hashRects,
-  intervalOverlapLength,
-  isNear,
-  lateralContactLength,
-  overlapArea,
-  touchesWall,
-} from "./packerGeometryCore";
 import {
   centerStats as computeCenterStats,
   estimateGapStats as computeEstimateGapStats,
@@ -39,6 +25,12 @@ import {
   hasWrapBlockingEdgeProtrusion as computeHasWrapBlockingEdgeProtrusion,
   isWrapFriendlyLayerShape as computeIsWrapFriendlyLayerShape,
 } from "./packerShapeAnalysis";
+import {
+  buildMirrorHashes,
+  createLayerMetricDeps,
+  createShapeAnalysisDeps,
+  createSupportModelDeps,
+} from "./packerRuntimeSharedDeps";
 
 export interface GapStats {
   largestGapRatio: number;
@@ -69,19 +61,12 @@ export function buildPackerRuntimeWrappers(
   EPS: number,
   minFullSupportRatio: number,
 ): PackerRuntimeWrappers {
+  const shapeAnalysisDeps = createShapeAnalysisDeps(EPS);
+  const layerMetricDeps = createLayerMetricDeps(EPS);
+  const supportModelDeps = createSupportModelDeps(EPS, minFullSupportRatio);
+
   const hasWrapBlockingEdgeProtrusion = (rects: Rect[], pw: number, pl: number): boolean => (
-    computeHasWrapBlockingEdgeProtrusion(rects, pw, pl, {
-      EPS,
-      boundsOfRects,
-      touchesWall,
-      lateralContactLength,
-      isWithinSupportEnvelope,
-      distanceToNearestWall,
-      coversPoint,
-      overlapArea,
-      intervalOverlapLength,
-      isNear,
-    })
+    computeHasWrapBlockingEdgeProtrusion(rects, pw, pl, shapeAnalysisDeps)
   );
 
   const isWrapFriendlyLayerShape = (
@@ -89,107 +74,39 @@ export function buildPackerRuntimeWrappers(
     supportRects: Rect[],
     pallet: PalletInput,
   ): boolean => (
-    computeIsWrapFriendlyLayerShape(rects, supportRects, pallet, {
-      EPS,
-      boundsOfRects,
-      touchesWall,
-      lateralContactLength,
-      isWithinSupportEnvelope,
-      distanceToNearestWall,
-      coversPoint,
-      overlapArea,
-      intervalOverlapLength,
-      isNear,
-    })
+    computeIsWrapFriendlyLayerShape(rects, supportRects, pallet, shapeAnalysisDeps)
   );
 
   const compactness = (rects: Rect[], pw: number, pl: number, mode: SelectionMode): number => (
-    computeCompactness(rects, pw, pl, mode, {
-      EPS,
-      boundsOfRects,
-      touchesWall,
-      lateralContactLength,
-      isWithinSupportEnvelope,
-      distanceToNearestWall,
-      coversPoint,
-      overlapArea,
-      intervalOverlapLength,
-      isNear,
-    })
+    computeCompactness(rects, pw, pl, mode, shapeAnalysisDeps)
   );
 
   const cornerCoverage = (rects: Rect[], pw: number, pl: number): number => (
-    computeCornerCoverage(rects, pw, pl, {
-      EPS,
-      boundsOfRects,
-      touchesWall,
-      lateralContactLength,
-      isWithinSupportEnvelope,
-      distanceToNearestWall,
-      coversPoint,
-      overlapArea,
-      intervalOverlapLength,
-      isNear,
-    })
+    computeCornerCoverage(rects, pw, pl, shapeAnalysisDeps)
   );
 
   const wallStats = (rects: Rect[], pw: number, pl: number): WallStats => (
-    computeWallStats(rects, pw, pl, {
-      EPS,
-      isNear,
-      coversPoint,
-    })
+    computeWallStats(rects, pw, pl, layerMetricDeps)
   );
 
   const estimateGapStats = (rects: Rect[], pw: number, pl: number): GapStats => (
-    computeEstimateGapStats(rects, pw, pl, {
-      EPS,
-      isNear,
-      coversPoint,
-    })
+    computeEstimateGapStats(rects, pw, pl, layerMetricDeps)
   );
 
   const centerStats = (rects: Rect[], pw: number, pl: number): CenterStats => (
-    computeCenterStats(rects, pw, pl, {
-      EPS,
-      isNear,
-      coversPoint,
-    })
+    computeCenterStats(rects, pw, pl, layerMetricDeps)
   );
 
   const connectedComponentCount = (rects: Rect[]): number => (
-    computeConnectedComponentCount(rects, {
-      EPS,
-      boundsOfRects,
-      touchesWall,
-      lateralContactLength,
-      isWithinSupportEnvelope,
-      distanceToNearestWall,
-      coversPoint,
-      overlapArea,
-      intervalOverlapLength,
-      isNear,
-    })
+    computeConnectedComponentCount(rects, shapeAnalysisDeps)
   );
 
   const analyzeSupport = (rect: Rect, below: PlacementRect[]): SupportInfo => (
-    computeAnalyzeSupport(rect, below, {
-      EPS,
-      MIN_FULL_SUPPORT_RATIO: minFullSupportRatio,
-      overlapArea,
-      areaOf,
-      coversPoint,
-    })
+    computeAnalyzeSupport(rect, below, supportModelDeps)
   );
 
   const hasFullSupport = (support: SupportInfo): boolean => (
-    computeHasFullSupport(support, {
-      EPS,
-      MIN_FULL_SUPPORT_RATIO: minFullSupportRatio,
-      overlapArea,
-      areaOf,
-      coversPoint,
-    })
+    computeHasFullSupport(support, supportModelDeps)
   );
 
   const pressureSafe = (
@@ -197,13 +114,7 @@ export function buildPackerRuntimeWrappers(
     support: SupportInfo,
     pressureLimitFactor: number,
   ): { ok: boolean; marginScore: number } => (
-    computePressureSafe(cartonWeight, support, pressureLimitFactor, {
-      EPS,
-      MIN_FULL_SUPPORT_RATIO: minFullSupportRatio,
-      overlapArea,
-      areaOf,
-      coversPoint,
-    })
+    computePressureSafe(cartonWeight, support, pressureLimitFactor, supportModelDeps)
   );
 
   const structuralSupportSafe = (
@@ -211,21 +122,11 @@ export function buildPackerRuntimeWrappers(
     topArea: number,
     support: SupportInfo,
   ): boolean => (
-    computeStructuralSupportSafe(topWeight, topArea, support, {
-      EPS,
-      MIN_FULL_SUPPORT_RATIO: minFullSupportRatio,
-      overlapArea,
-      areaOf,
-      coversPoint,
-    })
+    computeStructuralSupportSafe(topWeight, topArea, support, supportModelDeps)
   );
 
   const mirrorHashes = (rects: Rect[], pw: number, pl: number): Set<string> => (
-    new Set<string>([
-      hashRects(transformRects(rects, pw, pl, "mx", EPS)),
-      hashRects(transformRects(rects, pw, pl, "my", EPS)),
-      hashRects(transformRects(rects, pw, pl, "r180", EPS)),
-    ])
+    buildMirrorHashes(rects, pw, pl, EPS)
   );
 
   return {

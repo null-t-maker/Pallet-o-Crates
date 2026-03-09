@@ -1,40 +1,11 @@
-import React from "react";
+﻿import React from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrthographicCamera, OrbitControls, Edges, Environment, TransformControls } from "@react-three/drei";
+import { OrthographicCamera, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import { TransformControls as TransformControlsImpl, OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import type { PackedCarton, PackedPalletPlacement, PalletInput } from "../../lib/packer";
-import { CartonBox, type CartonBoxSceneEntry } from "./CartonBox";
-import { BASE_H, WOOD } from "./visualizerHelpers";
-
-interface VisualizerCanvasSceneProps {
-  pallet: PalletInput;
-  basePallets: PackedPalletPlacement[];
-  sceneCartons: CartonBoxSceneEntry[];
-  mode: "generation" | "manual";
-  selectedId: string | null;
-  onHover: (carton: PackedCarton | null) => void;
-  onSelectCarton: (id: string) => void;
-  manualMeshRefs: React.MutableRefObject<Record<string, THREE.Mesh | null>>;
-  selectedManualCarton: PackedCarton | null;
-  selectedManualMesh: THREE.Mesh | null;
-  setTransformControlsRef: (control: TransformControlsImpl | null) => void;
-  manualMoveStepMm: number;
-  beginManualDrag: () => void;
-  handleManualTransformEnd: () => void;
-  clampDraggedMeshAbovePalletTop: () => void;
-  orbitControlsRef: React.MutableRefObject<OrbitControlsImpl | null>;
-  cameraRef: React.MutableRefObject<THREE.OrthographicCamera | null>;
-  cameraPosition: [number, number, number];
-  cameraFar: number;
-  orbitTarget: [number, number, number];
-  handleControlsChange: () => void;
-  sceneCenterX: number;
-  sceneCenterZ: number;
-  sceneVisualDim: number;
-  gridSpan: number;
-  gridDivisions: number;
-}
+import { VisualizerCartonLayer } from "./VisualizerCartonLayer";
+import { VisualizerManualTransform } from "./VisualizerManualTransform";
+import { VisualizerSceneStatics } from "./VisualizerSceneStatics";
+import type { VisualizerCanvasSceneProps } from "./VisualizerCanvasScene.types";
 
 export const VisualizerCanvasScene: React.FC<VisualizerCanvasSceneProps> = ({
   pallet,
@@ -88,70 +59,37 @@ export const VisualizerCanvasScene: React.FC<VisualizerCanvasSceneProps> = ({
         }}
       />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[sceneCenterX + sceneVisualDim * 2, sceneVisualDim * 3, sceneCenterZ + sceneVisualDim]}
-        intensity={1}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+      <VisualizerSceneStatics
+        pallet={pallet}
+        basePallets={basePallets}
+        sceneCenterX={sceneCenterX}
+        sceneCenterZ={sceneCenterZ}
+        sceneVisualDim={sceneVisualDim}
+        gridSpan={gridSpan}
+        gridDivisions={gridDivisions}
       />
-      <Environment preset="warehouse" />
 
-      <gridHelper args={[gridSpan, gridDivisions, "#2f2f2f", "#181818"]} position={[sceneCenterX, -1, sceneCenterZ]} />
+      <VisualizerCartonLayer
+        pallet={pallet}
+        sceneCartons={sceneCartons}
+        mode={mode}
+        selectedId={selectedId}
+        onHover={onHover}
+        onSelectCarton={onSelectCarton}
+        manualMeshRefs={manualMeshRefs}
+      />
 
-      {basePallets.map((placed) => (
-        <mesh key={`pallet-${placed.index}`} position={[placed.offsetX, BASE_H / 2, placed.offsetY]} castShadow receiveShadow>
-          <boxGeometry args={[pallet.width, BASE_H, pallet.length]} />
-          <meshStandardMaterial color={WOOD} roughness={0.85} />
-          <Edges scale={1.002} threshold={15} color="#7a5c3a" />
-        </mesh>
-      ))}
-
-      {sceneCartons.map((entry) => (
-        <CartonBox
-          key={entry.carton.id}
-          c={entry}
-          pw={pallet.width}
-          pl={pallet.length}
-          selected={selectedId === entry.carton.id}
-          onHover={onHover}
-          onSelect={(carton) => onSelectCarton(carton.id)}
-          meshRef={mode === "manual" ? ((mesh) => {
-            if (mesh) {
-              manualMeshRefs.current[entry.carton.id] = mesh;
-            } else {
-              delete manualMeshRefs.current[entry.carton.id];
-            }
-          }) : undefined}
-        />
-      ))}
-
-      {mode === "manual" && selectedManualCarton && selectedManualMesh && (
-        <TransformControls
-          ref={setTransformControlsRef}
-          object={selectedManualMesh}
-          mode="translate"
-          showX
-          showY
-          showZ
-          size={0.85}
-          translationSnap={manualMoveStepMm > 0 ? manualMoveStepMm : undefined}
-          onMouseDown={() => {
-            beginManualDrag();
-            if (orbitControlsRef.current) {
-              orbitControlsRef.current.enabled = false;
-            }
-          }}
-          onMouseUp={() => {
-            if (orbitControlsRef.current) {
-              orbitControlsRef.current.enabled = true;
-            }
-            handleManualTransformEnd();
-          }}
-          onObjectChange={clampDraggedMeshAbovePalletTop}
-        />
-      )}
+      <VisualizerManualTransform
+        mode={mode}
+        selectedManualCarton={selectedManualCarton}
+        selectedManualMesh={selectedManualMesh}
+        setTransformControlsRef={setTransformControlsRef}
+        manualMoveStepMm={manualMoveStepMm}
+        beginManualDrag={beginManualDrag}
+        handleManualTransformEnd={handleManualTransformEnd}
+        clampDraggedMeshAbovePalletTop={clampDraggedMeshAbovePalletTop}
+        orbitControlsRef={orbitControlsRef}
+      />
     </Canvas>
   );
 };

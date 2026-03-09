@@ -2,7 +2,7 @@ import type { CartonInput } from "./packerTypes";
 import type { LayerState, Rect } from "./packerCoreTypes";
 import type { EvaluateCandidateDeps } from "./packerCandidateEvaluationTypes";
 
-interface SupportAnalysisResult {
+export interface SupportAnalysisResult {
   avgSupport: number;
   lowSupportCount: number;
   pressureMarginSum: number;

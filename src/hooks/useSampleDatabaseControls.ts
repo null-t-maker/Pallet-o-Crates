@@ -1,14 +1,13 @@
 import { useCallback, useMemo } from "react";
-import {
-  SAMPLE_GUIDANCE_CFG_SCALE_MAX,
-  SAMPLE_GUIDANCE_CFG_SCALE_MIN,
-  SAMPLE_GUIDANCE_STEPS_MAX,
-  SAMPLE_GUIDANCE_STEPS_MIN,
-  clamp,
-  toErrorMessage,
-} from "./sampleIntelligenceLogic";
 import type { UseSampleDatabaseControlsArgs, UseSampleDatabaseControlsResult } from "./sampleDatabaseControlsTypes";
 import { buildSampleDatabaseStatusSummary } from "./sampleDatabaseStatusSummary";
+import {
+  chooseSampleDatabaseFolderAction,
+  normalizeSampleGuidanceCfgScalePercent,
+  normalizeSampleGuidanceSeed,
+  normalizeSampleGuidanceSteps,
+  reloadSampleDatabaseAction,
+} from "./sampleDatabaseControlActions";
 
 export type { UseSampleDatabaseControlsArgs, UseSampleDatabaseControlsResult } from "./sampleDatabaseControlsTypes";
 
@@ -74,38 +73,27 @@ export function useSampleDatabaseControls({
   ]);
 
   const handleChooseSampleDatabaseFolder = useCallback(async () => {
-    try {
-      const selectedPath = await pickFolderPath();
-      if (!selectedPath) return;
-      setSampleDatabaseFolderPath(selectedPath);
-    } catch (error) {
-      setSampleDatabaseError(toErrorMessage(error));
-    }
+    await chooseSampleDatabaseFolderAction({
+      pickFolderPath,
+      setSampleDatabaseFolderPath,
+      setSampleDatabaseError,
+    });
   }, [pickFolderPath, setSampleDatabaseError, setSampleDatabaseFolderPath]);
 
   const handleReloadSampleDatabase = useCallback(() => {
-    if (!sampleDatabaseFolderPath) return;
-    void scanSampleDatabaseFolder(sampleDatabaseFolderPath);
+    reloadSampleDatabaseAction(sampleDatabaseFolderPath, scanSampleDatabaseFolder);
   }, [sampleDatabaseFolderPath, scanSampleDatabaseFolder]);
 
   const handleSampleGuidanceCfgScalePercentChange = useCallback((value: number) => {
-    setSampleGuidanceCfgScalePercent(Math.round(clamp(
-      value,
-      SAMPLE_GUIDANCE_CFG_SCALE_MIN,
-      SAMPLE_GUIDANCE_CFG_SCALE_MAX,
-    )));
+    setSampleGuidanceCfgScalePercent(normalizeSampleGuidanceCfgScalePercent(value));
   }, [setSampleGuidanceCfgScalePercent]);
 
   const handleSampleGuidanceStepsChange = useCallback((value: number) => {
-    setSampleGuidanceSteps(Math.round(clamp(
-      value,
-      SAMPLE_GUIDANCE_STEPS_MIN,
-      SAMPLE_GUIDANCE_STEPS_MAX,
-    )));
+    setSampleGuidanceSteps(normalizeSampleGuidanceSteps(value));
   }, [setSampleGuidanceSteps]);
 
   const handleSampleGuidanceSeedChange = useCallback((value: number) => {
-    setSampleGuidanceSeed(Number.isFinite(value) ? Math.trunc(value) : 0);
+    setSampleGuidanceSeed(normalizeSampleGuidanceSeed(value));
   }, [setSampleGuidanceSeed]);
 
   return {

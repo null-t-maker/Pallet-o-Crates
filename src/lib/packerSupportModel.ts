@@ -1,10 +1,17 @@
 import type { PlacementRect, Rect } from "./packerCoreTypes";
 
+const MIN_SINGLE_SUPPORT_RATIO = 0.84;
+const MIN_BRIDGED_SUPPORT_RATIO = 0.8;
+const MAX_SUPPORT_CENTROID_OFFSET_RATIO = 0.18;
+
 export interface SupportInfo {
   ratio: number;
   touching: number;
   centroidSupported: boolean;
   maxOverlapRatio: number;
+  supportCentroidOffsetX: number;
+  supportCentroidOffsetY: number;
+  balancedSupport: boolean;
   overlaps: Array<{ below: PlacementRect; area: number }>;
 }
 
@@ -24,6 +31,9 @@ export function analyzeSupport(rect: Rect, below: PlacementRect[], deps: Support
       touching: 1,
       centroidSupported: true,
       maxOverlapRatio: 1,
+      supportCentroidOffsetX: 0,
+      supportCentroidOffsetY: 0,
+      balancedSupport: true,
       overlaps,
     };
   }
@@ -31,29 +41,59 @@ export function analyzeSupport(rect: Rect, below: PlacementRect[], deps: Support
   const topArea = deps.areaOf(rect);
   let supportedArea = 0;
   let maxOverlapRatio = 0;
+  let weightedSupportCenterX = 0;
+  let weightedSupportCenterY = 0;
   for (const b of below) {
     const overlap = deps.overlapArea(rect, b);
     if (overlap <= deps.EPS) continue;
     overlaps.push({ below: b, area: overlap });
     supportedArea += overlap;
     maxOverlapRatio = Math.max(maxOverlapRatio, overlap / topArea);
+
+    const x1 = Math.max(rect.x, b.x);
+    const y1 = Math.max(rect.y, b.y);
+    const x2 = Math.min(rect.x + rect.w, b.x + b.w);
+    const y2 = Math.min(rect.y + rect.l, b.y + b.l);
+    if (x2 > x1 + deps.EPS && y2 > y1 + deps.EPS) {
+      weightedSupportCenterX += overlap * ((x1 + x2) / 2);
+      weightedSupportCenterY += overlap * ((y1 + y2) / 2);
+    }
   }
 
   const cx = rect.x + rect.w / 2;
   const cy = rect.y + rect.l / 2;
   const centroidSupported = below.some((b) => deps.coversPoint(b, cx, cy));
+  const supportCenterX = supportedArea > deps.EPS ? (weightedSupportCenterX / supportedArea) : cx;
+  const supportCenterY = supportedArea > deps.EPS ? (weightedSupportCenterY / supportedArea) : cy;
+  const supportCentroidOffsetX = Math.abs(supportCenterX - cx) / Math.max(rect.w, deps.EPS);
+  const supportCentroidOffsetY = Math.abs(supportCenterY - cy) / Math.max(rect.l, deps.EPS);
+  const balancedSupport = supportCentroidOffsetX <= MAX_SUPPORT_CENTROID_OFFSET_RATIO
+    && supportCentroidOffsetY <= MAX_SUPPORT_CENTROID_OFFSET_RATIO;
 
   return {
     ratio: Math.min(1, supportedArea / Math.max(topArea, deps.EPS)),
     touching: overlaps.length,
     centroidSupported,
     maxOverlapRatio,
+    supportCentroidOffsetX,
+    supportCentroidOffsetY,
+    balancedSupport,
     overlaps,
   };
 }
 
 export function hasFullSupport(support: SupportInfo, deps: SupportModelDeps): boolean {
-  return support.overlaps.length > 0 && support.ratio + deps.EPS >= deps.MIN_FULL_SUPPORT_RATIO;
+  if (support.overlaps.length === 0) return false;
+
+  const minRatio = support.touching <= 1
+    ? MIN_SINGLE_SUPPORT_RATIO
+    : deps.MIN_FULL_SUPPORT_RATIO;
+  if (support.ratio + deps.EPS < minRatio) return false;
+  if (support.centroidSupported) return true;
+
+  return support.touching >= 2
+    && support.ratio + deps.EPS >= MIN_BRIDGED_SUPPORT_RATIO
+    && support.balancedSupport;
 }
 
 export function pressureSafe(

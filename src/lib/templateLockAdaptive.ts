@@ -4,17 +4,19 @@
 import type {
   CartonInput,
   MultiPackResult,
-  PackResult,
   PalletInput,
   PalletPackingStyle,
 } from "./packerTypes";
+import {
+  isBetterSinglePalletPack,
+} from "./templateLockAdaptiveComparison";
+import { countCartonUnits } from "./templateLockAdaptiveUnits";
+
+export { countCartonUnits } from "./templateLockAdaptiveUnits";
+export { isBetterMultiPackResult } from "./templateLockAdaptiveComparison";
 
 const TEMPLATE_LOCK_EXTRA_PALLET_GAP_MM = 250;
 const TEMPLATE_LOCK_ADAPTIVE_MAX_PALLETS = 128;
-
-export function countCartonUnits(cartons: CartonInput[]): number {
-  return cartons.reduce((sum, carton) => sum + Math.max(0, Math.floor(carton.quantity)), 0);
-}
 
 function crossOffsetForTemplateSupplementary(index: number, pallet: PalletInput): { x: number; y: number } {
   if (index <= 0) return { x: 0, y: 0 };
@@ -27,25 +29,6 @@ function crossOffsetForTemplateSupplementary(index: number, pallet: PalletInput)
   if (slot === 1) return { x: -ring * stepX, y: 0 };
   if (slot === 2) return { x: 0, y: ring * stepY };
   return { x: 0, y: -ring * stepY };
-}
-
-function isBetterSinglePalletPack(
-  candidate: PackResult,
-  candidatePacked: number,
-  currentBest: PackResult,
-  currentBestPacked: number,
-): boolean {
-  if (candidatePacked !== currentBestPacked) return candidatePacked > currentBestPacked;
-  const candidateUnpacked = countCartonUnits(candidate.unpacked);
-  const currentUnpacked = countCartonUnits(currentBest.unpacked);
-  if (candidateUnpacked !== currentUnpacked) return candidateUnpacked < currentUnpacked;
-  if (Math.abs(candidate.totalHeight - currentBest.totalHeight) > 1e-6) {
-    return candidate.totalHeight < currentBest.totalHeight;
-  }
-  if (candidate.layers.length !== currentBest.layers.length) {
-    return candidate.layers.length < currentBest.layers.length;
-  }
-  return candidate.totalWeight < currentBest.totalWeight - 1e-6;
 }
 
 export function packTemplateRemainderAdaptive(
@@ -163,14 +146,4 @@ export function mergeTemplateWithSupplementaryPallets(
     packedUnits: Math.max(0, requestedUnits - unpackedUnits),
     requestedUnits,
   };
-}
-
-export function isBetterMultiPackResult(candidate: MultiPackResult, current: MultiPackResult): boolean {
-  if (candidate.packedUnits !== current.packedUnits) return candidate.packedUnits > current.packedUnits;
-  const candidateUnpacked = countCartonUnits(candidate.unpacked);
-  const currentUnpacked = countCartonUnits(current.unpacked);
-  if (candidateUnpacked !== currentUnpacked) return candidateUnpacked < currentUnpacked;
-  if (candidate.pallets.length !== current.pallets.length) return candidate.pallets.length < current.pallets.length;
-  if (Math.abs(candidate.maxHeight - current.maxHeight) > 1e-6) return candidate.maxHeight < current.maxHeight;
-  return candidate.totalWeight < current.totalWeight - 1e-6;
 }

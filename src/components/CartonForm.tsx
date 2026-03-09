@@ -9,15 +9,24 @@ interface Props {
     onAdd: (carton: CartonInput) => void;
     onEdit: (carton: CartonInput) => void;
     editing: CartonInput | null;
+    existingCartonCount: number;
     onCancelEdit: () => void;
     t: Translations;
 }
 
-const COLORS = ["#43b66f", "#f0883e", "#5fc486", "#9cd8b3", "#f778ba", "#6cc79a", "#dbab09"];
+const COLORS = ["#43b66f", "#f0883e", "#cfc807", "#0a07d5", "#f778ba"];
 let colorIdx = 0;
 
-export const CartonForm: React.FC<Props> = ({ onAdd, onEdit, editing, onCancelEdit, t }) => {
-    const [title, setTitle] = useState(t.defaultCartonName);
+function buildSuggestedCartonName(defaultCartonName: string, nextIndex: number): string {
+    const withoutNote = defaultCartonName.replace(/\s*\([^)]*\)\s*$/u, "").trim();
+    const parts = withoutNote.split(/\s+/u).filter(Boolean);
+    const base = parts.length > 1 ? parts.slice(0, -1).join(" ") : withoutNote;
+    const safeBase = base.trim() || withoutNote || "Carton";
+    return `${safeBase} ${nextIndex}`.trim();
+}
+
+export const CartonForm: React.FC<Props> = ({ onAdd, onEdit, editing, existingCartonCount, onCancelEdit, t }) => {
+    const [title, setTitle] = useState("");
     const [length, setLength] = useState(300);
     const [width, setWidth] = useState(200);
     const [height, setHeight] = useState(150);
@@ -25,6 +34,7 @@ export const CartonForm: React.FC<Props> = ({ onAdd, onEdit, editing, onCancelEd
     const [quantity, setQuantity] = useState(10);
     const [color, setColor] = useState(COLORS[0]);
     const [uprightPolicy, setUprightPolicy] = useState<CartonUprightPolicy>("tailOnly");
+    const suggestedCartonName = buildSuggestedCartonName(t.defaultCartonName, existingCartonCount + 1);
 
     useEffect(() => {
         if (editing) {
@@ -36,22 +46,19 @@ export const CartonForm: React.FC<Props> = ({ onAdd, onEdit, editing, onCancelEd
             setQuantity(editing.quantity);
             setColor(editing.color);
             setUprightPolicy(editing.uprightPolicy ?? (editing.allowUpright === false ? "never" : "prefer"));
+            return;
         }
+        setTitle("");
     }, [editing]);
-
-    useEffect(() => {
-        if (!editing && (title === "Karton A" || title === "Carton A")) {
-            setTitle(t.defaultCartonName);
-        }
-    }, [editing, t.defaultCartonName, title]);
 
     const handleSubmit = () => {
         if (!width || !length || !height || !quantity) return;
+        const resolvedTitle = title.trim() || suggestedCartonName;
 
         if (editing) {
             onEdit({
                 id: editing.id,
-                title: title || t.untitledCarton,
+                title: resolvedTitle || t.untitledCarton,
                 width,
                 length,
                 height,
@@ -63,7 +70,7 @@ export const CartonForm: React.FC<Props> = ({ onAdd, onEdit, editing, onCancelEd
         } else {
             onAdd({
                 id: uuidv4(),
-                title: title || t.untitledCarton,
+                title: resolvedTitle || t.untitledCarton,
                 width,
                 length,
                 height,
@@ -73,6 +80,7 @@ export const CartonForm: React.FC<Props> = ({ onAdd, onEdit, editing, onCancelEd
                 uprightPolicy,
             });
             colorIdx = (colorIdx + 1) % COLORS.length;
+            setTitle("");
             setColor(COLORS[colorIdx]);
         }
     };
@@ -83,7 +91,7 @@ export const CartonForm: React.FC<Props> = ({ onAdd, onEdit, editing, onCancelEd
         <>
             <div className="field" style={{ marginBottom: 10 }}>
                 <label title={t.cartonName}>{t.cartonName}</label>
-                <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder={t.cartonNamePlaceholder} />
+                <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder={editing ? t.cartonNamePlaceholder : suggestedCartonName} />
             </div>
 
             <div className="row">

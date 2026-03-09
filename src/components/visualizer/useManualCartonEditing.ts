@@ -2,15 +2,15 @@ import React from "react";
 import type { PackedCarton, PalletInput } from "../../lib/packer";
 import * as THREE from "three";
 import {
-  BASE_H,
-} from "./visualizerHelpers";
-import {
-  buildManualCandidateCarton,
   buildManualRotationPatch,
-  hasMeaningfulTranslationProgress,
   type ManualPatch,
-  resolveManualCollision,
 } from "./manualCartonEditingCore";
+import { commitManualCarton } from "./manualCartonCommit";
+import {
+  clampMeshAbovePalletTop,
+  setMeshPositionFromCarton,
+} from "./manualCartonMeshOps";
+import { handleManualTransformFromMesh } from "./manualCartonTransformEnd";
 
 interface UseManualCartonEditingArgs {
   mode: "generation" | "manual";
@@ -46,49 +46,24 @@ export function useManualCartonEditing({
   const resetManualMeshPosition = React.useCallback((carton: PackedCarton) => {
     const mesh = manualMeshRefs.current[carton.id];
     if (!mesh) return;
-    mesh.position.set(
-      carton.x + carton.w / 2 - pallet.width / 2,
-      carton.z + carton.h / 2 + BASE_H,
-      carton.y + carton.l / 2 - pallet.length / 2,
-    );
+    setMeshPositionFromCarton(mesh, carton, pallet);
   }, [manualMeshRefs, pallet.length, pallet.width]);
 
   const tryCommitManualCarton = React.useCallback((
     carton: PackedCarton,
     patch: ManualPatch,
   ): boolean => {
-    const candidate = buildManualCandidateCarton(carton, patch, manualMoveStepMm);
-    if (!candidate) {
-      setManualHint(manualCollisionHint);
-      return false;
-    }
-
-    const { resolved, resolvedBySnap } = resolveManualCollision({
-      source: carton,
-      candidate,
-      manualCartons,
+    return commitManualCarton({
+      carton,
       patch,
+      manualMoveStepMm,
+      manualCollisionHint,
+      manualCartons,
+      onManualCartonUpdate,
+      setManualHint: (value) => {
+        setManualHint(value);
+      },
     });
-    if (!resolved) {
-      setManualHint(manualCollisionHint);
-      return false;
-    }
-
-    if (resolvedBySnap && !hasMeaningfulTranslationProgress(carton, resolved)) {
-      setManualHint(manualCollisionHint);
-      return false;
-    }
-
-    onManualCartonUpdate(carton.id, {
-      x: resolved.x,
-      y: resolved.y,
-      z: resolved.z,
-      w: resolved.w,
-      l: resolved.l,
-      h: resolved.h,
-    });
-    setManualHint(null);
-    return true;
   }, [manualCartons, manualCollisionHint, manualMoveStepMm, onManualCartonUpdate, setManualHint]);
 
   const handleManualTransformEnd = React.useCallback(() => {
@@ -102,20 +77,15 @@ export function useManualCartonEditing({
     const source = manualDragStartRef.current && manualDragStartRef.current.id === selectedManualCarton.id
       ? manualDragStartRef.current
       : selectedManualCarton;
-    if (!Number.isFinite(mesh.position.x) || !Number.isFinite(mesh.position.y) || !Number.isFinite(mesh.position.z)) {
-      setManualHint(manualCollisionHint);
-      resetManualMeshPosition(source);
-      manualDragStartRef.current = null;
-      return;
-    }
-
-    const nextX = mesh.position.x + pallet.width / 2 - source.w / 2;
-    const nextY = mesh.position.z + pallet.length / 2 - source.l / 2;
-    const nextZ = mesh.position.y - BASE_H - source.h / 2;
-    const committed = tryCommitManualCarton(source, { x: nextX, y: nextY, z: nextZ });
-    if (!committed) {
-      resetManualMeshPosition(source);
-    }
+    handleManualTransformFromMesh({
+      mesh,
+      source,
+      pallet,
+      manualCollisionHint,
+      setManualHint,
+      tryCommitManualCarton,
+      resetManualMeshPosition,
+    });
     manualDragStartRef.current = null;
   }, [
     manualCollisionHint,
@@ -155,10 +125,7 @@ export function useManualCartonEditing({
     if (mode !== "manual" || !selectedManualCarton) return;
     const mesh = manualMeshRefs.current[selectedManualCarton.id];
     if (!mesh) return;
-    const minMeshY = BASE_H + selectedManualCarton.h / 2;
-    if (mesh.position.y < minMeshY) {
-      mesh.position.y = minMeshY;
-    }
+    clampMeshAbovePalletTop(mesh, selectedManualCarton);
   }, [manualMeshRefs, mode, selectedManualCarton]);
 
   return {

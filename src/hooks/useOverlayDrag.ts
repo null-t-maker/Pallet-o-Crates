@@ -6,29 +6,15 @@ import {
   useRef,
   useState,
 } from "react";
-
-export type DragPanel = "uiAccess" | "diagnostics";
-
-interface ModalPosition {
-  x: number;
-  y: number;
-}
-
-interface DragState {
-  panel: DragPanel;
-  pointerId: number;
-  width: number;
-  height: number;
-  startClientX: number;
-  startClientY: number;
-  initialX: number;
-  initialY: number;
-  active: boolean;
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
+import {
+  computeDraggedPosition,
+  type DragPanel,
+  type DragState,
+  type ModalPosition,
+  shouldActivateDrag,
+  toModalStyle,
+} from "./overlayDragHelpers";
+export type { DragPanel };
 
 interface UseOverlayDragArgs {
   uiAccessModalRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -85,24 +71,19 @@ export function useOverlayDrag({
     const dragState = dragStateRef.current;
     if (!dragState || dragState.panel !== panel || dragState.pointerId !== event.pointerId) return;
 
-    if (!dragState.active) {
-      const moveX = Math.abs(event.clientX - dragState.startClientX);
-      const moveY = Math.abs(event.clientY - dragState.startClientY);
-      if (moveX < 8 && moveY < 8) return;
-      dragState.active = true;
-      dragStateRef.current = dragState;
+    if (!dragState.active && shouldActivateDrag(dragState, event.clientX, event.clientY)) {
+      dragStateRef.current = { ...dragState, active: true };
+    } else if (!dragState.active) {
+      return;
     }
 
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const edgePadding = 6;
-    const minX = Math.min(edgePadding, viewportWidth - dragState.width - edgePadding);
-    const maxX = Math.max(edgePadding, viewportWidth - dragState.width - edgePadding);
-    const minY = Math.min(edgePadding, viewportHeight - dragState.height - edgePadding);
-    const maxY = Math.max(edgePadding, viewportHeight - dragState.height - edgePadding);
-    const x = clamp(dragState.initialX + (event.clientX - dragState.startClientX), minX, maxX);
-    const y = clamp(dragState.initialY + (event.clientY - dragState.startClientY), minY, maxY);
-    const nextPos: ModalPosition = { x, y };
+    const nextPos = computeDraggedPosition(
+      dragState,
+      event.clientX,
+      event.clientY,
+      window.innerWidth,
+      window.innerHeight,
+    );
     if (panel === "uiAccess") {
       setUiAccessPosition(nextPos);
     } else {
@@ -116,18 +97,8 @@ export function useOverlayDrag({
     dragStateRef.current = null;
   }, []);
 
-  const uiAccessModalStyle = useMemo<CSSProperties | undefined>(
-    () => (uiAccessPosition
-      ? { left: `${uiAccessPosition.x}px`, top: `${uiAccessPosition.y}px`, transform: "none" }
-      : undefined),
-    [uiAccessPosition],
-  );
-  const diagnosticsModalStyle = useMemo<CSSProperties | undefined>(
-    () => (diagnosticsPosition
-      ? { left: `${diagnosticsPosition.x}px`, top: `${diagnosticsPosition.y}px`, transform: "none" }
-      : undefined),
-    [diagnosticsPosition],
-  );
+  const uiAccessModalStyle = useMemo<CSSProperties | undefined>(() => toModalStyle(uiAccessPosition), [uiAccessPosition]);
+  const diagnosticsModalStyle = useMemo<CSSProperties | undefined>(() => toModalStyle(diagnosticsPosition), [diagnosticsPosition]);
 
   return {
     clearUiAccessPosition,

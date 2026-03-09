@@ -12,6 +12,18 @@ import type {
 export interface HeuristicRunnerDeps {
   hasAnyPreferredUprightCandidates: (rem: CartonInput[]) => boolean;
   hasAnyNonNeverUprightCandidates: (rem: CartonInput[]) => boolean;
+  tryFindCandidateOptions: (
+    pallet: PalletInput,
+    rem: CartonInput[],
+    state: LayerState,
+    remainingWeight: number,
+    patternCache: Map<string, Pattern[]>,
+    profile: EvaluationProfile,
+    zBase: number,
+    blockedRects: Rect[],
+    avoidTypeId?: string | null,
+    maxOptions?: number,
+  ) => BestCandidate[];
   tryFindBestCandidate: (
     pallet: PalletInput,
     rem: CartonInput[],
@@ -36,6 +48,20 @@ export interface HeuristicRunnerDeps {
     usedTypeIds: Set<string>,
     maxAllowedHeight?: number,
   ) => GapPlacementCandidate | null;
+  findGapPlacementOptions: (
+    pallet: PalletInput,
+    rem: CartonInput[],
+    state: LayerState,
+    remainingWeight: number,
+    blockedRects: Rect[],
+    zBase: number,
+    currentLayerHeight: number,
+    allowUpright: boolean,
+    preferTypeId: string | null,
+    usedTypeIds: Set<string>,
+    maxAllowedHeight?: number,
+    maxOptions?: number,
+  ) => GapPlacementCandidate[];
   findGapPlacementExhaustive: (
     pallet: PalletInput,
     rem: CartonInput[],
@@ -49,6 +75,20 @@ export interface HeuristicRunnerDeps {
     usedTypeIds: Set<string>,
     maxAllowedHeight?: number,
   ) => GapPlacementCandidate | null;
+  findGapPlacementExhaustiveOptions: (
+    pallet: PalletInput,
+    rem: CartonInput[],
+    state: LayerState,
+    remainingWeight: number,
+    blockedRects: Rect[],
+    zBase: number,
+    currentLayerHeight: number,
+    allowUpright: boolean,
+    preferTypeId: string | null,
+    usedTypeIds: Set<string>,
+    maxAllowedHeight?: number,
+    maxOptions?: number,
+  ) => GapPlacementCandidate[];
   findGapPlacement: (
     pallet: PalletInput,
     rem: CartonInput[],

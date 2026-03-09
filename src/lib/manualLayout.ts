@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import type { CartonInput, MultiPackResult, PackedCarton, PalletInput } from "./packerTypes";
+export { updateManualCartonsById } from "./manualLayoutUpdate";
 
 export function generateManualCartons(pallet: PalletInput, cartons: CartonInput[]): PackedCarton[] {
   const stagingGap = 30;
@@ -122,26 +123,4 @@ export function importGenerationToManual(generated: MultiPackResult): PackedCart
     return a.id.localeCompare(b.id);
   });
   return imported;
-}
-
-export function updateManualCartonsById(
-  existing: PackedCarton[],
-  id: string,
-  next: Partial<Pick<PackedCarton, "x" | "y" | "z" | "w" | "l" | "h">>,
-): PackedCarton[] {
-  const toFiniteOr = (value: number | undefined, fallback: number): number =>
-    typeof value === "number" && Number.isFinite(value) ? value : fallback;
-  return existing.map((carton) => (
-    carton.id === id
-      ? {
-        ...carton,
-        x: toFiniteOr(next.x, carton.x),
-        y: toFiniteOr(next.y, carton.y),
-        z: Math.max(0, toFiniteOr(next.z, carton.z)),
-        w: Math.max(1, toFiniteOr(next.w, carton.w)),
-        l: Math.max(1, toFiniteOr(next.l, carton.l)),
-        h: Math.max(1, toFiniteOr(next.h, carton.h)),
-      }
-      : carton
-  ));
 }

@@ -290,6 +290,13 @@ h2 {
   box-shadow: none;
 }
 
+.language-select-trigger:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
 .language-select-trigger:focus-visible {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--focus-ring);

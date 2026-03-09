@@ -1,62 +1,11 @@
-import type { PalletPackingStyle } from "./packerTypes";
-import type { SelectionMode } from "./packerCoreTypes";
+import type { CandidateScoreInputs } from "./packerCandidateScoreTypes";
+import { applyPackingStyleScoreAdjustments } from "./packerCandidateScorePackingStyle";
 
-export interface CandidateScoreInputs {
-  rectCount: number;
-  cornerCount: number;
-  taperAllowed: boolean;
-  rescue: boolean;
-  wallCoverageWeight: number;
-  wallsCoverage: number;
-  wallsBalance: number;
-  wallsSegments: number;
-  gapsEmptyRatio: number;
-  gapEmptyPenalty: number;
-  gapsLargestGapRatio: number;
-  largestGapPenalty: number;
-  avgSupport: number;
-  lowSupportCount: number;
-  crossBondCount: number;
-  baseLayer: boolean;
-  exactAlignedCount: number;
-  uniformStackMode: boolean;
-  alignmentRatio: number;
-  hasMeaningfulCrossBond: boolean;
-  stronglyColumnLikeLayer: boolean;
-  packingStyle: PalletPackingStyle;
-  towerPenalty: number;
-  pressureMarginSum: number;
-  shapeCompactness: number;
-  fillRatio: number;
-  boundsAreaRatio: number;
-  isPartial: boolean;
-  componentCount: number;
-  finalBatchFragmentPenalty: number;
-  centerOccupancy: number;
-  centerAxisCoverage: number;
-  centerHasGap: boolean;
-  centerGapStreak: number;
-  mode: SelectionMode;
-  insetsMin: number;
-  insetsMax: number;
-  hasControlledSetback: boolean;
-  maxRecommendedEdgeSetback: number;
-  lineComplexity: number;
-  footprintVariants: number;
-  layerIndex: number;
-  nearTail: boolean;
-  remainingTotalAfterPlacement: number;
-  prevCenterOccupancy: number;
-  prevWallCoverage: number;
-  sameTypeAsPrev: boolean;
-  sameLayoutAsPrev: boolean;
-  mirroredLayoutAsPrev: boolean;
-  cartonHeight: number;
-  density: number;
-}
+export type { CandidateScoreInputs } from "./packerCandidateScoreTypes";
 
 export function computeCandidateScore(input: CandidateScoreInputs): number {
   let score = 0;
+  const futureLayersLikely = input.baseLayer && input.remainingTotalAfterPlacement > 0;
   score += input.rectCount * 1000;
   score += input.cornerCount * (input.taperAllowed || input.rescue ? 45 : 140);
   score += input.wallsCoverage * input.wallCoverageWeight;
@@ -90,36 +39,22 @@ export function computeCandidateScore(input: CandidateScoreInputs): number {
   score += input.centerOccupancy * (input.centerGapStreak > 0 ? 520 : 220);
   score += input.centerAxisCoverage * (input.centerGapStreak > 0 ? 340 : 120);
 
-  if (input.packingStyle === "centerCompact") {
-    score += input.centerOccupancy * (input.baseLayer ? 190 : 150);
-    score += input.centerAxisCoverage * (input.baseLayer ? 130 : 85);
-    score += (1 - input.wallsCoverage) * (input.baseLayer ? 210 : 170);
-    if (input.mode === "center") score += input.baseLayer ? 280 : 170;
-    if (input.mode === "pin") score -= 140;
-    if (input.mode === "edge") score -= input.baseLayer ? (input.isPartial ? 360 : 220) : (input.isPartial ? 180 : 120);
-    if (input.baseLayer && input.isPartial) {
-      score += Math.min(60, Math.max(0, input.insetsMin)) * 18;
-      if (input.insetsMin < 8) score -= (8 - input.insetsMin) * 120;
-    }
-    if (input.isPartial && input.insetsMin < 8) score -= (8 - input.insetsMin) * 42;
-    score -= Math.max(0, input.lineComplexity - 4) * 55;
-    if (input.baseLayer) {
-      score -= Math.max(0, input.footprintVariants - 1) * 320;
-    }
-  } else {
-    score += input.wallsCoverage * 140;
-    score += input.wallsBalance * 70;
-    if (input.mode === "edge") score += 190;
-    if (input.mode === "center" && input.isPartial) score -= 90;
-    if (input.baseLayer) {
-      score -= Math.max(0, input.footprintVariants - 1) * 90;
-      score += input.fillRatio * 180;
-      score -= input.boundsAreaRatio * 320;
-      score -= Math.max(0, 0.9 - input.fillRatio) * 1800;
-      score -= Math.max(0, input.boundsAreaRatio - 0.8) * 700;
-      if (input.isPartial && input.centerHasGap && input.fillRatio < 0.9) score -= 520;
-    }
+  if (
+    futureLayersLikely
+    && !input.isPartial
+    && !input.uniformStackMode
+  ) {
+    // The base layer has no lower layer, so classic cross-bond metrics cannot reward it yet.
+    // Add a light preference for mixed-footprint full layers when another layer is definitely
+    // coming, which encourages interlocking to start from layer 1 instead of layer 2.
+    // Keep the centerCompact bonus slightly lighter so it still preserves its tighter footprint bias.
+    const footprintVariantBonus = input.packingStyle === "centerCompact" ? 180 : 220;
+    const lineComplexityBonus = input.packingStyle === "centerCompact" ? 10 : 12;
+    score += Math.max(0, input.footprintVariants - 1) * footprintVariantBonus;
+    score += Math.max(0, input.lineComplexity - 8) * lineComplexityBonus;
   }
+
+  score = applyPackingStyleScoreAdjustments(score, input);
 
   if (input.layerIndex >= 1 && input.hasControlledSetback) {
     score += 140;

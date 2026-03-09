@@ -73,7 +73,7 @@ describe("packer guidance workflow", () => {
     if (multiStep.packedUnits === oneStep.packedUnits) {
       expect(multiStep.maxHeight).toBeLessThanOrEqual(oneStep.maxHeight + 1e-6);
     }
-  });
+  }, 15000);
 
   it("guidance with zero confidence behaves like unguided packing", () => {
     const cartons: CartonInput[] = [

@@ -1,10 +1,9 @@
 import React from "react";
-import { SectionPanel } from "./SectionPanel";
-import { LanguagePickerPanel } from "./LanguagePickerPanel";
 import { SidebarSampleDatabaseSection } from "./SidebarSampleDatabaseSection";
-import { CartonListPanel } from "./CartonListPanel";
-import { PalletForm } from "../PalletForm";
-import { CartonForm } from "../CartonForm";
+import { SidebarLanguageSection } from "./SidebarLanguageSection";
+import { SidebarPalletSection } from "./SidebarPalletSection";
+import { SidebarCartonTypeSection } from "./SidebarCartonTypeSection";
+import { SidebarCartonListSection } from "./SidebarCartonListSection";
 import type { SidebarSectionsProps } from "./sidebarSectionsTypes";
 
 export const SidebarSections: React.FC<SidebarSectionsProps> = ({
@@ -49,24 +48,17 @@ export const SidebarSections: React.FC<SidebarSectionsProps> = ({
   hasManyCartonRows,
   handleStartEdit,
   handleRemoveCarton,
-}) => {
+  }) => {
   return (
     <div className="sidebar-sections">
-      {showLanguageSection && (
-        <SectionPanel
-          title={t.languageLabel}
-          collapsed={collapsedSections.language}
-          onToggle={() => toggleSection("language")}
-          className="language-section"
-        >
-          <LanguagePickerPanel
-            language={language}
-            setLanguage={setLanguage}
-            t={t}
-            includeDevtool
-          />
-        </SectionPanel>
-      )}
+      <SidebarLanguageSection
+        showLanguageSection={showLanguageSection}
+        collapsedSections={collapsedSections}
+        toggleSection={toggleSection}
+        language={language}
+        setLanguage={setLanguage}
+        t={t}
+      />
 
       <SidebarSampleDatabaseSection
         showSampleDatabaseSection={showSampleDatabaseSection}
@@ -96,49 +88,37 @@ export const SidebarSections: React.FC<SidebarSectionsProps> = ({
         onSampleTemplateLockEnabledChange={onSampleTemplateLockEnabledChange}
       />
 
-      <SectionPanel
-        title={t.palletDimensions}
-        collapsed={collapsedSections.pallet}
-        onToggle={() => toggleSection("pallet")}
-        className="dropdown-section"
-      >
-        <PalletForm
-          pallet={pallet}
-          onChange={setPallet}
-          t={t}
-          showExtraPalletMode={showExtraPalletMode}
-        />
-      </SectionPanel>
+      <SidebarPalletSection
+        collapsedSections={collapsedSections}
+        toggleSection={toggleSection}
+        t={t}
+        pallet={pallet}
+        setPallet={setPallet}
+        showExtraPalletMode={showExtraPalletMode}
+      />
 
-      <SectionPanel
-        title={editing ? t.editCartonType : t.addCartonType}
-        collapsed={collapsedSections.cartonType}
-        onToggle={() => toggleSection("cartonType")}
-        className={`dropdown-section${editing ? " is-editing" : ""}`}
-      >
-        <CartonForm
-          onAdd={handleAdd}
-          onEdit={handleEdit}
-          editing={editing}
-          onCancelEdit={() => setEditing(null)}
-          t={t}
-        />
-      </SectionPanel>
+      <SidebarCartonTypeSection
+        collapsedSections={collapsedSections}
+        toggleSection={toggleSection}
+        t={t}
+        cartons={cartons}
+        editing={editing}
+        setEditing={setEditing}
+        handleAdd={handleAdd}
+        handleEdit={handleEdit}
+      />
 
-      {cartons.length > 0 && (
-        <CartonListPanel
-          title={t.cartonsWithCount(totalCartons)}
-          collapsed={collapsedSections.cartons}
-          onToggle={() => toggleSection("cartons")}
-          cartons={cartons}
-          editingId={editing?.id ?? null}
-          hasManyRows={hasManyCartonRows}
-          editLabel={t.edit}
-          removeLabel={t.remove}
-          onStartEdit={handleStartEdit}
-          onRemove={handleRemoveCarton}
-        />
-      )}
+      <SidebarCartonListSection
+        cartons={cartons}
+        totalCartons={totalCartons}
+        collapsedSections={collapsedSections}
+        toggleSection={toggleSection}
+        editing={editing}
+        hasManyCartonRows={hasManyCartonRows}
+        t={t}
+        handleStartEdit={handleStartEdit}
+        handleRemoveCarton={handleRemoveCarton}
+      />
     </div>
   );
 };

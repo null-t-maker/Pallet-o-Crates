@@ -1,76 +1,37 @@
 import { Sidebar } from "./components/Sidebar";
 import { ViewerStage } from "./components/ViewerStage";
 import { AppTopbar } from "./components/AppTopbar";
-import { useManualLayoutHistory } from "./hooks/useManualLayoutHistory";
-import { useUiOverlays } from "./hooks/useUiOverlays";
-import { useTopbarPanels } from "./hooks/useTopbarPanels";
 import { useLayoutSampleSave } from "./hooks/useLayoutSampleSave";
-import { UI_SCALE_MAX, UI_SCALE_MIN, UI_ZOOM_MAX, UI_ZOOM_MIN, useUiScale } from "./hooks/useUiScale";
+import { UI_SCALE_MAX, UI_SCALE_MIN, UI_ZOOM_MAX, UI_ZOOM_MIN } from "./hooks/useUiScale";
 import { useAppLabels } from "./hooks/useAppLabels";
-import { useUpdateCheck } from "./hooks/useUpdateCheck";
 import { useWorkflowActions } from "./hooks/useWorkflowActions";
-import { useAppLanguage } from "./hooks/useAppLanguage";
-import { useManualUndoRedoShortcuts } from "./hooks/useManualUndoRedoShortcuts";
-import { useAppWorkflowState } from "./hooks/useAppWorkflowState";
-import { usePickFolderPath } from "./hooks/usePickFolderPath";
 import { useAppSampleDatabaseBindings } from "./hooks/useAppSampleDatabaseBindings";
 import { useAppLayoutBindings } from "./hooks/useAppLayoutBindings";
+import { useAppBootstrap } from "./hooks/useAppBootstrap";
 import "./App.css";
 
-const MANUAL_HISTORY_LIMIT = 200;
 const RELEASES_PAGE_URL = (import.meta.env.VITE_RELEASES_PAGE_URL as string | undefined)?.trim()
   || "https://github.com/null-t-maker/Pallet-o-Crates/releases";
 
 function App() {
   const {
-    pallet,
-    setPallet,
-    cartons,
-    setCartons,
-    result,
-    setResult,
-    workflowMode,
-    setWorkflowMode,
-    visibleLayers,
-    setVisibleLayers,
-    palletGenerationOpen,
-    setPalletGenerationOpen,
-  } = useAppWorkflowState();
-  const {
-    manualCartons,
-    applyManualCartons,
-    clearManualLayout,
-    undoManualEdit,
-    redoManualEdit,
-  } = useManualLayoutHistory(MANUAL_HISTORY_LIMIT);
-  const { uiScale, setUiScale, uiZoom, setUiZoom } = useUiScale();
-  const uiOverlays = useUiOverlays();
-  const {
-    windowSize,
-    capturingShortcutTarget,
-    setCapturingShortcutTarget,
-  } = uiOverlays;
-  const topbarPanels = useTopbarPanels({
-    viewportWidth: windowSize.width,
-    zoomFactor: uiZoom,
-    onClearTransientState: () => setCapturingShortcutTarget(null),
+    workflowState,
+    manualHistory,
+    uiScaleState,
+    uiOverlays,
+    topbarPanels,
+    updateCheck,
+    languageState,
+    pickFolderPath,
+  } = useAppBootstrap({
+    releasesPageUrl: RELEASES_PAGE_URL,
   });
   const { closeWorkflowPanel } = topbarPanels;
-  const {
-    updateCheckModalOpen,
-    openUpdateCheckModal,
-    closeUpdateCheckModal,
-    handleConfirmUpdateCheck,
-  } = useUpdateCheck({ releasesPageUrl: RELEASES_PAGE_URL });
-  const { language, setLanguage, t } = useAppLanguage();
-  const pickFolderPath = usePickFolderPath();
-
-  useManualUndoRedoShortcuts({
-    workflowMode,
-    capturingShortcutTarget,
-    undoManualEdit,
-    redoManualEdit,
-  });
+  const { language, setLanguage, t } = languageState;
+  const { uiScale, setUiScale, uiZoom, setUiZoom } = uiScaleState;
+  const { pallet, setPallet, cartons, setCartons, result, setResult, workflowMode, setWorkflowMode, visibleLayers, setVisibleLayers, palletGenerationOpen, setPalletGenerationOpen } = workflowState;
+  const { manualCartons, applyManualCartons, clearManualLayout } = manualHistory;
+  const { updateCheckModalOpen, openUpdateCheckModal, closeUpdateCheckModal, handleConfirmUpdateCheck } = updateCheck;
 
   const labels = useAppLabels({ t, workflowMode });
   const sampleDatabase = useAppSampleDatabaseBindings({
@@ -85,9 +46,9 @@ function App() {
     workflowMode,
     pallet,
     cartons,
-    result,
-    manualCartons,
-    pickFolderPath,
+      result,
+      manualCartons,
+      pickFolderPath,
     sampleFolderNotSelectedLabel: labels.sampleFolderNotSelectedLabel,
     sampleSavedPrefix: labels.sampleSavedPrefix,
     sampleSaveFailedPrefix: labels.sampleSaveFailedPrefix,

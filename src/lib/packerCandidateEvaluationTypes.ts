@@ -12,6 +12,9 @@ export interface SupportInfo {
   touching: number;
   centroidSupported: boolean;
   maxOverlapRatio: number;
+  supportCentroidOffsetX: number;
+  supportCentroidOffsetY: number;
+  balancedSupport: boolean;
   overlaps: Array<{ below: PlacementRect; area: number }>;
 }
 

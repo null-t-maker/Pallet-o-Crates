@@ -19,7 +19,6 @@ export function LanguagePanelContent({
         language={language}
         setLanguage={setLanguage}
         t={t}
-        includeDevtool
       />
     </div>
   );

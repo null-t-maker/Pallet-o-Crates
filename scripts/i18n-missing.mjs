@@ -4,7 +4,9 @@ import ts from "typescript";
 
 const root = process.cwd();
 const i18nPath = path.resolve(root, "src/i18n.ts");
+const i18nLanguagesPath = path.resolve(root, "src/i18n-languages.ts");
 const i18nTypesPath = path.resolve(root, "src/i18n-types.ts");
+const i18nTranslationSchemaPath = path.resolve(root, "src/i18n-translation-schema.ts");
 const localeDirPath = path.resolve(root, "src/i18n-locales");
 const strictMode = process.argv.includes("--strict");
 
@@ -74,13 +76,14 @@ if (!fs.existsSync(localeDirPath) || !fs.statSync(localeDirPath).isDirectory()) 
   fail("Missing locale directory: src/i18n-locales");
 }
 
-const { sourceFile: i18nSource } = parseTypeScriptFile(i18nPath);
+const languageSourcePath = fs.existsSync(i18nLanguagesPath) ? i18nLanguagesPath : i18nPath;
+const { sourceFile: i18nSource } = parseTypeScriptFile(languageSourcePath);
 const languagesDecl = findVarDeclaration(i18nSource, "LANGUAGES");
 if (!languagesDecl || !languagesDecl.initializer) {
-  fail("Missing LANGUAGES constant in src/i18n.ts");
+  fail(`Missing LANGUAGES constant in ${path.relative(root, languageSourcePath)}`);
 }
 if (!ts.isAsExpression(languagesDecl.initializer) || !ts.isArrayLiteralExpression(languagesDecl.initializer.expression)) {
-  fail("LANGUAGES in src/i18n.ts is not an `as const` array literal.");
+  fail(`LANGUAGES in ${path.relative(root, languageSourcePath)} is not an \`as const\` array literal.`);
 }
 
 const declaredLanguages = [];
@@ -91,10 +94,11 @@ for (const element of languagesDecl.initializer.expression.elements) {
   declaredLanguages.push(element.text);
 }
 
-const { sourceFile: i18nTypesSource } = parseTypeScriptFile(i18nTypesPath);
+const i18nSchemaPath = fs.existsSync(i18nTranslationSchemaPath) ? i18nTranslationSchemaPath : i18nTypesPath;
+const { sourceFile: i18nTypesSource } = parseTypeScriptFile(i18nSchemaPath);
 const translationsInterface = findInterfaceDeclaration(i18nTypesSource, "Translations");
 if (!translationsInterface) {
-  fail("Missing Translations interface in src/i18n-types.ts");
+  fail(`Missing Translations interface in ${path.relative(root, i18nSchemaPath)}`);
 }
 
 const requiredKeys = [];
@@ -179,4 +183,3 @@ console.log(`[i18n-missing] Missing optional total: ${missingOptionalCount}`);
 if (strictMode) {
   process.exit(1);
 }
-

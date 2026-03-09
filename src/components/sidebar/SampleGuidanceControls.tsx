@@ -1,43 +1,11 @@
 import React from "react";
-import type { SampleGuidanceFilter } from "../../lib/packer";
 import {
   FilterField,
   NumberField,
   RangeField,
   ToggleField,
 } from "./sampleGuidanceControlsPrimitives";
-
-interface SampleGuidanceControlsProps {
-  guidanceEnabled?: boolean;
-  onGuidanceEnabledChange?: (enabled: boolean) => void;
-  guidanceModeLabel: string;
-  guidanceModeOnLabel: string;
-  guidanceModeOffLabel: string;
-  templateLockEnabled?: boolean;
-  onTemplateLockEnabledChange?: (enabled: boolean) => void;
-  templateLockLabel: string;
-  templateLockOnLabel: string;
-  templateLockOffLabel: string;
-  guidanceStrengthPercent?: number;
-  onGuidanceStrengthPercentChange?: (value: number) => void;
-  guidanceStrengthLabel: string;
-  guidanceCfgScalePercent?: number;
-  onGuidanceCfgScalePercentChange?: (value: number) => void;
-  guidanceCfgScaleLabel: string;
-  guidanceSteps?: number;
-  onGuidanceStepsChange?: (value: number) => void;
-  guidanceStepsLabel: string;
-  guidanceSeed?: number;
-  onGuidanceSeedChange?: (value: number) => void;
-  guidanceSeedLabel: string;
-  guidanceFilter?: SampleGuidanceFilter;
-  onGuidanceFilterChange?: (value: SampleGuidanceFilter) => void;
-  guidanceFilterLabel: string;
-  guidanceFilterAllLabel: string;
-  guidanceFilterDimsLabel: string;
-  guidanceFilterShapeLabel: string;
-  guidanceFilterExactLabel: string;
-}
+import type { SampleGuidanceControlsProps } from "./sampleGuidanceControlsTypes";
 
 export const SampleGuidanceControls: React.FC<SampleGuidanceControlsProps> = ({
   guidanceEnabled,
@@ -82,17 +50,6 @@ export const SampleGuidanceControls: React.FC<SampleGuidanceControlsProps> = ({
           onLabel={guidanceModeOnLabel}
           offLabel={guidanceModeOffLabel}
           marginTop={10}
-        />
-      )}
-
-      {typeof templateLockEnabled === "boolean" && onTemplateLockEnabledChange && (
-        <ToggleField
-          label={templateLockLabel}
-          enabled={templateLockEnabled}
-          onChange={onTemplateLockEnabledChange}
-          onLabel={templateLockOnLabel}
-          offLabel={templateLockOffLabel}
-          marginTop={8}
         />
       )}
 
@@ -144,6 +101,17 @@ export const SampleGuidanceControls: React.FC<SampleGuidanceControlsProps> = ({
         />
       )}
 
+      {typeof templateLockEnabled === "boolean" && onTemplateLockEnabledChange && (
+        <ToggleField
+          label={templateLockLabel}
+          enabled={templateLockEnabled}
+          onChange={onTemplateLockEnabledChange}
+          onLabel={templateLockOnLabel}
+          offLabel={templateLockOffLabel}
+          marginTop={8}
+        />
+      )}
+
       {guidanceFilter && onGuidanceFilterChange && (
         <FilterField
           label={guidanceFilterLabel}
@@ -153,6 +121,7 @@ export const SampleGuidanceControls: React.FC<SampleGuidanceControlsProps> = ({
           dimsLabel={guidanceFilterDimsLabel}
           shapeLabel={guidanceFilterShapeLabel}
           exactLabel={guidanceFilterExactLabel}
+          disabled={guidanceDisabled}
         />
       )}
     </>

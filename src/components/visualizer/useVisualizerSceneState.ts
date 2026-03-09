@@ -76,23 +76,19 @@ export function useVisualizerSceneState({
     () => sceneCartons.find((entry) => entry.carton.id === selectedId)?.carton ?? null,
     [sceneCartons, selectedId],
   );
-
   const selectedManualCarton = useMemo(
     () => (mode === "manual" && selectedId
       ? manualCartons.find((carton) => carton.id === selectedId && isValidCartonGeometry(carton)) ?? null
       : null),
     [manualCartons, mode, selectedId],
   );
-
-  const manualTotalWeight = useMemo(
-    () => manualCartons.filter(isValidCartonGeometry).reduce((sum, carton) => sum + carton.weight, 0),
-    [manualCartons],
-  );
-  const manualMaxHeight = useMemo(
-    () => manualCartons.filter(isValidCartonGeometry).reduce((maxHeight, carton) => Math.max(maxHeight, carton.z + carton.h), 0),
-    [manualCartons],
-  );
-
+  const { manualTotalWeight, manualMaxHeight } = useMemo(() => {
+    const validManualCartons = manualCartons.filter(isValidCartonGeometry);
+    return {
+      manualTotalWeight: validManualCartons.reduce((sum, carton) => sum + carton.weight, 0),
+      manualMaxHeight: validManualCartons.reduce((maxHeight, carton) => Math.max(maxHeight, carton.z + carton.h), 0),
+    };
+  }, [manualCartons]);
   const footprintBounds = useMemo(
     () => computeFootprintBounds(basePallets, mode, pallet, sceneCartons),
     [basePallets, mode, pallet, sceneCartons],

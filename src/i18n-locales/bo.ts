@@ -89,7 +89,7 @@ export const bo: Translations = {
     uiZoomLabel: "UI ཆེ་ཆུང",
     shortcutActivationLabel: "མྱུར་ཐབས་འགོ་སློང",
     shortcutPressLabel: "མྱུར་ཐབས་གནོན...",
-    refreshAppLabel: "App ཡང་གསར",
+    refreshAppLabel: "མཉེན་ཆས་ཡང་གསར",
     closeLabel: "ཁ་རྒྱག",
     closeUiZoomAndScaleLabel: "UI ཆེ་ཆུང་དང་ཚད་ཁ་རྒྱག",
     closeDiagnosticsLabel: "བརྟག་དཔྱད་ཁ་རྒྱག",

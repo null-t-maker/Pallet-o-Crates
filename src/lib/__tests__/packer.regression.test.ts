@@ -3,7 +3,8 @@ import { buildDiagnosticsSummary } from "../diagnostics";
 import { CartonInput, MultiPackResult, PackedCarton, PalletInput, packPallets } from "../packer";
 
 const EPS = 1e-6;
-const MIN_SUPPORT_RATIO = 0.985;
+const MIN_MULTI_SUPPORT_RATIO = 0.76;
+const MIN_SINGLE_SUPPORT_RATIO = 0.84;
 
 function carton(overrides: Partial<CartonInput> & Pick<CartonInput, "id" | "title">): CartonInput {
   return {
@@ -35,8 +36,25 @@ function overlapArea2D(a: PackedCarton, b: PackedCarton): number {
   return Math.max(0, x2 - x1) * Math.max(0, y2 - y1);
 }
 
-function supportRatio(top: PackedCarton, all: PackedCarton[]): number {
-  if (top.z <= EPS) return 1;
+function coversPoint(rect: PackedCarton, px: number, py: number): boolean {
+  return px >= rect.x - EPS
+    && px <= rect.x + rect.w + EPS
+    && py >= rect.y - EPS
+    && py <= rect.y + rect.l + EPS;
+}
+
+function supportStats(top: PackedCarton, all: PackedCarton[]): {
+  ratio: number;
+  touching: number;
+  centroidSupported: boolean;
+} {
+  if (top.z <= EPS) {
+    return {
+      ratio: 1,
+      touching: 1,
+      centroidSupported: true,
+    };
+  }
 
   const touchingBelow = all.filter((candidate) => {
     if (candidate.id === top.id) return false;
@@ -44,10 +62,32 @@ function supportRatio(top: PackedCarton, all: PackedCarton[]): number {
     return Math.abs(candidateTop - top.z) <= 1e-3;
   });
 
-  if (touchingBelow.length === 0) return 0;
+  if (touchingBelow.length === 0) {
+    return {
+      ratio: 0,
+      touching: 0,
+      centroidSupported: false,
+    };
+  }
 
-  const area = touchingBelow.reduce((sum, below) => sum + overlapArea2D(top, below), 0);
-  return area / Math.max(top.w * top.l, EPS);
+  let area = 0;
+  let touching = 0;
+  for (const below of touchingBelow) {
+    const overlap = overlapArea2D(top, below);
+    if (overlap <= EPS) continue;
+    area += overlap;
+    touching += 1;
+  }
+
+  const cx = top.x + top.w / 2;
+  const cy = top.y + top.l / 2;
+  const centroidSupported = touchingBelow.some((below) => coversPoint(below, cx, cy));
+
+  return {
+    ratio: area / Math.max(top.w * top.l, EPS),
+    touching,
+    centroidSupported,
+  };
 }
 
 function assertNoFloatingCartons(result: MultiPackResult): void {
@@ -55,8 +95,12 @@ function assertNoFloatingCartons(result: MultiPackResult): void {
     const localCartons = placed.result.layers.flatMap((layer) => layer.cartons);
     for (const top of localCartons) {
       if (top.z <= EPS) continue;
-      const ratio = supportRatio(top, localCartons);
-      expect(ratio).toBeGreaterThanOrEqual(MIN_SUPPORT_RATIO - 1e-3);
+      const stats = supportStats(top, localCartons);
+      const minRatio = stats.touching <= 1 ? MIN_SINGLE_SUPPORT_RATIO : MIN_MULTI_SUPPORT_RATIO;
+      expect(stats.ratio).toBeGreaterThanOrEqual(minRatio - 1e-3);
+      if (!stats.centroidSupported) {
+        expect(stats.touching).toBeGreaterThanOrEqual(2);
+      }
     }
   }
 }

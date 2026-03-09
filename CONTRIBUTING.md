@@ -2,49 +2,80 @@
 
 Thanks for helping improve the project.
 
-## How to contribute
+This repo does not require heavy process. Small, clear changes are preferred.
 
-1. Fork the repo and create a feature branch.
-2. Make focused changes (one topic per PR if possible).
-3. Run local checks.
-4. Open a Pull Request with a clear description.
+## Good Contribution Types
 
-## Local checks
+- bug fixes
+- packing-quality improvements
+- test additions
+- translation fixes
+- documentation cleanup
 
-Run these before opening a PR:
+## Before Opening a PR
+
+Run the local checks that match your change:
 
 ```bash
 npm run check:i18n
 npm run build
+npm run test:regression
 ```
 
-## Translation contributions
+If you changed packing behavior, also run:
 
-Translation fixes are welcome and encouraged.
+```bash
+npm run benchmark:packer
+```
 
-- Main locale files live in `src/i18n-locales/*.ts`.
-- Language names and runtime fallbacks are in `src/components/Sidebar.tsx`.
-- Keep files UTF-8 encoded.
-- Avoid mass recoding or bulk encoding rewrites.
-- Keep wording practical for warehouse/logistics users.
+## PR Style
 
-When suggesting translation changes, include:
+Keep PRs focused:
 
-- Language code (example: `es`, `uz`, `hy`)
-- Key name (example: `calculatePacking`)
-- Current text
-- Suggested text
-- Short context (where it appears in UI)
+- one topic per PR if possible
+- explain what changed
+- explain why it changed
+- mention any tradeoff or known limitation
 
-If you are unsure, open an issue first using the translation issue template.
+## Translation Contributions
 
-## Large implementation changes
+Translation fixes are welcome.
 
-For major features/refactors, maintainers use an English-first flow:
+Current i18n structure:
 
-- Add/update English first
-- Keep other locales on English fallback temporarily
-- Localize other languages after approval/review
+- locale files: `src/i18n-locales/*.ts`
+- language registry: `src/i18n-languages.ts`
+- translation map: `src/i18n-translations.ts`
+- language metadata: `src/i18n-language-metadata/*`
+- UI fallback names: `src/i18n-language-fallbacks/*`
 
-This keeps large changes safer and easier to validate.
+Please keep:
 
+- UTF-8 encoding
+- placeholders like `${...}` unchanged
+- technical tokens unchanged unless intentionally part of UI copy (`JSON`, `CFG`, `UI`, `3D`, `mm`, `X/Y/Z`)
+
+Useful checks:
+
+```bash
+npm run check:i18n
+npm run i18n:missing
+```
+
+## Packing / Algorithm Contributions
+
+If you change packing behavior, include at least one of:
+
+- a new regression test
+- a benchmark result
+- a screenshot or sample showing before/after behavior
+
+That matters more than long theory.
+
+## Large Changes
+
+For bigger features or refactors:
+
+- prefer English-first UI changes
+- keep translation waves separate from feature logic
+- avoid mixing algorithm rewrites with large localization edits in one PR
