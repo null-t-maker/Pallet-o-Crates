@@ -17,7 +17,7 @@ Pallet-o-Crates is a Tauri desktop tool for generating pallet layouts, switching
   </tr>
   <tr>
     <td><strong>01</strong>: the same baseline carton set opened in manual mode and staged off-pallet to show the default editing workspace.</td>
-    <td><strong>02</strong>: a harder mixed-size manual case, showing how a difficult arrangement can be refined or rebuilt directly in the editor.</td>
+    <td><strong>02</strong>: a harder real-world manual case, showing how a difficult arrangement can be refined directly in the editor.</td>
   </tr>
   <tr>
     <td><img src="docs/assets/Pallet-o-Crates-03.png" alt="Missing-carton generation without sample guidance" /></td>
