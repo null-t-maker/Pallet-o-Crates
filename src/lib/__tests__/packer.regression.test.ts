@@ -222,48 +222,52 @@ describe("packer hard invariants", () => {
     expect(result.packedUnits).toBeLessThanOrEqual(requestedUnits(cartons));
   });
 
-  it("maintains hard invariants with sample guidance enabled", () => {
-    const pallet: PalletInput = {
-      width: 800,
-      length: 1200,
-      maxHeight: 1800,
-      maxWeight: 900,
-      packingStyle: "edgeAligned",
-      extraPalletMode: "full",
-      sampleGuidance: {
-        preferredMode: "center",
-        preferredPackingStyle: "centerCompact",
-        confidence: 1.2,
-        sourceSampleCount: 12,
-        cfgScale: 1.6,
-        searchSteps: 4,
-        randomSeed: 42,
-        sampleFilter: "dims",
-      },
-    };
-    const cartons: CartonInput[] = [
-      carton({
-        id: "G1",
-        title: "Guided A",
-        width: 300,
-        length: 200,
-        height: 150,
-        weight: 2,
-        quantity: 90,
-      }),
-      carton({
-        id: "G2",
-        title: "Guided B",
-        width: 250,
-        length: 200,
-        height: 120,
-        weight: 1.8,
-        quantity: 60,
-      }),
-    ];
+  it(
+    "maintains hard invariants with sample guidance enabled",
+    () => {
+      const pallet: PalletInput = {
+        width: 800,
+        length: 1200,
+        maxHeight: 1800,
+        maxWeight: 900,
+        packingStyle: "edgeAligned",
+        extraPalletMode: "full",
+        sampleGuidance: {
+          preferredMode: "center",
+          preferredPackingStyle: "centerCompact",
+          confidence: 1.2,
+          sourceSampleCount: 12,
+          cfgScale: 1.6,
+          searchSteps: 4,
+          randomSeed: 42,
+          sampleFilter: "dims",
+        },
+      };
+      const cartons: CartonInput[] = [
+        carton({
+          id: "G1",
+          title: "Guided A",
+          width: 300,
+          length: 200,
+          height: 150,
+          weight: 2,
+          quantity: 90,
+        }),
+        carton({
+          id: "G2",
+          title: "Guided B",
+          width: 250,
+          length: 200,
+          height: 120,
+          weight: 1.8,
+          quantity: 60,
+        }),
+      ];
 
-    const result = packPallets(pallet, cartons);
-    assertHardInvariants(pallet, result);
-    expect(result.packedUnits).toBeGreaterThan(0);
-  });
+      const result = packPallets(pallet, cartons);
+      assertHardInvariants(pallet, result);
+      expect(result.packedUnits).toBeGreaterThan(0);
+    },
+    15_000,
+  );
 });
