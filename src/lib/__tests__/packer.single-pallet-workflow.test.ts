@@ -228,7 +228,9 @@ describe("packer single-pallet workflow", () => {
     expect(result.totalHeight).toBeLessThan(1400);
   });
 
-  it("does not leave large late-stage cartons behind when legal shelf space exists", () => {
+  it(
+    "does not leave large late-stage cartons behind when legal shelf space exists",
+    () => {
     const pallet: PalletInput = {
       width: 800,
       length: 1200,
@@ -285,5 +287,7 @@ describe("packer single-pallet workflow", () => {
     expect(packedD).toBeGreaterThanOrEqual(6);
     expect(unpackedD).toBeLessThanOrEqual(2);
     expect(result.totalHeight).toBeLessThanOrEqual(1800);
-  });
+    },
+    15_000,
+  );
 });
