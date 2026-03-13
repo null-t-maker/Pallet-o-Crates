@@ -102,7 +102,7 @@ export const HU_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "örmény",
     hu: "magyar",
     sw: "szuahéli",
-    ha: "hausza (latin)",
+    ha: "hausza",
     am: "amhara",
     yo: "joruba",
     ig: "igbó",

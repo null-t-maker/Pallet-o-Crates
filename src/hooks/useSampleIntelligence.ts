@@ -25,6 +25,7 @@ export type { TemplateLockCandidate };
 export function useSampleIntelligence({
   pallet,
   cartons,
+  sampleDatabasePanelVisible,
 }: UseSampleIntelligenceArgs): UseSampleIntelligenceResult {
   const {
     sampleDatabaseFolderPath,
@@ -51,7 +52,7 @@ export function useSampleIntelligence({
     setSampleGuidanceFilter,
     sampleTemplateLockStatus,
     setSampleTemplateLockStatus,
-  } = useSampleIntelligenceState();
+  } = useSampleIntelligenceState({ sampleDatabasePanelVisible });
   const { scanSampleDatabaseFolder } = useSampleDatabaseScanner({
     sampleDatabaseFolderPath,
     setSampleDatabaseData,

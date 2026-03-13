@@ -102,7 +102,7 @@ export const TO_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "lea fakaʻāmenia",
     hu: "lea fakahungakalia",
     sw: "lea fakasuahili",
-    ha: "lea fakahausa (tohinima fakalatina)",
+    ha: "lea fakahausa",
     am: "lea fakaʻameliki",
     yo: "lea fakaʻiōlupa",
     ig: "lea fakaʻikipō",

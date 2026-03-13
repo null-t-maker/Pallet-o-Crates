@@ -102,7 +102,7 @@ export const RO_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armeană",
     hu: "maghiară",
     sw: "swahili",
-    ha: "hausa (latină)",
+    ha: "hausa",
     am: "amharică",
     yo: "yoruba",
     ig: "igbo",

@@ -59,7 +59,18 @@ export function resolveVisualizerLabels(t: Translations): {
   manualRotateHorizontalLabel: string;
   manualRotateVerticalXLabel: string;
   manualRotateVerticalYLabel: string;
+  manualShadowModeLabel: string;
+  manualShadowModeOnLabel: string;
+  manualShadowModeOffLabel: string;
+  manualAlignSectionLabel: string;
+  manualAlignXButtonLabel: string;
+  manualAlignYButtonLabel: string;
+  manualAxisInputModeLabel: string;
+  manualAxisInputAutoLabel: string;
+  manualAxisInputManualLabel: string;
+  manualAxisApplyLabel: string;
   manualCollisionHint: string;
+  manualShadowModeBlockedHint: string;
   manualPalletAreaLabel: (width: number, length: number) => string;
   manualClearSelectedCartonAriaLabel: string;
   manualPlacedCartonsLabel: string;
@@ -71,7 +82,18 @@ export function resolveVisualizerLabels(t: Translations): {
     manualRotateHorizontalLabel: t.manualRotateHorizontal ?? "Horizontal",
     manualRotateVerticalXLabel: t.manualRotateVerticalX ?? "Vertical X",
     manualRotateVerticalYLabel: t.manualRotateVerticalY ?? "Vertical Y",
+    manualShadowModeLabel: t.manualShadowModeLabel ?? "Ghost mode",
+    manualShadowModeOnLabel: t.manualShadowModeOnLabel ?? "On",
+    manualShadowModeOffLabel: t.manualShadowModeOffLabel ?? "Off",
+    manualAlignSectionLabel: t.manualAlignSectionLabel ?? "Align to edge below",
+    manualAlignXButtonLabel: t.manualAlignXButtonLabel ?? "Edge X",
+    manualAlignYButtonLabel: t.manualAlignYButtonLabel ?? "Edge Y",
+    manualAxisInputModeLabel: t.manualAxisInputModeLabel ?? "Axis input",
+    manualAxisInputAutoLabel: t.manualAxisInputAutoLabel ?? "Auto",
+    manualAxisInputManualLabel: t.manualAxisInputManualLabel ?? "Manual",
+    manualAxisApplyLabel: t.manualAxisApplyLabel ?? "Apply",
     manualCollisionHint: t.manualMoveBlockedCollision ?? "Move blocked: cartons cannot overlap.",
+    manualShadowModeBlockedHint: t.manualShadowModeBlockedHint ?? "Ghost mode cannot be disabled until overlaps are resolved.",
     manualPalletAreaLabel: t.manualPalletAreaLabel ?? ((width: number, length: number) => `Pallet area: X 0..${width} mm | Y 0..${length} mm`),
     manualClearSelectedCartonAriaLabel: t.manualClearSelectedCartonAriaLabel ?? "Clear selected carton",
     manualPlacedCartonsLabel: t.packedUnits,

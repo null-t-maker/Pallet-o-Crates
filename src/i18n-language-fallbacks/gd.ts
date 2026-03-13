@@ -102,7 +102,7 @@ export const GD_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Airmeinis",
     hu: "Ungairis",
     sw: "Kiswahili",
-    ha: "Hausa (Laideann)",
+    ha: "Hausa",
     am: "Amtharais",
     yo: "Yoruba",
     ig: "Igbo",

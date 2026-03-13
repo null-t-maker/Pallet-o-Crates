@@ -1,6 +1,6 @@
 import { type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { X } from "lucide-react";
-import { DiagnosticsSummary } from "../lib/diagnostics";
+import { DiagnosticsSummary, type DiagnosticsTelemetry } from "../lib/diagnostics";
 
 interface DiagnosticsWindowProps {
   modalRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -8,6 +8,16 @@ interface DiagnosticsWindowProps {
   diagnosticsLabel: string;
   closeDiagnosticsLabel: string;
   diagnostics: DiagnosticsSummary | null;
+  diagnosticsTelemetry: DiagnosticsTelemetry;
+  diagnosticsRuntimeTelemetryLabel: string;
+  diagnosticsLayoutChecksLabel: string;
+  fpsLabel: string;
+  cpuSystemUtilizationLabel: string;
+  cpuAppUtilizationLabel: string;
+  memorySystemUsedLabel: string;
+  memorySystemTotalLabel: string;
+  workingSetAppLabel: string;
+  privateMemoryAppLabel: string;
   requestedUnitsLabel: string;
   packedUnitsLabel: string;
   overlapCountLabel: string;
@@ -26,12 +36,85 @@ interface DiagnosticsWindowProps {
   onPointerCancel: (event: ReactPointerEvent<HTMLDivElement>) => void;
 }
 
+interface MetricRowProps {
+  label: string;
+  value: string;
+  valueColor?: string;
+}
+
+const STATUS_OK = "#118F38";
+const STATUS_WARN = "#FFDD99";
+const STATUS_CRIT = "#B3282D";
+
+function resolveStatusColor(value: number | null, warnThreshold: number, critThreshold: number): string | undefined {
+  if (value === null || Number.isNaN(value)) {
+    return undefined;
+  }
+  if (value >= critThreshold) {
+    return STATUS_CRIT;
+  }
+  if (value >= warnThreshold) {
+    return STATUS_WARN;
+  }
+  return STATUS_OK;
+}
+
+function resolveInverseStatusColor(value: number | null, warnThreshold: number, critThreshold: number): string | undefined {
+  if (value === null || Number.isNaN(value)) {
+    return undefined;
+  }
+  if (value <= critThreshold) {
+    return STATUS_CRIT;
+  }
+  if (value <= warnThreshold) {
+    return STATUS_WARN;
+  }
+  return STATUS_OK;
+}
+
+function MetricRow({ label, value, valueColor }: MetricRowProps) {
+  return (
+    <p className="metric-row diagnostics-metric-row">
+      <span className="metric-label" title={label}>{label}</span>
+      <strong className="metric-value" style={valueColor ? { color: valueColor } : undefined}>{value}</strong>
+    </p>
+  );
+}
+
+function formatPercent(value: number | null): string {
+  return value === null ? "--" : `${value}%`;
+}
+
+function formatFps(value: number | null): string {
+  return value === null ? "--" : `${value}`;
+}
+
+function formatMemory(valueMb: number | null): string {
+  if (valueMb === null) return "--";
+  if (valueMb >= 1024) {
+    const gb = valueMb / 1024;
+    const digits = gb >= 10 ? 0 : 1;
+    return `${gb.toFixed(digits).replace(/\.0$/, "")} GB`;
+  }
+  return `${valueMb} MB`;
+}
+
 export function DiagnosticsWindow({
   modalRef,
   modalStyle,
   diagnosticsLabel,
   closeDiagnosticsLabel,
   diagnostics,
+  diagnosticsTelemetry,
+  diagnosticsRuntimeTelemetryLabel,
+  diagnosticsLayoutChecksLabel,
+  fpsLabel,
+  cpuSystemUtilizationLabel,
+  cpuAppUtilizationLabel,
+  memorySystemUsedLabel,
+  memorySystemTotalLabel,
+  workingSetAppLabel,
+  privateMemoryAppLabel,
   requestedUnitsLabel,
   packedUnitsLabel,
   overlapCountLabel,
@@ -49,6 +132,29 @@ export function DiagnosticsWindow({
   onPointerUp,
   onPointerCancel,
 }: DiagnosticsWindowProps) {
+  const systemMemoryPercent = diagnosticsTelemetry.memorySystemUsedMb !== null
+    && diagnosticsTelemetry.memorySystemTotalMb !== null
+    && diagnosticsTelemetry.memorySystemTotalMb > 0
+    ? (diagnosticsTelemetry.memorySystemUsedMb / diagnosticsTelemetry.memorySystemTotalMb) * 100
+    : null;
+  const workingSetPercent = diagnosticsTelemetry.memoryAppWorkingSetMb !== null
+    && diagnosticsTelemetry.memorySystemTotalMb !== null
+    && diagnosticsTelemetry.memorySystemTotalMb > 0
+    ? (diagnosticsTelemetry.memoryAppWorkingSetMb / diagnosticsTelemetry.memorySystemTotalMb) * 100
+    : null;
+  const privateMemoryPercent = diagnosticsTelemetry.memoryAppPrivateMb !== null
+    && diagnosticsTelemetry.memorySystemTotalMb !== null
+    && diagnosticsTelemetry.memorySystemTotalMb > 0
+    ? (diagnosticsTelemetry.memoryAppPrivateMb / diagnosticsTelemetry.memorySystemTotalMb) * 100
+    : null;
+
+  const fpsColor = resolveInverseStatusColor(diagnosticsTelemetry.fps, 60, 30);
+  const cpuSystemColor = resolveStatusColor(diagnosticsTelemetry.cpuSystemUsage, 60, 85);
+  const cpuAppColor = resolveStatusColor(diagnosticsTelemetry.cpuAppUsage, 60, 85);
+  const systemMemoryColor = resolveStatusColor(systemMemoryPercent, 70, 90);
+  const workingSetColor = resolveStatusColor(workingSetPercent, 5, 10);
+  const privateMemoryColor = resolveStatusColor(privateMemoryPercent, 5, 10);
+
   return (
     <div
       ref={modalRef}
@@ -75,45 +181,67 @@ export function DiagnosticsWindow({
         </button>
       </div>
 
-      {diagnostics ? (
-        <div className="section-body floating-window-body diagnostics-window-body">
-          <p className="metric-row" style={{ margin: "3px 0", fontSize: "0.83rem" }}>
-            <span className="metric-label" title={requestedUnitsLabel}>{requestedUnitsLabel}</span>
-            <strong className="metric-value">{diagnostics.requestedUnits}</strong>
-          </p>
-          <p className="metric-row" style={{ margin: "3px 0", fontSize: "0.83rem" }}>
-            <span className="metric-label" title={packedUnitsLabel}>{packedUnitsLabel}</span>
-            <strong className="metric-value">{diagnostics.packedUnits}</strong>
-          </p>
-          <p className="metric-row" style={{ margin: "3px 0", fontSize: "0.83rem" }}>
-            <span className="metric-label" title={overlapCountLabel}>{overlapCountLabel}</span>
-            <strong className="metric-value">{diagnostics.overlapCount}</strong>
-          </p>
-          <p className="metric-row" style={{ margin: "3px 0", fontSize: "0.83rem" }}>
-            <span className="metric-label" title={boundsViolationsLabel}>{boundsViolationsLabel}</span>
-            <strong className="metric-value">{diagnostics.boundsViolations}</strong>
-          </p>
-          <p className="metric-row" style={{ margin: "3px 0", fontSize: "0.83rem" }}>
-            <span className="metric-label" title={windowResolutionLabel}>{windowResolutionLabel}</span>
-            <strong className="metric-value">{windowWidth} x {windowHeight}</strong>
-          </p>
-          <p style={{
-            margin: "4px 0 0",
-            fontSize: "0.82rem",
-            color: diagnostics.hasIssues ? "var(--error)" : "var(--success)",
-          }}>
-            <strong title={`${hardChecksLabel}: ${diagnostics.hasIssues ? checksIssuesLabel : checksOkLabel}`}>
-              {hardChecksLabel}: {diagnostics.hasIssues ? checksIssuesLabel : checksOkLabel}
-            </strong>
-          </p>
-        </div>
-      ) : (
-        <div className="section-body floating-window-body diagnostics-window-body">
-          <p style={{ margin: 0, fontSize: "0.84rem", color: "var(--text-muted)" }}>
+      <div className="section-body floating-window-body diagnostics-window-body">
+        <p className="diagnostics-group-title" title={diagnosticsRuntimeTelemetryLabel}>
+          {diagnosticsRuntimeTelemetryLabel}
+        </p>
+        <MetricRow label={fpsLabel} value={formatFps(diagnosticsTelemetry.fps)} valueColor={fpsColor} />
+        <MetricRow
+          label={cpuSystemUtilizationLabel}
+          value={formatPercent(diagnosticsTelemetry.cpuSystemUsage)}
+          valueColor={cpuSystemColor}
+        />
+        <MetricRow
+          label={cpuAppUtilizationLabel}
+          value={formatPercent(diagnosticsTelemetry.cpuAppUsage)}
+          valueColor={cpuAppColor}
+        />
+        <MetricRow
+          label={memorySystemUsedLabel}
+          value={formatMemory(diagnosticsTelemetry.memorySystemUsedMb)}
+          valueColor={systemMemoryColor}
+        />
+        <MetricRow
+          label={memorySystemTotalLabel}
+          value={formatMemory(diagnosticsTelemetry.memorySystemTotalMb)}
+          valueColor={systemMemoryColor}
+        />
+        <MetricRow
+          label={workingSetAppLabel}
+          value={formatMemory(diagnosticsTelemetry.memoryAppWorkingSetMb)}
+          valueColor={workingSetColor}
+        />
+        <MetricRow
+          label={privateMemoryAppLabel}
+          value={formatMemory(diagnosticsTelemetry.memoryAppPrivateMb)}
+          valueColor={privateMemoryColor}
+        />
+        <MetricRow label={windowResolutionLabel} value={`${windowWidth} x ${windowHeight}`} />
+
+        <div className="diagnostics-divider" />
+
+        <p className="diagnostics-group-title" title={diagnosticsLayoutChecksLabel}>
+          {diagnosticsLayoutChecksLabel}
+        </p>
+
+        {diagnostics ? (
+          <>
+            <MetricRow label={requestedUnitsLabel} value={`${diagnostics.requestedUnits}`} />
+            <MetricRow label={packedUnitsLabel} value={`${diagnostics.packedUnits}`} />
+            <MetricRow label={overlapCountLabel} value={`${diagnostics.overlapCount}`} />
+            <MetricRow label={boundsViolationsLabel} value={`${diagnostics.boundsViolations}`} />
+            <MetricRow
+              label={hardChecksLabel}
+              value={diagnostics.hasIssues ? checksIssuesLabel : checksOkLabel}
+              valueColor={diagnostics.hasIssues ? "var(--error)" : "var(--success)"}
+            />
+          </>
+        ) : (
+          <p className="diagnostics-hint">
             {diagnosticsHint}
           </p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

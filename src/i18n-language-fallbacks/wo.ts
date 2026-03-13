@@ -2,7 +2,7 @@ import type { Language } from "../i18n";
 
 export const WO_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     pl: "Polski",
-    en: "?ngale",
+    en: "Angale",
     de: "Deutsch",
     lb: "Lëtzebuergesch",
     zh: "中文（简体）",
@@ -80,7 +80,7 @@ export const WO_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     bo: "བོད་ཡིག",
     ku: "Kurdî",
     ug: "ئۇيغۇرچە",
-    id: "Bahasa Indonesia",
+    id: "Làkku Enndonesi",
     ar: "العربية",
     fa: "فارسی",
     bn: "বাংলা",

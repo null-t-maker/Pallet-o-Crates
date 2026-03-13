@@ -14,9 +14,25 @@ export interface SampleSaveControls {
   sampleSavePackingStyle: SampleSavePackingStyle;
   setSampleSavePackingStyle: Dispatch<SetStateAction<SampleSavePackingStyle>>;
   saveSampleBusy: boolean;
+  saveSampleBlockedReason: string | null;
   saveSampleStatus: SaveSampleStatus | null;
   handleChooseSampleSaveFolder: () => Promise<void>;
   handleSaveLayoutSample: () => Promise<void>;
+}
+
+export interface SampleLoadControls {
+  sampleLoadFolderPath: string;
+  sampleLoadOptions: readonly { value: string; label: string }[];
+  sampleLoadHasOptions: boolean;
+  sampleLoadSelectedFilePath: string;
+  setSampleLoadSelectedFilePath: Dispatch<SetStateAction<string>>;
+  sampleLoadScanning: boolean;
+  sampleLoadFolderError: string | null;
+  sampleLoadBusy: boolean;
+  sampleLoadStatus: SaveSampleStatus | null;
+  handleChooseSampleLoadFolder: () => Promise<void>;
+  handleReloadSampleLoadFolder: () => void;
+  handleLoadLayoutSample: () => Promise<void>;
 }
 
 export interface SettingsControls {
@@ -28,7 +44,9 @@ export interface SettingsControls {
   diagnosticsShortcutDraft: ShortcutConfig;
   uiAccessOpen: boolean;
   diagnosticsOpen: boolean;
+  sampleDatabasePanelVisible: boolean;
   toggleUiAccess: () => void;
   toggleDiagnostics: () => void;
+  toggleSampleDatabasePanelVisible: () => void;
   restoreUiAccessDefaults: () => void;
 }

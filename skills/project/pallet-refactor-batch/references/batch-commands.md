@@ -18,6 +18,6 @@ Get-ChildItem src/components,src/hooks,src/lib -Recurse -File -Include *.ts,*.ts
 
 ## Progress Update Targets
 
-- `docs/refactor-progress.md`
-- `docs/refactor-regression-checklist.md`
+- `attachment/refactor-progress.md`
+- `attachment/refactor-regression-checklist.md`
 - `AGENTS.md`

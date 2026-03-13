@@ -102,7 +102,7 @@ export const EO_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armena",
     hu: "hungara",
     sw: "svahila",
-    ha: "haŭsa (latina)",
+    ha: "haŭsa",
     am: "amhara",
     yo: "joruba",
     ig: "Igboa",

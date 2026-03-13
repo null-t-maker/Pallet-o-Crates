@@ -102,7 +102,7 @@ export const YO_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Èdè Armenia",
     hu: "Èdè Hungaria",
     sw: "Èdè Swahili",
-    ha: "Èdè Hausa (Èdè Látìn)",
+    ha: "Èdè Hausa",
     am: "Èdè Amariki",
     yo: "Èdè Yorùbá",
     ig: "Èdè Yíbò",

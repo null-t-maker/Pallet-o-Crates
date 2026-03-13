@@ -19,13 +19,23 @@ import {
   persistSampleTemplateLockEnabled,
 } from "./sampleIntelligenceStateStorage";
 
-export function useSampleIntelligenceState() {
+interface UseSampleIntelligenceStateArgs {
+  sampleDatabasePanelVisible: boolean;
+}
+
+export function useSampleIntelligenceState({
+  sampleDatabasePanelVisible,
+}: UseSampleIntelligenceStateArgs) {
   const [sampleDatabaseFolderPath, setSampleDatabaseFolderPath] = useState<string>(getInitialSampleDatabaseFolderPath);
   const [sampleDatabaseData, setSampleDatabaseData] = useState<ScanSampleDatabaseResponse | null>(null);
   const [sampleDatabaseLoading, setSampleDatabaseLoading] = useState(false);
   const [sampleDatabaseError, setSampleDatabaseError] = useState<string | null>(null);
-  const [sampleGuidanceEnabled, setSampleGuidanceEnabled] = useState<boolean>(getInitialSampleGuidanceEnabled);
-  const [sampleTemplateLockEnabled, setSampleTemplateLockEnabled] = useState<boolean>(getInitialSampleTemplateLockEnabled);
+  const [sampleGuidanceEnabled, setSampleGuidanceEnabled] = useState<boolean>(() =>
+    sampleDatabasePanelVisible ? getInitialSampleGuidanceEnabled() : false,
+  );
+  const [sampleTemplateLockEnabled, setSampleTemplateLockEnabled] = useState<boolean>(() =>
+    sampleDatabasePanelVisible ? getInitialSampleTemplateLockEnabled() : false,
+  );
   const [sampleGuidanceStrengthPercent, setSampleGuidanceStrengthPercent] = useState<number>(
     getInitialSampleGuidanceStrengthPercent,
   );
@@ -68,6 +78,24 @@ export function useSampleIntelligenceState() {
   useEffect(() => {
     persistSampleGuidanceFilter(sampleGuidanceFilter);
   }, [sampleGuidanceFilter]);
+
+  useEffect(() => {
+    if (sampleDatabasePanelVisible) return;
+    if (sampleGuidanceEnabled) {
+      setSampleGuidanceEnabled(false);
+    }
+    if (sampleTemplateLockEnabled) {
+      setSampleTemplateLockEnabled(false);
+    }
+    if (sampleTemplateLockStatus !== null) {
+      setSampleTemplateLockStatus(null);
+    }
+  }, [
+    sampleDatabasePanelVisible,
+    sampleGuidanceEnabled,
+    sampleTemplateLockEnabled,
+    sampleTemplateLockStatus,
+  ]);
 
   return {
     sampleDatabaseFolderPath,

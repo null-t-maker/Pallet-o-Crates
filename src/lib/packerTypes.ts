@@ -4,6 +4,11 @@ export type ExtraPalletMode = "none" | "limitsOnly" | "full";
 export type SampleGuidanceMode = "center" | "edge";
 export type SampleGuidanceFilter = "all" | "dims" | "shape" | "exact";
 
+export interface ManualSpawnLevel {
+  quantity: number;
+  zLevel: number;
+}
+
 export interface PackSampleGuidance {
   preferredMode?: SampleGuidanceMode;
   preferredPackingStyle?: PalletPackingStyle;
@@ -35,6 +40,8 @@ export interface CartonInput {
   weight: number;
   quantity: number;
   color: string;
+  enabled?: boolean;
+  manualSpawnLevels?: ManualSpawnLevel[];
   uprightPolicy?: CartonUprightPolicy;
   allowUpright?: boolean;
 }

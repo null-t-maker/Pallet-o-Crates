@@ -46,12 +46,12 @@ Run these commands based on scope:
 - `npm run i18n:missing`
 
 3. Localization wave completion or release candidate:
-- `npm run i18n:missing -- --strict`
+- `npm run i18n:missing:strict`
 - `npm run i18n:status`
 
 Definition of done:
 - `feature-mode`: `check:i18n` passes, no missing required keys.
-- `localization-wave`: `check:i18n` passes and `i18n:missing -- --strict` passes.
+- `localization-wave`: `check:i18n` passes and `i18n:missing:strict` passes.
 
 ## Translation Safety Rules (Mandatory)
 
@@ -62,9 +62,18 @@ Definition of done:
 - Do not modify TypeScript signatures in locale files (function params/types).
 - Prefer one-language-at-a-time for quality-critical translation batches.
 
+## Draft Retention Rule (Mandatory)
+
+- If a locale already has a real non-English draft, do **not** revert it back to English during later quality work just because native-level polish is unavailable.
+- Prefer the best available in-language draft over an English rollback.
+- Only revert to English when:
+  - the user explicitly asks for it, or
+  - the locale file is clearly corrupted / unusable.
+- For open-source or community translation flows, treat in-language drafts as the preferred base for future native-speaker refinement.
+
 ## i18n Encoding Safety (Mandatory)
 
-- Treat `src/i18n.ts` and `src/components/Sidebar.tsx` as UTF-8 only.
+- Treat `src/i18n.ts` as UTF-8 only.
 - Treat `src/i18n-locales/*` and `src/i18n-language-fallbacks/*` as UTF-8 only.
 - Do not mass-rewrite these files with shell recoding tools.
 - If shell editing is unavoidable, always read/write explicitly as UTF-8.

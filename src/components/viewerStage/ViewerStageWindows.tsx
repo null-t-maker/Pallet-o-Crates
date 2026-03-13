@@ -30,6 +30,16 @@ export function ViewerStageWindows({
   t,
   closeDiagnosticsLabel,
   diagnostics,
+  diagnosticsTelemetry,
+  diagnosticsRuntimeTelemetryLabel,
+  diagnosticsLayoutChecksLabel,
+  fpsLabel,
+  cpuSystemUtilizationLabel,
+  cpuAppUtilizationLabel,
+  memorySystemUsedLabel,
+  memorySystemTotalLabel,
+  workingSetAppLabel,
+  privateMemoryAppLabel,
   requestedUnitsLabel,
   packedUnitsLabel,
   overlapCountLabel,
@@ -86,6 +96,16 @@ export function ViewerStageWindows({
           diagnosticsLabel={t.diagnostics}
           closeDiagnosticsLabel={closeDiagnosticsLabel}
           diagnostics={diagnostics}
+          diagnosticsTelemetry={diagnosticsTelemetry}
+          diagnosticsRuntimeTelemetryLabel={diagnosticsRuntimeTelemetryLabel}
+          diagnosticsLayoutChecksLabel={diagnosticsLayoutChecksLabel}
+          fpsLabel={fpsLabel}
+          cpuSystemUtilizationLabel={cpuSystemUtilizationLabel}
+          cpuAppUtilizationLabel={cpuAppUtilizationLabel}
+          memorySystemUsedLabel={memorySystemUsedLabel}
+          memorySystemTotalLabel={memorySystemTotalLabel}
+          workingSetAppLabel={workingSetAppLabel}
+          privateMemoryAppLabel={privateMemoryAppLabel}
           requestedUnitsLabel={requestedUnitsLabel}
           packedUnitsLabel={packedUnitsLabel}
           overlapCountLabel={overlapCountLabel}

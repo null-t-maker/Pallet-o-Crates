@@ -15,6 +15,8 @@ export function useVisualizerRuntime({
   mode,
   manualCartons,
   onManualCartonUpdate,
+  manualShadowModeEnabled,
+  setManualShadowModeEnabled,
 }: VisualizerProps) {
   const {
     hovered,
@@ -61,6 +63,9 @@ export function useVisualizerRuntime({
     selectedManualCarton: sceneState.selectedManualCarton,
     manualMoveStepMm,
     manualCollisionHint: sceneState.manualCollisionHint,
+    manualShadowModeBlockedHint: sceneState.manualShadowModeBlockedHint,
+    manualShadowModeEnabled,
+    setManualShadowModeEnabled,
     setManualHint,
     onManualCartonUpdate,
     manualMeshRefs,
@@ -81,6 +86,7 @@ export function useVisualizerRuntime({
     manualMoveStepMm,
     setManualMoveStepMm,
     manualHint,
+    manualShadowModeEnabled,
     manualMeshRefs,
     sceneState,
     selectedManualMesh,

@@ -29,6 +29,7 @@ export interface SidebarSectionsLabelSet {
 }
 
 export interface SidebarSectionsProps {
+  workflowMode: "generation" | "manual";
   showLanguageSection: boolean;
   showSampleDatabaseSection: boolean;
   collapsedSections: Record<SidebarSectionKey, boolean>;
@@ -75,4 +76,5 @@ export interface SidebarSectionsProps {
   hasManyCartonRows: boolean;
   handleStartEdit: (carton: CartonInput) => void;
   handleRemoveCarton: (cartonId: string) => void;
+  handleToggleCartonEnabled: (cartonId: string) => void;
 }

@@ -1,4 +1,4 @@
-import type { PackedCarton } from "../../lib/packer";
+import type { PackedCarton, PalletInput } from "../../lib/packer";
 import {
   MIN_TRANSLATION_PROGRESS_MM,
   WORKSPACE_LIMIT_MM,
@@ -17,11 +17,245 @@ interface CollisionResolutionArgs {
   candidate: PackedCarton;
   manualCartons: PackedCarton[];
   patch: ManualPatch;
+  pallet?: PalletInput;
+  autoAlignEnabled?: boolean;
+  ignoreCollisions?: boolean;
 }
 
 interface CollisionResolutionResult {
   resolved: PackedCarton | null;
   resolvedBySnap: boolean;
+}
+
+type SupportAlignAxis = "x" | "y";
+
+const CONTACT_SNAP_MM = 4;
+const CONTACT_EPS = 1e-3;
+const SUPPORT_ALIGN_MM = 150;
+
+function overlapsAxis(aMin: number, aSize: number, bMin: number, bSize: number): boolean {
+  return aMin + aSize > bMin + CONTACT_EPS && bMin + bSize > aMin + CONTACT_EPS;
+}
+
+function overlapsForX(a: PackedCarton, b: PackedCarton): boolean {
+  return overlapsAxis(a.y, a.l, b.y, b.l) && overlapsAxis(a.z, a.h, b.z, b.h);
+}
+
+function overlapsForY(a: PackedCarton, b: PackedCarton): boolean {
+  return overlapsAxis(a.x, a.w, b.x, b.w) && overlapsAxis(a.z, a.h, b.z, b.h);
+}
+
+function overlapsForZ(a: PackedCarton, b: PackedCarton): boolean {
+  return overlapsAxis(a.x, a.w, b.x, b.w) && overlapsAxis(a.y, a.l, b.y, b.l);
+}
+
+function touchesSupportTop(a: PackedCarton, b: PackedCarton): boolean {
+  return Math.abs(a.z - (b.z + b.h)) <= CONTACT_SNAP_MM + CONTACT_EPS;
+}
+
+function snapAxisToNearest(
+  current: number,
+  contacts: number[],
+): number {
+  let best = current;
+  let bestDist = CONTACT_SNAP_MM + CONTACT_EPS;
+  for (const contact of contacts) {
+    const dist = Math.abs(current - contact);
+    if (dist <= CONTACT_SNAP_MM + CONTACT_EPS && dist < bestDist) {
+      best = roundMm(contact);
+      bestDist = dist;
+    }
+  }
+  return best;
+}
+
+function overlapsPalletFootprint(carton: PackedCarton, pallet: PalletInput): boolean {
+  const overlapWidth = Math.min(carton.x + carton.w, pallet.width) - Math.max(carton.x, 0);
+  const overlapLength = Math.min(carton.y + carton.l, pallet.length) - Math.max(carton.y, 0);
+  return overlapWidth > CONTACT_EPS && overlapLength > CONTACT_EPS;
+}
+
+function normalizeCandidateToNearbyContacts(
+  candidate: PackedCarton,
+  manualCartons: PackedCarton[],
+  sourceId: string,
+  pallet?: PalletInput,
+): PackedCarton {
+  if (!pallet) return candidate;
+
+  const touchesPallet = overlapsPalletFootprint(candidate, pallet);
+  if (!touchesPallet) {
+    return candidate;
+  }
+
+  let current = { ...candidate };
+  for (let pass = 0; pass < 3; pass++) {
+    const xContacts: number[] = [];
+    const yContacts: number[] = [];
+    const zContacts: number[] = [0];
+
+    if (current.w <= pallet.width + CONTACT_EPS) {
+      xContacts.push(0, pallet.width - current.w);
+    }
+    if (current.l <= pallet.length + CONTACT_EPS) {
+      yContacts.push(0, pallet.length - current.l);
+    }
+
+    for (const other of manualCartons) {
+      if (other.id === sourceId) continue;
+      if (!isValidCartonGeometry(other)) continue;
+
+      if (overlapsForX(current, other)) {
+        xContacts.push(other.x - current.w, other.x + other.w);
+      }
+      if (overlapsForY(current, other)) {
+        yContacts.push(other.y - current.l, other.y + other.l);
+      }
+      if (overlapsForZ(current, other)) {
+        zContacts.push(other.z + other.h);
+      }
+    }
+
+    let next = {
+      ...current,
+      x: snapAxisToNearest(current.x, xContacts),
+      y: snapAxisToNearest(current.y, yContacts),
+      z: Math.max(0, snapAxisToNearest(current.z, zContacts)),
+    };
+
+    if (next.w <= pallet.width + CONTACT_EPS) {
+      next.x = clampValue(next.x, 0, pallet.width - next.w);
+    }
+    if (next.l <= pallet.length + CONTACT_EPS) {
+      next.y = clampValue(next.y, 0, pallet.length - next.l);
+    }
+
+    if (
+      Math.abs(next.x - current.x) <= CONTACT_EPS
+      && Math.abs(next.y - current.y) <= CONTACT_EPS
+      && Math.abs(next.z - current.z) <= CONTACT_EPS
+    ) {
+      return current;
+    }
+    current = next;
+  }
+
+  return current;
+}
+
+function buildSupportAlignedCandidate(
+  candidate: PackedCarton,
+  manualCartons: PackedCarton[],
+  sourceId: string,
+  pallet?: PalletInput,
+  axis?: SupportAlignAxis,
+): PackedCarton | null {
+  if (!pallet) return null;
+
+  const xTargets = new Set<number>([roundMm(candidate.x)]);
+  const yTargets = new Set<number>([roundMm(candidate.y)]);
+  const supportXTargets = new Set<number>();
+  const supportYTargets = new Set<number>();
+  const supportsBelow: PackedCarton[] = [];
+
+  for (const other of manualCartons) {
+    if (other.id === sourceId) continue;
+    if (!isValidCartonGeometry(other)) continue;
+    if (!touchesSupportTop(candidate, other)) continue;
+    supportsBelow.push(other);
+
+    if ((axis === undefined || axis === "x") && overlapsAxis(candidate.y, candidate.l, other.y, other.l)) {
+      const start = roundMm(other.x);
+      const end = roundMm(other.x + other.w - candidate.w);
+      xTargets.add(start);
+      xTargets.add(end);
+      supportXTargets.add(start);
+      supportXTargets.add(end);
+    }
+    if ((axis === undefined || axis === "y") && overlapsAxis(candidate.x, candidate.w, other.x, other.w)) {
+      const start = roundMm(other.y);
+      const end = roundMm(other.y + other.l - candidate.l);
+      yTargets.add(start);
+      yTargets.add(end);
+      supportYTargets.add(start);
+      supportYTargets.add(end);
+    }
+  }
+
+  let best: PackedCarton | null = null;
+  let bestSupportArea = -1;
+  let bestScore = Number.POSITIVE_INFINITY;
+
+  for (const x of xTargets) {
+    for (const y of yTargets) {
+      let next: PackedCarton = {
+        ...candidate,
+        x,
+        y,
+      };
+
+      if (next.w <= pallet.width + CONTACT_EPS) {
+        next.x = clampValue(next.x, 0, pallet.width - next.w);
+      }
+      if (next.l <= pallet.length + CONTACT_EPS) {
+        next.y = clampValue(next.y, 0, pallet.length - next.l);
+      }
+
+      if (
+        Math.abs(next.x - candidate.x) > SUPPORT_ALIGN_MM + CONTACT_EPS
+        || Math.abs(next.y - candidate.y) > SUPPORT_ALIGN_MM + CONTACT_EPS
+      ) {
+        continue;
+      }
+
+      if (hasCartonCollision(next, manualCartons, sourceId)) {
+        continue;
+      }
+
+      const alignedX = supportXTargets.has(roundMm(next.x));
+      const alignedY = supportYTargets.has(roundMm(next.y));
+      if (axis === "x" && !alignedX) {
+        continue;
+      }
+      if (axis === "y" && !alignedY) {
+        continue;
+      }
+      if (axis === undefined && !alignedX && !alignedY) {
+        continue;
+      }
+
+      let supportArea = 0;
+      for (const support of supportsBelow) {
+        const overlapWidth = Math.min(next.x + next.w, support.x + support.w) - Math.max(next.x, support.x);
+        const overlapLength = Math.min(next.y + next.l, support.y + support.l) - Math.max(next.y, support.y);
+        if (overlapWidth > CONTACT_EPS && overlapLength > CONTACT_EPS) {
+          supportArea += overlapWidth * overlapLength;
+        }
+      }
+
+      const score = Math.abs(next.x - candidate.x) + Math.abs(next.y - candidate.y);
+      if (
+        supportArea > bestSupportArea + CONTACT_EPS
+        || (Math.abs(supportArea - bestSupportArea) <= CONTACT_EPS && score < bestScore - CONTACT_EPS)
+      ) {
+        best = next;
+        bestSupportArea = supportArea;
+        bestScore = score;
+      }
+    }
+  }
+
+  return best;
+}
+
+export function alignCandidateToSupportEdges(
+  candidate: PackedCarton,
+  manualCartons: PackedCarton[],
+  sourceId: string,
+  pallet?: PalletInput,
+  axis?: SupportAlignAxis,
+): PackedCarton {
+  return buildSupportAlignedCandidate(candidate, manualCartons, sourceId, pallet, axis) ?? candidate;
 }
 
 export function buildManualCandidateCarton(
@@ -65,8 +299,17 @@ export function resolveManualCollision({
   candidate,
   manualCartons,
   patch,
+  pallet,
+  autoAlignEnabled = true,
+  ignoreCollisions = false,
 }: CollisionResolutionArgs): CollisionResolutionResult {
-  let resolved = candidate;
+  if (ignoreCollisions) {
+    return { resolved: candidate, resolvedBySnap: false };
+  }
+
+  let resolved = autoAlignEnabled
+    ? normalizeCandidateToNearbyContacts(candidate, manualCartons, source.id, pallet)
+    : candidate;
   let resolvedBySnap = false;
   const translationOnly = patch.w === undefined && patch.l === undefined && patch.h === undefined;
 
@@ -80,7 +323,9 @@ export function resolveManualCollision({
     if (!snapped) {
       return { resolved: null, resolvedBySnap: false };
     }
-    resolved = snapped;
+    resolved = autoAlignEnabled
+      ? normalizeCandidateToNearbyContacts(snapped, manualCartons, source.id, pallet)
+      : snapped;
     resolvedBySnap = true;
   }
 

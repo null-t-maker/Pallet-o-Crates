@@ -1,4 +1,5 @@
 import { packPallets } from "./packer";
+import { packPalletsAsync } from "./packerAsync";
 import type {
   CartonInput,
   MultiPackResult,
@@ -6,6 +7,7 @@ import type {
   PalletInput,
 } from "./packerTypes";
 import { isBetterMultiPackResult } from "./templateLock";
+import type { PackingProgressReporter } from "./packingProgress";
 
 export function applySampleGuidance(
   pallet: PalletInput,
@@ -35,6 +37,36 @@ export function calculateGuidedWithFallback(
   const unguided = packPallets(
     { ...pallet, sampleGuidance: undefined },
     cartons.map((carton) => ({ ...carton })),
+  );
+  return isBetterMultiPackResult(unguided, guided) ? unguided : guided;
+}
+
+export async function calculateGuidedWithFallbackAsync(
+  pallet: PalletInput,
+  cartons: CartonInput[],
+  sampleGuidance: PackSampleGuidance | null,
+  progressReporter?: PackingProgressReporter | null,
+): Promise<MultiPackResult> {
+  progressReporter?.throwIfCancelled();
+  const guided = await packPalletsAsync(
+    pallet,
+    cartons.map((carton) => ({ ...carton })),
+    progressReporter,
+  );
+  if (!sampleGuidance) return guided;
+
+  if (progressReporter) {
+    await progressReporter.report({
+      stage: "comparingFallback",
+      packedUnits: guided.packedUnits,
+    }, { force: true, yieldToUi: true });
+  }
+  progressReporter?.throwIfCancelled();
+
+  const unguided = await packPalletsAsync(
+    { ...pallet, sampleGuidance: undefined },
+    cartons.map((carton) => ({ ...carton })),
+    progressReporter,
   );
   return isBetterMultiPackResult(unguided, guided) ? unguided : guided;
 }

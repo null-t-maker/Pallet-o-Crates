@@ -10,6 +10,7 @@ export function buildSidebarSectionsProps({
   showExtraPalletMode,
 }: BuildSidebarSectionsPropsArgs): SidebarSectionsProps {
   return {
+    workflowMode: props.workflowMode,
     showLanguageSection,
     showSampleDatabaseSection,
     collapsedSections: sidebarState.collapsedSections,
@@ -51,5 +52,6 @@ export function buildSidebarSectionsProps({
     hasManyCartonRows: sidebarState.hasManyCartonRows,
     handleStartEdit: sidebarState.handleStartEdit,
     handleRemoveCarton: sidebarState.handleRemoveCarton,
+    handleToggleCartonEnabled: sidebarState.handleToggleCartonEnabled,
   };
 }

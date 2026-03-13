@@ -46,6 +46,8 @@ export function useUiOverlays(): UseUiOverlaysResult {
     setCapturingShortcutTarget,
     setUiAccessShortcutDraft,
     setDiagnosticsShortcutDraft,
+    sampleDatabasePanelVisible,
+    setSampleDatabasePanelVisible,
     settingsDirty,
     saveSettings,
   } = useOverlayShortcutsState({
@@ -63,6 +65,8 @@ export function useUiOverlays(): UseUiOverlaysResult {
     setCapturingShortcutTarget,
     setUiAccessShortcutDraft,
     setDiagnosticsShortcutDraft,
+    sampleDatabasePanelVisible,
+    setSampleDatabasePanelVisible,
     settingsDirty,
     saveSettings,
     toggleUiAccess,

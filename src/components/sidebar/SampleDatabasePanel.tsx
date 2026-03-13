@@ -3,6 +3,7 @@ import { SectionPanel } from "./SectionPanel";
 import { SampleDatabaseFolderControls } from "./SampleDatabaseFolderControls";
 import { SampleGuidanceControls } from "./SampleGuidanceControls";
 import { SampleDatabaseStatusBlock } from "./SampleDatabaseStatusBlock";
+import { ToggleField } from "./sampleGuidanceControlsPrimitives";
 import type { SampleDatabasePanelProps } from "./sampleDatabasePanelTypes";
 export type { SampleDatabasePanelProps } from "./sampleDatabasePanelTypes";
 
@@ -77,11 +78,6 @@ export const SampleDatabasePanel: React.FC<SampleDatabasePanelProps> = ({
         guidanceModeLabel={guidanceModeLabel}
         guidanceModeOnLabel={guidanceModeOnLabel}
         guidanceModeOffLabel={guidanceModeOffLabel}
-        templateLockEnabled={templateLockEnabled}
-        onTemplateLockEnabledChange={onTemplateLockEnabledChange}
-        templateLockLabel={templateLockLabel}
-        templateLockOnLabel={templateLockOnLabel}
-        templateLockOffLabel={templateLockOffLabel}
         guidanceStrengthPercent={guidanceStrengthPercent}
         onGuidanceStrengthPercentChange={onGuidanceStrengthPercentChange}
         guidanceStrengthLabel={guidanceStrengthLabel}
@@ -102,6 +98,17 @@ export const SampleDatabasePanel: React.FC<SampleDatabasePanelProps> = ({
         guidanceFilterShapeLabel={guidanceFilterShapeLabel}
         guidanceFilterExactLabel={guidanceFilterExactLabel}
       />
+
+      {typeof templateLockEnabled === "boolean" && onTemplateLockEnabledChange && (
+        <ToggleField
+          label={templateLockLabel}
+          enabled={templateLockEnabled}
+          onChange={onTemplateLockEnabledChange}
+          onLabel={templateLockOnLabel}
+          offLabel={templateLockOffLabel}
+          marginTop={10}
+        />
+      )}
 
       <SampleDatabaseStatusBlock
         error={error}

@@ -1,6 +1,7 @@
 export interface MenuSelectOption {
   value: string;
   label: string;
+  searchText?: string;
 }
 
 export interface MenuSelectProps {
@@ -10,4 +11,5 @@ export interface MenuSelectProps {
   ariaLabel: string;
   className?: string;
   disabled?: boolean;
+  searchable?: boolean;
 }

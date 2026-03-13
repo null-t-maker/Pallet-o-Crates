@@ -103,7 +103,7 @@ export const XH_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "IsiArmenian",
     hu: "IsiHungarian",
     sw: "IsiSwahili",
-    ha: "IsiHausa (IsiLatin)",
+    ha: "IsiHausa",
     am: "IsiAmharic",
     yo: "IsiYoruba",
     ig: "IsiIgbo",

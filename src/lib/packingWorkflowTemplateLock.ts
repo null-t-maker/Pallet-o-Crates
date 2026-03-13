@@ -7,6 +7,7 @@ import {
   mergeTemplateWithSupplementaryPallets,
   packTemplateRemainderAdaptive,
 } from "./templateLock";
+import { isPackingCancelledError, type PackingProgressReporter } from "./packingProgress";
 import type {
   TemplateLockAttemptResult,
   TemplateLockCandidateInput,
@@ -18,6 +19,7 @@ interface TryApplyTemplateLockArgs {
   nextPallet: PalletInput;
   sampleTemplateLockEnabled: boolean;
   templateLockCandidate: TemplateLockCandidateInput | null;
+  progressReporter?: PackingProgressReporter | null;
 }
 
 function toErrorMessage(error: unknown): string {
@@ -32,7 +34,9 @@ export async function tryApplyTemplateLock({
   nextPallet,
   sampleTemplateLockEnabled,
   templateLockCandidate,
+  progressReporter,
 }: TryApplyTemplateLockArgs): Promise<TemplateLockAttemptResult> {
+  progressReporter?.throwIfCancelled();
   if (!sampleTemplateLockEnabled) {
     return {
       result: null,
@@ -48,9 +52,17 @@ export async function tryApplyTemplateLock({
   }
 
   try {
+    if (progressReporter) {
+      await progressReporter.report({
+        stage: "tryingTemplateLock",
+        packedUnits: 0,
+        detail: templateLockCandidate.sample.fileName,
+      }, { force: true, yieldToUi: true });
+    }
     const loaded = await invoke<LoadLayoutSampleResponse>("load_layout_sample", {
       request: { filePath: templateLockCandidate.sample.filePath },
     });
+    progressReporter?.throwIfCancelled();
     const templated = buildTemplateResultFromPayload(loaded.payload, pallet, cartons);
     if (!templated) {
       return {
@@ -60,6 +72,13 @@ export async function tryApplyTemplateLock({
     }
 
     let result = templated.result;
+    if (progressReporter) {
+      await progressReporter.report({
+        stage: "tryingTemplateLock",
+        packedUnits: result.packedUnits,
+        detail: templateLockCandidate.sample.fileName,
+      }, { force: true });
+    }
     let templateStatus = `Template lock: applied (${templated.note}, ${templateLockCandidate.matchKind})`;
     if (
       (nextPallet.extraPalletMode === "full" || nextPallet.extraPalletMode === "limitsOnly")
@@ -69,13 +88,23 @@ export async function tryApplyTemplateLock({
       let templateContinuationPasses = 0;
       let continuationSafety = 0;
       while (countCartonUnits(result.unpacked) > 0 && continuationSafety < 96) {
+        progressReporter?.throwIfCancelled();
         continuationSafety += 1;
         const remainderBefore = countCartonUnits(result.unpacked);
+        if (progressReporter) {
+          await progressReporter.report({
+            stage: "templateContinuation",
+            packedUnits: result.packedUnits,
+            detail: templateLockCandidate.sample.fileName,
+            palletIndex: continuationSafety + 1,
+          });
+        }
         const nextTemplate = buildTemplateResultFromPayload(
           loaded.payload,
           pallet,
           result.unpacked.map((carton) => ({ ...carton })),
         );
+        progressReporter?.throwIfCancelled();
         if (!nextTemplate) break;
 
         const remainderAfter = countCartonUnits(nextTemplate.result.unpacked);
@@ -91,10 +120,19 @@ export async function tryApplyTemplateLock({
         ...nextPallet,
         sampleGuidance: undefined,
       };
+      if (progressReporter) {
+        await progressReporter.report({
+          stage: "packingSupplementary",
+          packedUnits: result.packedUnits,
+          detail: templateLockCandidate.sample.fileName,
+        }, { force: true, yieldToUi: true });
+      }
+      progressReporter?.throwIfCancelled();
       const adaptiveSupplementary = packTemplateRemainderAdaptive(
         noGuidancePallet,
         result.unpacked.map((carton) => ({ ...carton })),
       );
+      progressReporter?.throwIfCancelled();
       result = mergeTemplateWithSupplementaryPallets(
         result,
         adaptiveSupplementary.result,
@@ -118,6 +156,9 @@ export async function tryApplyTemplateLock({
       templateStatus,
     };
   } catch (error) {
+    if (isPackingCancelledError(error)) {
+      throw error;
+    }
     return {
       result: null,
       templateStatus: `Template lock: failed (${toErrorMessage(error)})`,

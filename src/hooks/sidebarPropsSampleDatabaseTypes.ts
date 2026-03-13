@@ -53,6 +53,7 @@ export type SampleDatabaseSidebarBindings = Pick<
 
 export interface BuildSampleDatabaseSidebarBindingsArgs {
   workflowMode: WorkflowMode;
+  sampleDatabasePanelVisible: boolean;
   sampleDatabaseFolderPath: string;
   sampleDatabaseSummary: SidebarProps["sampleDatabaseSummary"];
   sampleDatabaseLoading: boolean;

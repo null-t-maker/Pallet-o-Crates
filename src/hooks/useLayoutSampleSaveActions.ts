@@ -15,6 +15,7 @@ export function useLayoutSampleSaveActions({
   sampleFolderNotSelectedLabel,
   sampleSavedPrefix,
   sampleSaveFailedPrefix,
+  saveSampleBlockedReason,
   sampleSaveFolderPath,
   sampleSaveName,
   sampleSavePackingStyle,
@@ -36,6 +37,13 @@ export function useLayoutSampleSaveActions({
   }, [pickFolderPath, sampleSaveFailedPrefix, setSampleSaveFolderPath, setSaveSampleStatus]);
 
   const handleSaveLayoutSample = useCallback(async () => {
+    if (saveSampleBlockedReason) {
+      setSaveSampleStatus({
+        kind: "error",
+        message: saveSampleBlockedReason,
+      });
+      return;
+    }
     await saveLayoutSampleAction({
       workflowMode,
       pallet,
@@ -47,13 +55,14 @@ export function useLayoutSampleSaveActions({
       sampleSavedPrefix,
       sampleSaveFailedPrefix,
       sampleSaveFolderPath,
-      sampleSaveName,
-      sampleSavePackingStyle,
-      saveSampleBusy,
-      setSampleSaveFolderPath,
-      setSaveSampleStatus,
-      setSaveSampleBusy,
-    });
+    sampleSaveName,
+    sampleSavePackingStyle,
+    saveSampleBusy,
+    saveSampleBlockedReason,
+    setSampleSaveFolderPath,
+    setSaveSampleStatus,
+    setSaveSampleBusy,
+  });
   }, [
     cartons,
     manualCartons,
@@ -61,6 +70,7 @@ export function useLayoutSampleSaveActions({
     pickFolderPath,
     result,
     sampleFolderNotSelectedLabel,
+    saveSampleBlockedReason,
     saveSampleBusy,
     sampleSaveFailedPrefix,
     sampleSaveFolderPath,

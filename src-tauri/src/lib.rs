@@ -3,7 +3,10 @@ use serde_json::Value;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
+use once_cell::sync::Lazy;
+use sysinfo::{Pid, ProcessRefreshKind, System};
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -63,6 +66,24 @@ struct ScanSampleDatabaseResponse {
     invalid_files: usize,
     samples: Vec<SampleDatabaseRecord>,
 }
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SystemStatsResponse {
+    cpu_usage: f32,
+    cpu_system_usage: f32,
+    memory_used_mb: u64,
+    memory_total_mb: u64,
+    memory_working_mb: u64,
+    memory_private_mb: u64,
+}
+
+static SYSTEM_STATS: Lazy<Mutex<System>> = Lazy::new(|| {
+    let mut system = System::new();
+    system.refresh_cpu();
+    system.refresh_memory();
+    Mutex::new(system)
+});
 
 fn now_unix_seconds() -> u64 {
     SystemTime::now()
@@ -468,6 +489,28 @@ fn scan_sample_database(
 }
 
 #[tauri::command]
+fn get_system_stats() -> Result<SystemStatsResponse, String> {
+    let mut system = SYSTEM_STATS.lock().map_err(|error| error.to_string())?;
+    let pid = Pid::from_u32(std::process::id());
+    system.refresh_pids_specifics(&[pid], ProcessRefreshKind::new().with_cpu().with_memory());
+    system.refresh_memory();
+    system.refresh_cpu_usage();
+
+    if let Some(process) = system.process(pid) {
+        Ok(SystemStatsResponse {
+            cpu_usage: process.cpu_usage(),
+            cpu_system_usage: system.global_cpu_info().cpu_usage(),
+            memory_used_mb: system.used_memory() / (1024 * 1024),
+            memory_total_mb: system.total_memory() / (1024 * 1024),
+            memory_working_mb: process.memory() / (1024 * 1024),
+            memory_private_mb: process.virtual_memory() / (1024 * 1024),
+        })
+    } else {
+        Err("Failed to read process stats.".to_string())
+    }
+}
+
+#[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
@@ -481,7 +524,8 @@ pub fn run() {
             greet,
             save_layout_sample,
             load_layout_sample,
-            scan_sample_database
+            scan_sample_database,
+            get_system_stats
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

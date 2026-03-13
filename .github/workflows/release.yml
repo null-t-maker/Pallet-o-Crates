@@ -40,6 +40,24 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Pallet-o-Crates ${{ github.ref_name }}"
-          releaseBody: "Automated release for ${{ github.ref_name }}."
+          releaseBody: |
+            Experimental `0.x` Windows release for `${{ github.ref_name }}`.
+
+            What this release includes:
+            - Tauri desktop build for Windows
+            - pallet layout generation
+            - manual 3D editing workflow
+            - sample database guidance and template-lock support
+
+            What this release does not claim:
+            - guaranteed global optimization
+            - production-grade certainty for every mixed-carton case
+            - native-speaker review for every shipped UI language
+
+            Project docs:
+            - [README](README.md)
+            - [Contributing](CONTRIBUTING.md)
+            - [Command Reference](docs/command-reference.md)
+            - [Localization Workflow](docs/localization-workflow.md)
           releaseDraft: false
-          prerelease: false
+          prerelease: ${{ startsWith(github.ref_name, 'v0.') }}

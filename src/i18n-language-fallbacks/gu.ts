@@ -102,7 +102,7 @@ export const GU_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "આર્મેનિયન",
     hu: "હંગેરિયન",
     sw: "સ્વાહિલી",
-    ha: "હૌસા (લેટિન)",
+    ha: "હૌસા",
     am: "એમ્હારિક",
     yo: "યોરૂબા",
     ig: "ઇગ્બો",

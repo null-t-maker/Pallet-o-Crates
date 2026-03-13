@@ -102,7 +102,7 @@ export const TR_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Ermenice",
     hu: "Macarca",
     sw: "Svahili dili",
-    ha: "Hausa dili (Latin)",
+    ha: "Hausa dili",
     am: "Amharca",
     yo: "Yorubaca",
     ig: "İbo dili",

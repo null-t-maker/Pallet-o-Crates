@@ -17,7 +17,9 @@ export function TopbarCorePanels({
   currentWorkflowLabel,
   workflowGenerationLabel,
   workflowManualLabel,
+  layoutSamplesLabel,
   saveLayoutSampleLabel,
+  loadLayoutSampleLabel,
   sampleFolderLabel,
   sampleChooseFolderLabel,
   sampleChangeFolderLabel,
@@ -28,6 +30,11 @@ export function TopbarCorePanels({
   sampleStrategyBothLabel,
   sampleSaveActionLabel,
   sampleSavingLabel,
+  sampleLoad,
+  sampleLoadFileLabel,
+  sampleReloadFolderLabel,
+  sampleLoadActionLabel,
+  sampleLoadingLabel,
   languageLabel,
   settingsLabel,
   settingsSaveLabel,
@@ -54,7 +61,10 @@ export function TopbarCorePanels({
         t={t}
         topbarPanels={topbarPanels}
         sampleSave={sampleSave}
+        sampleLoad={sampleLoad}
+        layoutSamplesLabel={layoutSamplesLabel}
         saveLayoutSampleLabel={saveLayoutSampleLabel}
+        loadLayoutSampleLabel={loadLayoutSampleLabel}
         sampleFolderLabel={sampleFolderLabel}
         sampleChooseFolderLabel={sampleChooseFolderLabel}
         sampleChangeFolderLabel={sampleChangeFolderLabel}
@@ -65,6 +75,10 @@ export function TopbarCorePanels({
         sampleStrategyBothLabel={sampleStrategyBothLabel}
         sampleSaveActionLabel={sampleSaveActionLabel}
         sampleSavingLabel={sampleSavingLabel}
+        sampleLoadFileLabel={sampleLoadFileLabel}
+        sampleReloadFolderLabel={sampleReloadFolderLabel}
+        sampleLoadActionLabel={sampleLoadActionLabel}
+        sampleLoadingLabel={sampleLoadingLabel}
       />
 
       <div className="topbar-actions-spacer" aria-hidden="true" />

@@ -4,6 +4,7 @@ import type {
   PackSampleGuidance,
   PalletInput,
 } from "./packerTypes";
+import type { PackingProgressReporter } from "./packingProgress";
 
 export interface TemplateLockCandidateInput {
   sample: {
@@ -29,4 +30,5 @@ export interface CalculatePackingArgs {
   sampleGuidance: PackSampleGuidance | null;
   sampleTemplateLockEnabled: boolean;
   templateLockCandidate: TemplateLockCandidateInput | null;
+  progressReporter?: PackingProgressReporter | null;
 }

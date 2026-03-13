@@ -102,7 +102,7 @@ export const KU_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "ermenî",
     hu: "mecarî",
     sw: "swahîlî",
-    ha: "hawsayî (latînî)",
+    ha: "hawsayî",
     am: "amharî",
     yo: "yorubayî",
     ig: "îgboyî",

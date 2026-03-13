@@ -17,8 +17,8 @@ Keep refactoring incremental, deterministic, and low-risk:
 
 1. Load project context before editing:
 - `AGENTS.md`
-- `docs/refactor-progress.md`
-- `docs/refactor-regression-checklist.md`
+- `attachment/refactor-progress.md`
+- `attachment/refactor-regression-checklist.md`
 
 2. Pick one batch scope only:
 - one primary target file or one tightly related target group,
@@ -35,7 +35,7 @@ Keep refactoring incremental, deterministic, and low-risk:
 - do not continue to next batch until both are green.
 
 5. Update progress docs:
-- append completed split(s) to `docs/refactor-progress.md`,
+- append completed split(s) to `attachment/refactor-progress.md`,
 - keep “Highest-Priority Remaining Chunks” aligned with current largest hotspots,
 - keep status percentages explicit.
 

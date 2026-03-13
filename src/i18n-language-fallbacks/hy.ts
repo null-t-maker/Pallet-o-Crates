@@ -102,7 +102,7 @@ export const HY_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "հայերեն",
     hu: "հունգարերեն",
     sw: "սուահիլի",
-    ha: "հաուսա (լատինական)",
+    ha: "հաուսա",
     am: "ամհարերեն",
     yo: "յորուբա",
     ig: "իգբո",

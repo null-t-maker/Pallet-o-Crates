@@ -1,7 +1,9 @@
 import type { CartonInput, PalletInput, SampleGuidanceFilter } from "../../lib/packer";
 import type { Language, Translations } from "../../i18n";
+import type { WorkflowMode } from "../Visualizer";
 
 export interface SidebarProps {
+  workflowMode: WorkflowMode;
   pallet: PalletInput;
   setPallet: (p: PalletInput) => void;
   cartons: CartonInput[];
@@ -10,7 +12,10 @@ export interface SidebarProps {
   primaryActionLabel: string;
   onSecondaryAction?: () => void;
   secondaryActionLabel?: string;
+  onWorkflowModeAction?: () => void;
+  workflowModeActionLabel?: string;
   dualActionPrimaryAccent?: boolean;
+  actionsDisabled?: boolean;
   language: Language;
   setLanguage: (language: Language) => void;
   t: Translations;

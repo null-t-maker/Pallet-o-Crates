@@ -102,7 +102,7 @@ export const LV_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armēņu",
     hu: "ungāru",
     sw: "svahili",
-    ha: "hausu (latīņu)",
+    ha: "hausu",
     am: "amharu",
     yo: "jorubu",
     ig: "igbo",

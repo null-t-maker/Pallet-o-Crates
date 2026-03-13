@@ -102,7 +102,7 @@ export const HR_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armenski",
     hu: "mađarski",
     sw: "svahili",
-    ha: "hausa (latinica)",
+    ha: "hausa",
     am: "amharski",
     yo: "jorupski",
     ig: "igbo",

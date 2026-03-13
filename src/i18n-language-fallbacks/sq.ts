@@ -102,7 +102,7 @@ export const SQ_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armenisht",
     hu: "hungarisht",
     sw: "suahilisht",
-    ha: "hausisht (latin)",
+    ha: "hausisht",
     am: "amarisht",
     yo: "jorubaisht",
     ig: "igboisht",

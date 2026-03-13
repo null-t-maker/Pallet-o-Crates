@@ -102,7 +102,7 @@ export const CO_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armeno",
     hu: "ungherese",
     sw: "swahili",
-    ha: "hausa (latino)",
+    ha: "hausa",
     am: "amarico",
     yo: "yoruba",
     ig: "igbo",

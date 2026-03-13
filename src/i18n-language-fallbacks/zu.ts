@@ -102,7 +102,7 @@ export const ZU_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "isi-Armenia",
     hu: "isi-Hungarian",
     sw: "isiSwahili",
-    ha: "isi-Hausa (isi-Latin)",
+    ha: "isi-Hausa",
     am: "isi-Amharic",
     yo: "isi-Yoruba",
     ig: "isi-Igbo",

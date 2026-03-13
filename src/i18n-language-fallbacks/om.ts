@@ -102,7 +102,7 @@ export const OM_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Armeeniyaa",
     hu: "Afaan Hangaari",
     sw: "Suwahilii",
-    ha: "Afaan Hawusaa (Laatinii)",
+    ha: "Afaan Hawusaa",
     am: "Afaan Amaaraa",
     yo: "Afaan Yoruba",
     ig: "Afaan Igbo",

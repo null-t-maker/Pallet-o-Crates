@@ -118,7 +118,7 @@ export const MG_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     sm: "Samoanina",
     to: "Tonganina",
     tpi: "Tok Pisin",
-    eo: "Esperanto",
+    eo: "esperanto",
     yi: "Yiddish",
     kmr: "Kiorda (Kurmanji)",
     bi: "Bislama",

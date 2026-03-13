@@ -105,7 +105,7 @@ export const BO_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "ཨར་མེ་ནི་ཡན",
     hu: "ཧང་གེ་རི་ཡན",
     sw: "ས་ཝ་ཧི་ལི",
-    ha: "ཧའུ་ས་ (ལེ་ཊིན)",
+    ha: "ཧའུ་ས་",
     am: "ཨམ་ཧ་རིཀ",
     yo: "ཡོ་རུ་བ",
     ig: "ཨིག་བོ",

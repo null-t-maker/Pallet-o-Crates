@@ -102,7 +102,7 @@ export const VI_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Tiếng Armenia",
     hu: "Tiếng Hungary",
     sw: "Tiếng Swahili",
-    ha: "Tiếng Hausa (Chữ La tinh)",
+    ha: "Tiếng Hausa",
     am: "Tiếng Amharic",
     yo: "Tiếng Yoruba",
     ig: "Tiếng Igbo",

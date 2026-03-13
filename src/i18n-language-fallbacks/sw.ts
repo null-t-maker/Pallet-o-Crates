@@ -102,7 +102,7 @@ export const SW_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Kiarmenia",
     hu: "Kihungaria",
     sw: "Kiswahili",
-    ha: "Kihausa (Kilatini)",
+    ha: "Kihausa",
     am: "Kiamhari",
     yo: "Kiyoruba",
     ig: "Kiigbo",

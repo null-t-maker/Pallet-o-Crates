@@ -1,4 +1,4 @@
-name: Asset Guard
+name: Critical Paths Guard
 
 on:
   pull_request:
@@ -19,6 +19,8 @@ jobs:
 
       - name: Analyze PR changes
         shell: bash
+        env:
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
         run: |
           set -euo pipefail
 
@@ -32,21 +34,35 @@ jobs:
           critical_changed="$(git diff --name-only "$base_sha" "$head_sha" -- src-tauri/icons src/assets public | wc -l | tr -d ' ')"
           critical_deleted="$(git diff --name-only --diff-filter=D "$base_sha" "$head_sha" -- src-tauri/icons src/assets public | wc -l | tr -d ' ')"
           critical_renamed="$(git diff --name-only --diff-filter=R "$base_sha" "$head_sha" -- src-tauri/icons src/assets public | wc -l | tr -d ' ')"
+          agent_instruction_changed="$(git diff --name-only "$base_sha" "$head_sha" -- AGENTS.md skills | wc -l | tr -d ' ')"
 
           deps_changed="$(git diff --name-only "$base_sha" "$head_sha" -- package.json package-lock.json pnpm-lock.yaml yarn.lock src-tauri/Cargo.toml src-tauri/Cargo.lock | wc -l | tr -d ' ')"
 
+          agent_override="no"
+          case " $PR_LABELS " in
+            *" allow-agent-instructions "*) agent_override="yes" ;;
+          esac
+
           {
-            echo "## Asset Guard summary"
+            echo "## Critical Paths Guard summary"
             echo ""
             echo "- Files added: $added_count"
             echo "- Files deleted: $deleted_count"
             echo "- Files renamed: $renamed_count"
             echo "- Critical asset paths touched (src-tauri/icons, src/assets, public): $critical_changed"
+            echo "- Agent instruction paths touched (AGENTS.md, skills/): $agent_instruction_changed"
+            echo "- Agent instruction override label present: $agent_override"
             echo "- Dependency manifests/locks touched: $deps_changed"
           } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "$critical_deleted" -gt 0 ] || [ "$critical_renamed" -gt 0 ]; then
-            echo "Asset Guard blocked this PR: detected deletion or rename in critical asset paths." >&2
+            echo "Critical Paths Guard blocked this PR: detected deletion or rename in critical asset paths." >&2
             echo "Please request explicit maintainer approval for asset structure changes." >&2
+            exit 1
+          fi
+
+          if [ "$agent_instruction_changed" -gt 0 ] && [ "$agent_override" != "yes" ]; then
+            echo "Critical Paths Guard blocked this PR: detected changes in AGENTS.md or skills/." >&2
+            echo "If this change is intentional, add the 'allow-agent-instructions' label and describe the reason in the PR." >&2
             exit 1
           fi

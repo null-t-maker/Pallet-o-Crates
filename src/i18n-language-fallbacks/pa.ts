@@ -102,7 +102,7 @@ export const PA_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "ਅਰਮੀਨੀਆਈ",
     hu: "ਹੰਗਰੀਆਈ",
     sw: "ਸਵਾਹਿਲੀ",
-    ha: "ਹੌਸਾ (ਲਾਤੀਨੀ)",
+    ha: "ਹੌਸਾ",
     am: "ਅਮਹਾਰਿਕ",
     yo: "ਯੋਰੂਬਾ",
     ig: "ਇਗਬੋ",

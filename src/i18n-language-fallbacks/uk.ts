@@ -102,7 +102,7 @@ export const UK_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "вірменська",
     hu: "угорська",
     sw: "суахілі",
-    ha: "хауса (латиниця)",
+    ha: "хауса",
     am: "амхарська",
     yo: "йоруба",
     ig: "ігбо",

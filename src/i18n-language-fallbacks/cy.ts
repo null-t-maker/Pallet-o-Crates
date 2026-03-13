@@ -102,7 +102,7 @@ export const CY_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Armeneg",
     hu: "Hwngareg",
     sw: "Swahili",
-    ha: "Hawsa (Lladin)",
+    ha: "Hawsa",
     am: "Amhareg",
     yo: "Iorwba",
     ig: "Igbo",

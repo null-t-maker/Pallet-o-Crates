@@ -102,7 +102,7 @@ export const KK_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "армян тілі",
     hu: "венгр тілі",
     sw: "суахили тілі",
-    ha: "хауса тілі (латын жазуы)",
+    ha: "хауса тілі",
     am: "амхар тілі",
     yo: "йоруба тілі",
     ig: "игбо тілі",

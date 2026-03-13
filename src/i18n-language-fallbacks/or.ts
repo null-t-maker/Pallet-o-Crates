@@ -102,7 +102,7 @@ export const OR_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "ଆର୍ମେନିଆନ୍",
     hu: "ହଙ୍ଗେରୀୟ",
     sw: "ସ୍ୱାହିଲି",
-    ha: "ହୌସା (ଲାଟିନ୍)",
+    ha: "ହୌସା",
     am: "ଆମହାରକି",
     yo: "ୟୋରୁବା",
     ig: "ଇଗବୋ",

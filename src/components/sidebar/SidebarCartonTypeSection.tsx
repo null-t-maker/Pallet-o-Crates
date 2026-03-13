@@ -5,6 +5,7 @@ import type { SidebarSectionsProps } from "./sidebarSectionsTypes";
 
 type SidebarCartonTypeSectionProps = Pick<
   SidebarSectionsProps,
+  | "workflowMode"
   | "collapsedSections"
   | "toggleSection"
   | "t"
@@ -16,6 +17,7 @@ type SidebarCartonTypeSectionProps = Pick<
 >;
 
 export const SidebarCartonTypeSection: FC<SidebarCartonTypeSectionProps> = ({
+  workflowMode,
   collapsedSections,
   toggleSection,
   t,
@@ -32,6 +34,7 @@ export const SidebarCartonTypeSection: FC<SidebarCartonTypeSectionProps> = ({
     className={`dropdown-section${editing ? " is-editing" : ""}`}
   >
     <CartonForm
+      showManualSpawnControls={workflowMode === "manual"}
       onAdd={handleAdd}
       onEdit={handleEdit}
       editing={editing}

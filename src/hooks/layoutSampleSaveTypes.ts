@@ -16,6 +16,7 @@ export interface UseLayoutSampleSaveArgs {
   sampleFolderNotSelectedLabel: string;
   sampleSavedPrefix: string;
   sampleSaveFailedPrefix: string;
+  saveSampleBlockedReason: string | null;
 }
 
 export interface UseLayoutSampleSaveResult {
@@ -26,6 +27,7 @@ export interface UseLayoutSampleSaveResult {
   sampleSavePackingStyle: SampleSavePackingStyle;
   setSampleSavePackingStyle: React.Dispatch<React.SetStateAction<SampleSavePackingStyle>>;
   saveSampleBusy: boolean;
+  saveSampleBlockedReason: string | null;
   saveSampleStatus: SaveSampleStatus | null;
   setSaveSampleStatus: React.Dispatch<React.SetStateAction<SaveSampleStatus | null>>;
   handleChooseSampleSaveFolder: () => Promise<void>;

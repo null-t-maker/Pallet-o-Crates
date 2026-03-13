@@ -1,0 +1,7 @@
+{
+  "defaultStatus": "machine",
+  "overrides": {
+    "pl": "approved",
+    "en": "approved"
+  }
+}

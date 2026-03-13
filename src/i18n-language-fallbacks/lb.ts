@@ -102,7 +102,7 @@ export const LB_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Armenesch",
     hu: "Ungaresch",
     sw: "Suaheli",
-    ha: "Hausa (Laténgesch)",
+    ha: "Hausa",
     am: "Amharesch",
     yo: "Yoruba",
     ig: "Igbo-Sprooch",

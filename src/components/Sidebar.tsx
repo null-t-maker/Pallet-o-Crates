@@ -22,6 +22,9 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
     primaryActionLabel,
     onSecondaryAction,
     secondaryActionLabel,
+    onWorkflowModeAction,
+    workflowModeActionLabel,
+    actionsDisabled,
     t,
     showHeader = true,
     showLanguageSection = true,
@@ -60,8 +63,11 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
         secondaryActionLabel={secondaryActionLabel}
         onPrimaryAction={onPrimaryAction}
         primaryActionLabel={primaryActionLabel}
+        onWorkflowModeAction={onWorkflowModeAction}
+        workflowModeActionLabel={workflowModeActionLabel}
         primaryButtonClass={primaryButtonClass}
         secondaryButtonClass={secondaryButtonClass}
+        actionsDisabled={actionsDisabled}
       />
     </aside>
   );

@@ -102,7 +102,7 @@ export const NB_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armensk",
     hu: "ungarsk",
     sw: "swahili",
-    ha: "hausa (latinsk)",
+    ha: "hausa",
     am: "amharisk",
     yo: "joruba",
     ig: "ibo",

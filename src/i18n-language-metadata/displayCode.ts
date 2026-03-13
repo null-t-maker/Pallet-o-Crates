@@ -102,7 +102,7 @@ export const LANGUAGE_DISPLAY_CODE: Record<Language, string> = {
     hy: "hy",
     hu: "hu",
     sw: "sw",
-    ha: "ha-Latn",
+    ha: "ha",
     am: "am",
     yo: "yo",
     ig: "ig",

@@ -102,7 +102,7 @@ export const FRCA_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "arménien",
     hu: "hongrois",
     sw: "swahili",
-    ha: "haoussa (latin)",
+    ha: "haoussa",
     am: "amharique",
     yo: "yoruba",
     ig: "igbo",

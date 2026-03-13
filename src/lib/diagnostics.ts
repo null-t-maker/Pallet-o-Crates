@@ -9,6 +9,16 @@ export interface DiagnosticsSummary {
   hasIssues: boolean;
 }
 
+export interface DiagnosticsTelemetry {
+  fps: number | null;
+  cpuSystemUsage: number | null;
+  cpuAppUsage: number | null;
+  memorySystemUsedMb: number | null;
+  memorySystemTotalMb: number | null;
+  memoryAppWorkingSetMb: number | null;
+  memoryAppPrivateMb: number | null;
+}
+
 function overlapArea2D(a: PackedCarton, b: PackedCarton): number {
   const x1 = Math.max(a.x, b.x);
   const y1 = Math.max(a.y, b.y);

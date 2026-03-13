@@ -13,11 +13,6 @@ export const SampleGuidanceControls: React.FC<SampleGuidanceControlsProps> = ({
   guidanceModeLabel,
   guidanceModeOnLabel,
   guidanceModeOffLabel,
-  templateLockEnabled,
-  onTemplateLockEnabledChange,
-  templateLockLabel,
-  templateLockOnLabel,
-  templateLockOffLabel,
   guidanceStrengthPercent,
   onGuidanceStrengthPercentChange,
   guidanceStrengthLabel,
@@ -50,6 +45,19 @@ export const SampleGuidanceControls: React.FC<SampleGuidanceControlsProps> = ({
           onLabel={guidanceModeOnLabel}
           offLabel={guidanceModeOffLabel}
           marginTop={10}
+        />
+      )}
+
+      {guidanceFilter && onGuidanceFilterChange && (
+        <FilterField
+          label={guidanceFilterLabel}
+          value={guidanceFilter}
+          onChange={onGuidanceFilterChange}
+          allLabel={guidanceFilterAllLabel}
+          dimsLabel={guidanceFilterDimsLabel}
+          shapeLabel={guidanceFilterShapeLabel}
+          exactLabel={guidanceFilterExactLabel}
+          disabled={guidanceDisabled}
         />
       )}
 
@@ -97,30 +105,6 @@ export const SampleGuidanceControls: React.FC<SampleGuidanceControlsProps> = ({
           label={guidanceSeedLabel}
           value={Math.trunc(guidanceSeed)}
           onChange={onGuidanceSeedChange}
-          disabled={guidanceDisabled}
-        />
-      )}
-
-      {typeof templateLockEnabled === "boolean" && onTemplateLockEnabledChange && (
-        <ToggleField
-          label={templateLockLabel}
-          enabled={templateLockEnabled}
-          onChange={onTemplateLockEnabledChange}
-          onLabel={templateLockOnLabel}
-          offLabel={templateLockOffLabel}
-          marginTop={8}
-        />
-      )}
-
-      {guidanceFilter && onGuidanceFilterChange && (
-        <FilterField
-          label={guidanceFilterLabel}
-          value={guidanceFilter}
-          onChange={onGuidanceFilterChange}
-          allLabel={guidanceFilterAllLabel}
-          dimsLabel={guidanceFilterDimsLabel}
-          shapeLabel={guidanceFilterShapeLabel}
-          exactLabel={guidanceFilterExactLabel}
           disabled={guidanceDisabled}
         />
       )}

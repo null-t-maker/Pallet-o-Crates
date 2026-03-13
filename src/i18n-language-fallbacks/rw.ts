@@ -102,7 +102,7 @@ export const RW_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Ikinyarumeniya",
     hu: "Igihongiriya",
     sw: "Igiswahili",
-    ha: "Igihawusa (Latini)",
+    ha: "Igihawusa",
     am: "Inyamuhariki",
     yo: "Ikiyoruba",
     ig: "Ikiigbo",

@@ -8,6 +8,7 @@ import type { UseSampleIntelligenceResult } from "./sampleIntelligenceTypes";
 interface UseAppSampleDatabaseBindingsArgs {
   pallet: PalletInput;
   cartons: CartonInput[];
+  sampleDatabasePanelVisible: boolean;
   t: Translations;
   labels: AppLabels;
   pickFolderPath: () => Promise<string | null>;
@@ -20,11 +21,12 @@ export type UseAppSampleDatabaseBindingsResult =
 export function useAppSampleDatabaseBindings({
   pallet,
   cartons,
+  sampleDatabasePanelVisible,
   t,
   labels,
   pickFolderPath,
 }: UseAppSampleDatabaseBindingsArgs): UseAppSampleDatabaseBindingsResult {
-  const sampleIntelligence = useSampleIntelligence({ pallet, cartons });
+  const sampleIntelligence = useSampleIntelligence({ pallet, cartons, sampleDatabasePanelVisible });
 
   const controls = useSampleDatabaseControls({
     pickFolderPath,

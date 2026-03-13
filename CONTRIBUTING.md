@@ -1,25 +1,29 @@
 # Contributing to Pallet-o-Crates
 
-Thanks for helping improve the project.
+Pallet-o-Crates is still an experimental `0.x` project. Small, clear contributions are preferred over large mixed PRs.
 
-This repo does not require heavy process. Small, clear changes are preferred.
-
-## Good Contribution Types
+## High-Value Contribution Types
 
 - bug fixes
 - packing-quality improvements
-- test additions
-- translation fixes
+- regression tests
 - documentation cleanup
+- native-speaker translation review
 
 ## Before Opening a PR
 
-Run the local checks that match your change:
+Run the checks that match your change:
 
 ```bash
 npm run check:i18n
 npm run build
 npm run test:regression
+```
+
+If your change affects runtime behavior, also verify it in:
+
+```bash
+npm run tauri dev
 ```
 
 If you changed packing behavior, also run:
@@ -37,40 +41,74 @@ Keep PRs focused:
 - explain why it changed
 - mention any tradeoff or known limitation
 
-## Translation Contributions
-
-Translation fixes are welcome.
-
-Current i18n structure:
-
-- locale files: `src/i18n-locales/*.ts`
-- language registry: `src/i18n-languages.ts`
-- translation map: `src/i18n-translations.ts`
-- language metadata: `src/i18n-language-metadata/*`
-- UI fallback names: `src/i18n-language-fallbacks/*`
-
-Please keep:
-
-- UTF-8 encoding
-- placeholders like `${...}` unchanged
-- technical tokens unchanged unless intentionally part of UI copy (`JSON`, `CFG`, `UI`, `3D`, `mm`, `X/Y/Z`)
-
-Useful checks:
-
-```bash
-npm run check:i18n
-npm run i18n:missing
-```
-
-## Packing / Algorithm Contributions
-
 If you change packing behavior, include at least one of:
 
 - a new regression test
 - a benchmark result
 - a screenshot or sample showing before/after behavior
 
-That matters more than long theory.
+For this project, concrete evidence matters more than long theory.
+
+## Translation Contributions
+
+Translation fixes are welcome and genuinely useful here.
+
+Current public i18n status:
+
+- `138` UI languages are present in the repo
+- only `pl` and `en` are currently marked as human-verified
+- most other locales are still machine-draft or AI-assisted and need native-speaker review
+
+Core files:
+
+- locale files: `src/i18n-locales/*.ts`
+- language registry: `src/i18n-languages.ts`
+- translation map: `src/i18n-translations.ts`
+- language metadata: `src/i18n-language-metadata/*`
+- UI fallback names: `src/i18n-language-fallbacks/*`
+- translation review badge registry: `src/i18n-language-review-status.json`
+
+Review badge meaning:
+
+- `approved`: translated and reviewed by a trusted human reviewer
+- `machine`: usable draft, but still awaiting confident human review
+- `none`: hide the badge when no public signal is desired
+
+Please keep:
+
+- UTF-8 encoding
+- placeholders like `${...}` unchanged
+- technical tokens unchanged unless intentionally part of UI copy: `JSON`, `CFG`, `UI`, `3D`, `mm`, `X/Y/Z`
+
+Useful checks:
+
+```bash
+npm run check:i18n
+npm run i18n:missing
+npm run i18n:missing:strict
+npm run i18n:status
+```
+
+Useful docs:
+
+- [docs/command-reference.md](docs/command-reference.md)
+- [docs/localization-workflow.md](docs/localization-workflow.md)
+- [docs/i18n-language-status.md](docs/i18n-language-status.md)
+
+If you are a native speaker, review PRs are one of the highest-value ways to help this project.
+
+## Command Reference
+
+If you are new to the repo, start with [docs/command-reference.md](docs/command-reference.md). It explains which commands are desktop-first, which are frontend-only, and which are intended for validation or i18n maintenance.
+
+## Packing / Algorithm Contributions
+
+The packer aims for practical layouts, not mathematically guaranteed global optimum. Please evaluate changes accordingly.
+
+- preserve hard validity rules first
+- improve heuristic quality second
+- include a regression test whenever behavior changes
+- do not market a heuristic tweak as a guaranteed optimizer improvement
 
 ## Large Changes
 

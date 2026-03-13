@@ -1,5 +1,6 @@
 # Session attachments (for AI/chat workflow)
 /attachment/
+/i18n-waves/
 
 # Dependencies
 /node_modules/

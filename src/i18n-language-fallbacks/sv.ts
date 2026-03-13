@@ -102,7 +102,7 @@ export const SV_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armeniska",
     hu: "ungerska",
     sw: "swahili",
-    ha: "hausa (latinska)",
+    ha: "hausa",
     am: "amhariska",
     yo: "yoruba",
     ig: "igbo",

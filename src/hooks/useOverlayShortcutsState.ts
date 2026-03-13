@@ -11,6 +11,10 @@ import {
   DIAGNOSTICS_SHORTCUT_STORAGE_KEY,
   UI_ACCESS_SHORTCUT_STORAGE_KEY,
 } from "./overlayShortcutDefaults";
+import {
+  DEFAULT_SAMPLE_DATABASE_PANEL_VISIBLE,
+  SAMPLE_DATABASE_PANEL_VISIBILITY_STORAGE_KEY,
+} from "./settingsPanelDefaults";
 import { useGlobalOverlayShortcuts } from "./useGlobalOverlayShortcuts";
 import { useOverlayShortcutCapture } from "./useOverlayShortcutCapture";
 
@@ -29,9 +33,16 @@ export function useOverlayShortcutsState({
   setCapturingShortcutTarget: React.Dispatch<React.SetStateAction<ShortcutTarget | null>>;
   setUiAccessShortcutDraft: React.Dispatch<React.SetStateAction<ShortcutConfig>>;
   setDiagnosticsShortcutDraft: React.Dispatch<React.SetStateAction<ShortcutConfig>>;
+  sampleDatabasePanelVisible: boolean;
+  setSampleDatabasePanelVisible: React.Dispatch<React.SetStateAction<boolean>>;
   settingsDirty: boolean;
   saveSettings: () => void;
 } {
+  const loadStoredBoolean = (storageKey: string, fallback: boolean): boolean => {
+    const raw = window.localStorage.getItem(storageKey);
+    if (raw === null) return fallback;
+    return raw === "1";
+  };
   const [uiAccessShortcut, setUiAccessShortcut] = useState<ShortcutConfig>(() =>
     loadStoredShortcut(UI_ACCESS_SHORTCUT_STORAGE_KEY, DEFAULT_UI_ACCESS_SHORTCUT),
   );
@@ -44,6 +55,9 @@ export function useOverlayShortcutsState({
   const [diagnosticsShortcutDraft, setDiagnosticsShortcutDraft] = useState<ShortcutConfig>(() =>
     loadStoredShortcut(DIAGNOSTICS_SHORTCUT_STORAGE_KEY, DEFAULT_DIAGNOSTICS_SHORTCUT),
   );
+  const [sampleDatabasePanelVisible, setSampleDatabasePanelVisible] = useState<boolean>(() =>
+    loadStoredBoolean(SAMPLE_DATABASE_PANEL_VISIBILITY_STORAGE_KEY, DEFAULT_SAMPLE_DATABASE_PANEL_VISIBLE),
+  );
   const [capturingShortcutTarget, setCapturingShortcutTarget] = useState<ShortcutTarget | null>(null);
 
   useEffect(() => {
@@ -53,6 +67,13 @@ export function useOverlayShortcutsState({
   useEffect(() => {
     window.localStorage.setItem(DIAGNOSTICS_SHORTCUT_STORAGE_KEY, JSON.stringify(diagnosticsShortcut));
   }, [diagnosticsShortcut]);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      SAMPLE_DATABASE_PANEL_VISIBILITY_STORAGE_KEY,
+      sampleDatabasePanelVisible ? "1" : "0",
+    );
+  }, [sampleDatabasePanelVisible]);
 
   useGlobalOverlayShortcuts({
     capturingShortcutTarget,
@@ -86,6 +107,8 @@ export function useOverlayShortcutsState({
     setCapturingShortcutTarget,
     setUiAccessShortcutDraft,
     setDiagnosticsShortcutDraft,
+    sampleDatabasePanelVisible,
+    setSampleDatabasePanelVisible,
     settingsDirty,
     saveSettings,
   };

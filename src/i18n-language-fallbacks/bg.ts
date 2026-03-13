@@ -102,7 +102,7 @@ export const BG_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "арменски",
     hu: "унгарски",
     sw: "суахили",
-    ha: "хауса (латиница)",
+    ha: "хауса",
     am: "амхарски",
     yo: "йоруба",
     ig: "игбо",

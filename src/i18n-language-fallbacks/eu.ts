@@ -80,7 +80,7 @@ export const EU_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     bo: "བོད་ཡིག",
     ku: "Kurdî",
     ug: "ئۇيغۇرچە",
-    id: "Bahasa Indonesia",
+    id: "Indonesian hizkuntza",
     ar: "العربية",
     fa: "فارسی",
     bn: "বাংলা",

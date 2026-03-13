@@ -102,7 +102,7 @@ export const MI_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Āmeniana",
     hu: "Hanekari",
     sw: "Wāhīri",
-    ha: "Hauha (Rātini)",
+    ha: "Hauha",
     am: "Amahereka",
     yo: "Ōrūpa",
     ig: "Ikapo",

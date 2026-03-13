@@ -9,6 +9,8 @@ export function useAppWorkflowState(): {
   setCartons: React.Dispatch<React.SetStateAction<CartonInput[]>>;
   result: MultiPackResult | null;
   setResult: React.Dispatch<React.SetStateAction<MultiPackResult | null>>;
+  generationSeedResult: MultiPackResult | null;
+  setGenerationSeedResult: React.Dispatch<React.SetStateAction<MultiPackResult | null>>;
   workflowMode: WorkflowMode;
   setWorkflowMode: React.Dispatch<React.SetStateAction<WorkflowMode>>;
   visibleLayers: number;
@@ -26,6 +28,7 @@ export function useAppWorkflowState(): {
   });
   const [cartons, setCartons] = useState<CartonInput[]>([]);
   const [result, setResult] = useState<MultiPackResult | null>(null);
+  const [generationSeedResult, setGenerationSeedResult] = useState<MultiPackResult | null>(null);
   const [workflowMode, setWorkflowMode] = useState<WorkflowMode>("generation");
   const [visibleLayers, setVisibleLayers] = useState(0);
   const [palletGenerationOpen, setPalletGenerationOpen] = useState(true);
@@ -37,6 +40,8 @@ export function useAppWorkflowState(): {
     setCartons,
     result,
     setResult,
+    generationSeedResult,
+    setGenerationSeedResult,
     workflowMode,
     setWorkflowMode,
     visibleLayers,

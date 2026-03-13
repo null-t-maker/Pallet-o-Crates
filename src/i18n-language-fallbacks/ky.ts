@@ -102,7 +102,7 @@ export const KY_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "армянча",
     hu: "венгерче",
     sw: "суахиличе",
-    ha: "хаусача (Латын)",
+    ha: "хаусача",
     am: "амхарча",
     yo: "йорубача",
     ig: "игбочо",

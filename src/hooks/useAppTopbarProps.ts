@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { WorkflowMode } from "../components/Visualizer";
 import type { AppTopbarProps, TopbarPanels } from "../components/topbar/AppTopbar.types";
-import type { SampleSaveControls, SettingsControls } from "../components/topbar/topbarPanelTypes";
+import type { SampleLoadControls, SampleSaveControls, SettingsControls } from "../components/topbar/topbarPanelTypes";
 import type { Language, Translations } from "../i18n";
 import type { AppLabels } from "./useAppLabels";
 
@@ -18,6 +18,7 @@ interface UseAppTopbarPropsArgs {
   switchWorkflowMode: (mode: WorkflowMode) => void;
   topbarPanels: TopbarPanels;
   sampleSave: SampleSaveControls;
+  sampleLoad: SampleLoadControls;
   settings: SettingsControls;
   labels: AppLabels;
 }
@@ -34,6 +35,7 @@ export function useAppTopbarProps({
   switchWorkflowMode,
   topbarPanels,
   sampleSave,
+  sampleLoad,
   settings,
   labels,
 }: UseAppTopbarPropsArgs): AppTopbarProps {
@@ -49,6 +51,7 @@ export function useAppTopbarProps({
     switchWorkflowMode,
     topbarPanels,
     sampleSave,
+    sampleLoad,
     settings,
     refreshAppLabel: labels.refreshAppLabel,
     updateCheckTitle: labels.updateCheckTitle,
@@ -57,7 +60,9 @@ export function useAppTopbarProps({
     currentWorkflowLabel: labels.currentWorkflowLabel,
     workflowGenerationLabel: labels.workflowGenerationLabel,
     workflowManualLabel: labels.workflowManualLabel,
+    layoutSamplesLabel: labels.layoutSamplesLabel,
     saveLayoutSampleLabel: labels.saveLayoutSampleLabel,
+    loadLayoutSampleLabel: labels.loadLayoutSampleLabel,
     sampleFolderLabel: labels.sampleFolderLabel,
     sampleChooseFolderLabel: labels.sampleChooseFolderLabel,
     sampleChangeFolderLabel: labels.sampleChangeFolderLabel,
@@ -68,6 +73,10 @@ export function useAppTopbarProps({
     sampleStrategyBothLabel: labels.sampleStrategyBothLabel,
     sampleSaveActionLabel: labels.sampleSaveActionLabel,
     sampleSavingLabel: labels.sampleSavingLabel,
+    sampleLoadFileLabel: labels.sampleLoadFileLabel,
+    sampleReloadFolderLabel: labels.sampleReloadFolderLabel,
+    sampleLoadActionLabel: labels.sampleLoadActionLabel,
+    sampleLoadingLabel: labels.sampleLoadingLabel,
     languageLabel: labels.languageLabel,
     settingsLabel: labels.settingsLabel,
     settingsSaveLabel: labels.settingsSaveLabel,
@@ -83,6 +92,7 @@ export function useAppTopbarProps({
     openUpdateCheckModal,
     palletGenerationOpen,
     refreshApp,
+    sampleLoad,
     sampleSave,
     setLanguage,
     settings,

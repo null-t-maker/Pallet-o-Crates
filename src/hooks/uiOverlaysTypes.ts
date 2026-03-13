@@ -17,6 +17,8 @@ export interface UseUiOverlaysResult {
   setCapturingShortcutTarget: React.Dispatch<React.SetStateAction<ShortcutTarget | null>>;
   setUiAccessShortcutDraft: React.Dispatch<React.SetStateAction<ShortcutConfig>>;
   setDiagnosticsShortcutDraft: React.Dispatch<React.SetStateAction<ShortcutConfig>>;
+  sampleDatabasePanelVisible: boolean;
+  setSampleDatabasePanelVisible: React.Dispatch<React.SetStateAction<boolean>>;
   settingsDirty: boolean;
   saveSettings: () => void;
   toggleUiAccess: () => void;

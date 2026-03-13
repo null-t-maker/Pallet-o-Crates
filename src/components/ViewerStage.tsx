@@ -14,6 +14,8 @@ export function ViewerStage(props: ViewerStageProps) {
     workflowMode,
     manualCartons,
     onManualCartonUpdate,
+    manualShadowModeEnabled,
+    setManualShadowModeEnabled,
     maxLayerCount,
   } = props;
 
@@ -27,6 +29,8 @@ export function ViewerStage(props: ViewerStageProps) {
         mode={workflowMode}
         manualCartons={manualCartons}
         onManualCartonUpdate={onManualCartonUpdate}
+        manualShadowModeEnabled={manualShadowModeEnabled}
+        setManualShadowModeEnabled={setManualShadowModeEnabled}
       />
 
       <ViewerStageWindows {...props} />

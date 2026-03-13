@@ -102,7 +102,7 @@ export const YI_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "אַרמעניש",
     hu: "אונגעריש",
     sw: "סוואַהיליש",
-    ha: "האַוסאַ (גַלחיש)",
+    ha: "האַוסאַ",
     am: "אַמהאַריש",
     yo: "יורובה",
     ig: "איגבו",

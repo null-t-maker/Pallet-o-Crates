@@ -5,6 +5,7 @@ import type { TemplateLockCandidate } from "./sampleIntelligenceLogic";
 export interface UseSampleIntelligenceArgs {
   pallet: PalletInput;
   cartons: CartonInput[];
+  sampleDatabasePanelVisible: boolean;
 }
 
 export interface UseSampleIntelligenceResult {

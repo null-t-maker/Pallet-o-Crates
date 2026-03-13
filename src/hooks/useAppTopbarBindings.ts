@@ -5,7 +5,9 @@ import type { AppLabels } from "./useAppLabels";
 import type { UseTopbarPanelsResult } from "./useTopbarPanels";
 import type { UseUiOverlaysResult } from "./useUiOverlays";
 import type { UseLayoutSampleSaveResult } from "./useLayoutSampleSave";
+import type { UseLayoutSampleLoadResult } from "./useLayoutSampleLoad";
 import { useAppTopbarProps } from "./useAppTopbarProps";
+import { DEFAULT_SAMPLE_DATABASE_PANEL_VISIBLE } from "./settingsPanelDefaults";
 
 interface UseAppTopbarBindingsArgs {
   t: Translations;
@@ -19,6 +21,7 @@ interface UseAppTopbarBindingsArgs {
   switchWorkflowMode: (mode: WorkflowMode) => void;
   topbarPanels: UseTopbarPanelsResult;
   sampleSave: UseLayoutSampleSaveResult;
+  sampleLoad: UseLayoutSampleLoadResult;
   uiOverlays: UseUiOverlaysResult;
   setUiScale: (value: number) => void;
   setUiZoom: (value: number) => void;
@@ -36,6 +39,7 @@ export function useAppTopbarBindings({
   switchWorkflowMode,
   topbarPanels,
   sampleSave,
+  sampleLoad,
   uiOverlays,
   setUiScale,
   setUiZoom,
@@ -43,6 +47,7 @@ export function useAppTopbarBindings({
   const restoreUiAccessDefaults = useCallback(() => {
     setUiScale(1);
     setUiZoom(1);
+    uiOverlays.setSampleDatabasePanelVisible(DEFAULT_SAMPLE_DATABASE_PANEL_VISIBLE);
     uiOverlays.closeUiAccess();
   }, [setUiScale, setUiZoom, uiOverlays]);
 
@@ -53,6 +58,10 @@ export function useAppTopbarBindings({
   const refreshApp = useCallback(() => {
     window.location.reload();
   }, []);
+
+  const toggleSampleDatabasePanelVisible = useCallback(() => {
+    uiOverlays.setSampleDatabasePanelVisible((prev) => !prev);
+  }, [uiOverlays]);
 
   return useAppTopbarProps({
     t,
@@ -66,6 +75,7 @@ export function useAppTopbarBindings({
     switchWorkflowMode,
     topbarPanels,
     sampleSave,
+    sampleLoad,
     settings: {
       settingsDirty: uiOverlays.settingsDirty,
       saveSettings: uiOverlays.saveSettings,
@@ -75,8 +85,10 @@ export function useAppTopbarBindings({
       diagnosticsShortcutDraft: uiOverlays.diagnosticsShortcutDraft,
       uiAccessOpen: uiOverlays.uiAccessOpen,
       diagnosticsOpen: uiOverlays.diagnosticsOpen,
+      sampleDatabasePanelVisible: uiOverlays.sampleDatabasePanelVisible,
       toggleUiAccess: uiOverlays.toggleUiAccess,
       toggleDiagnostics: uiOverlays.toggleDiagnostics,
+      toggleSampleDatabasePanelVisible,
       restoreUiAccessDefaults,
     },
     labels,

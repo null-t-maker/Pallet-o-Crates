@@ -29,6 +29,8 @@ export interface UseViewerStagePropsArgs {
   workflowMode: WorkflowMode;
   manualCartons: PackedCarton[];
   onManualCartonUpdate: (id: string, next: Partial<Pick<PackedCarton, "x" | "y" | "z" | "w" | "l" | "h">>) => void;
+  manualShadowModeEnabled: boolean;
+  setManualShadowModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
   uiOverlays: ViewerUiOverlayBindings;
   uiScale: number;
   uiZoom: number;

@@ -37,3 +37,27 @@ export function buildMenuSelectClassName(
 ): string {
   return `language-select ${open ? "open" : ""}${openUpward ? " open-up" : ""}${className ? ` ${className}` : ""}`;
 }
+
+export function normalizeMenuSelectSearch(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+export function filterMenuSelectOptions(
+  options: readonly MenuSelectOption[],
+  query: string,
+): readonly MenuSelectOption[] {
+  const normalizedQuery = normalizeMenuSelectSearch(query);
+  if (!normalizedQuery) {
+    return options;
+  }
+
+  return options.filter((option) => (
+    [option.label, option.value, option.searchText ?? ""]
+      .map((value) => normalizeMenuSelectSearch(value))
+      .some((value) => value.includes(normalizedQuery))
+  ));
+}

@@ -2,6 +2,7 @@ import React from "react";
 import * as THREE from "three";
 import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { computeVisualizerCameraMetrics } from "./visualizerCameraMetrics";
+import { resolveNextManualViewSeed } from "./visualizerManualViewSeed";
 import type { UseVisualizerCameraArgs, UseVisualizerCameraResult } from "./useVisualizerCameraTypes";
 
 export function useVisualizerCamera({
@@ -19,7 +20,7 @@ export function useVisualizerCamera({
   const hasManualZoomRef = React.useRef(false);
   const syncCameraRef = React.useRef(false);
   const prevMaxDimRef = React.useRef<number | null>(null);
-  const manualViewSeedRef = React.useRef<{ maxDim: number; orbitTargetY: number } | null>(null);
+  const [manualViewSeed, setManualViewSeed] = React.useState<{ maxDim: number; orbitTargetY: number } | null>(null);
   const [viewportSize, setViewportSize] = React.useState({ width: 1200, height: 800 });
 
   React.useEffect(() => {
@@ -43,19 +44,9 @@ export function useVisualizerCamera({
   }, []);
 
   React.useEffect(() => {
-    if (mode !== "manual") {
-      manualViewSeedRef.current = null;
-      return;
-    }
-    if (!manualViewSeedRef.current) {
-      manualViewSeedRef.current = {
-        maxDim,
-        orbitTargetY: dynamicOrbitTargetY,
-      };
-    }
+    setManualViewSeed((current) => resolveNextManualViewSeed(current, mode, maxDim, dynamicOrbitTargetY));
   }, [dynamicOrbitTargetY, maxDim, mode]);
 
-  const manualViewSeed = manualViewSeedRef.current;
   const {
     viewMaxDim,
     sceneVisualDim,

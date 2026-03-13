@@ -1,5 +1,6 @@
 import type { CartonInput, MultiPackResult, PackedCarton, PalletInput, PalletPackingStyle } from "./packerTypes";
 import { LayoutSampleDocument, LayoutSamplePlacement, SampleSavePackingStyle, isPalletPackingStyle } from "./layoutSamples";
+import { normalizeManualCartonsForSampleSave } from "./layoutSampleSaveNormalization";
 
 interface BuildLayoutSamplePayloadArgs {
   descriptorInput: string;
@@ -95,7 +96,9 @@ export function buildLayoutSamplePayload({
     };
   }
 
-  const placements: LayoutSamplePlacement[] = manualCartons.map((carton) => ({
+  const normalizedManualCartons = normalizeManualCartonsForSampleSave(manualCartons);
+
+  const placements: LayoutSamplePlacement[] = normalizedManualCartons.map((carton) => ({
     id: carton.id,
     typeId: carton.typeId,
     title: carton.title,

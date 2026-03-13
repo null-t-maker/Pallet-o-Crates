@@ -102,7 +102,7 @@ export const MK_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "ерменски",
     hu: "унгарски",
     sw: "свахили",
-    ha: "хауса (латинично писмо)",
+    ha: "хауса",
     am: "амхарски",
     yo: "јорупски",
     ig: "игбо",

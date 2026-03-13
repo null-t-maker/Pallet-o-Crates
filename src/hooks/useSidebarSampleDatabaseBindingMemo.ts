@@ -8,6 +8,7 @@ interface UseSidebarSampleDatabaseBindingMemoArgs extends SidebarSampleDatabaseB
 
 export function useSidebarSampleDatabaseBindingMemo({
   workflowMode,
+  sampleDatabasePanelVisible,
   sampleDatabaseFolderPath,
   sampleDatabaseSummary,
   sampleDatabaseLoading,
@@ -35,6 +36,7 @@ export function useSidebarSampleDatabaseBindingMemo({
     () =>
       buildSampleDatabaseSidebarBindings({
         workflowMode,
+        sampleDatabasePanelVisible,
         sampleDatabaseFolderPath,
         sampleDatabaseSummary,
         sampleDatabaseLoading,
@@ -68,6 +70,7 @@ export function useSidebarSampleDatabaseBindingMemo({
       sampleDatabaseError,
       sampleDatabaseFolderPath,
       sampleDatabaseLoading,
+      sampleDatabasePanelVisible,
       sampleDatabaseStatusSummaryText,
       sampleDatabaseSummary,
       sampleGuidanceCfgScalePercent,

@@ -13,6 +13,7 @@ type SidebarCartonListSectionProps = Pick<
   | "t"
   | "handleStartEdit"
   | "handleRemoveCarton"
+  | "handleToggleCartonEnabled"
 >;
 
 export const SidebarCartonListSection: FC<SidebarCartonListSectionProps> = ({
@@ -25,6 +26,7 @@ export const SidebarCartonListSection: FC<SidebarCartonListSectionProps> = ({
   t,
   handleStartEdit,
   handleRemoveCarton,
+  handleToggleCartonEnabled,
 }) => {
   if (cartons.length === 0) return null;
 
@@ -38,8 +40,10 @@ export const SidebarCartonListSection: FC<SidebarCartonListSectionProps> = ({
       hasManyRows={hasManyCartonRows}
       editLabel={t.edit}
       removeLabel={t.remove}
+      cartonGenerationToggleLabel={t.cartonGenerationToggleLabel ?? "Use in generation"}
       onStartEdit={handleStartEdit}
       onRemove={handleRemoveCarton}
+      onToggleEnabled={handleToggleCartonEnabled}
     />
   );
 };

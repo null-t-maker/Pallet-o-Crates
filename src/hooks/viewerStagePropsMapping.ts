@@ -1,6 +1,6 @@
 import type { ViewerStageProps } from "../components/ViewerStage";
 import type { UseViewerStagePropsArgs } from "./viewerStagePropsTypes";
-import { buildDiagnosticsSummary } from "../lib/diagnostics";
+import { buildDiagnosticsSummary, type DiagnosticsTelemetry } from "../lib/diagnostics";
 
 export function mapViewerStageProps({
   pallet,
@@ -11,6 +11,8 @@ export function mapViewerStageProps({
   workflowMode,
   manualCartons,
   onManualCartonUpdate,
+  manualShadowModeEnabled,
+  setManualShadowModeEnabled,
   uiOverlays,
   uiScale,
   uiZoom,
@@ -24,7 +26,7 @@ export function mapViewerStageProps({
   onConfirmUpdateCheck,
   onCloseUpdateCheck,
   labels,
-}: UseViewerStagePropsArgs): ViewerStageProps {
+}: UseViewerStagePropsArgs, diagnosticsTelemetry: DiagnosticsTelemetry): ViewerStageProps {
   const maxLayerCount = result
     ? result.pallets.reduce((max, placed) => Math.max(max, placed.result.layers.length), 0)
     : 0;
@@ -39,6 +41,8 @@ export function mapViewerStageProps({
     workflowMode,
     manualCartons,
     onManualCartonUpdate,
+    manualShadowModeEnabled,
+    setManualShadowModeEnabled,
     maxLayerCount,
     uiAccessOpen: uiOverlays.uiAccessOpen,
     uiAccessModalRef: uiOverlays.uiAccessModalRef,
@@ -62,6 +66,16 @@ export function mapViewerStageProps({
     diagnosticsModalStyle: uiOverlays.diagnosticsModalStyle,
     closeDiagnosticsLabel: labels.closeDiagnosticsLabel,
     diagnostics: diagnosticsSummary,
+    diagnosticsTelemetry,
+    diagnosticsRuntimeTelemetryLabel: labels.diagnosticsRuntimeTelemetryLabel,
+    diagnosticsLayoutChecksLabel: labels.diagnosticsLayoutChecksLabel,
+    fpsLabel: labels.fpsLabel,
+    cpuSystemUtilizationLabel: labels.cpuSystemUtilizationLabel,
+    cpuAppUtilizationLabel: labels.cpuAppUtilizationLabel,
+    memorySystemUsedLabel: labels.memorySystemUsedLabel,
+    memorySystemTotalLabel: labels.memorySystemTotalLabel,
+    workingSetAppLabel: labels.workingSetAppLabel,
+    privateMemoryAppLabel: labels.privateMemoryAppLabel,
     requestedUnitsLabel: t.requestedUnits,
     packedUnitsLabel: t.packedUnits,
     overlapCountLabel: t.overlapCount,

@@ -102,7 +102,7 @@ export const GA_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Airméinis",
     hu: "Ungáiris",
     sw: "Svahaílis",
-    ha: "Hásais (Laidineach)",
+    ha: "Hásais",
     am: "Amáiris",
     yo: "Iarúibis",
     ig: "Íogbóis",

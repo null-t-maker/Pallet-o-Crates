@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { WorkflowMode } from "../components/Visualizer";
-import type { MultiPackResult, PackedCarton } from "../lib/packer";
+import type { CartonInput, MultiPackResult, PackedCarton, PalletInput } from "../lib/packer";
+import { buildManualGenerationSeedResult } from "../lib/manualGenerationSeed";
 import { importGenerationToManual } from "../lib/manualLayout";
 
 interface ApplyWorkflowModeTransitionArgs {
@@ -8,6 +9,9 @@ interface ApplyWorkflowModeTransitionArgs {
   nextMode: WorkflowMode;
   closeWorkflowPanel: () => void;
   setVisibleLayers: Dispatch<SetStateAction<number>>;
+  pallet: PalletInput;
+  cartons: CartonInput[];
+  manualCartons: PackedCarton[];
   result: MultiPackResult | null;
   applyManualCartons: (
     cartons: PackedCarton[],
@@ -15,6 +19,8 @@ interface ApplyWorkflowModeTransitionArgs {
   ) => void;
   clearManualLayout: () => void;
   setResult: Dispatch<SetStateAction<MultiPackResult | null>>;
+  generationSeedResult: MultiPackResult | null;
+  setGenerationSeedResult: Dispatch<SetStateAction<MultiPackResult | null>>;
   setWorkflowMode: Dispatch<SetStateAction<WorkflowMode>>;
 }
 
@@ -23,10 +29,15 @@ export function applyWorkflowModeTransition({
   nextMode,
   closeWorkflowPanel,
   setVisibleLayers,
+  pallet,
+  cartons,
+  manualCartons,
   result,
   applyManualCartons,
   clearManualLayout,
   setResult,
+  generationSeedResult,
+  setGenerationSeedResult,
   setWorkflowMode,
 }: ApplyWorkflowModeTransitionArgs): void {
   if (nextMode === workflowMode) {
@@ -38,15 +49,22 @@ export function applyWorkflowModeTransition({
   setVisibleLayers(0);
 
   if (workflowMode === "generation" && nextMode === "manual") {
+    setGenerationSeedResult(null);
     if (result && result.pallets.length > 0 && result.packedUnits > 0) {
       const imported = importGenerationToManual(result);
       applyManualCartons(imported, { resetHistory: true });
-    } else {
+    } else if (!generationSeedResult) {
       clearManualLayout();
     }
     setResult(null);
   } else if (workflowMode === "manual" && nextMode === "generation") {
-    clearManualLayout();
+    const nextSeed = buildManualGenerationSeedResult({
+      pallet,
+      cartons,
+      manualCartons,
+    });
+    setResult(null);
+    setGenerationSeedResult(nextSeed.seedResult);
   }
 
   setWorkflowMode(nextMode);

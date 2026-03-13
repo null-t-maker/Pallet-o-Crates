@@ -102,7 +102,7 @@ export const LT_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armėnų",
     hu: "vengrų",
     sw: "suahilių",
-    ha: "hausų (lotynų)",
+    ha: "hausų",
     am: "amharų",
     yo: "jorubų",
     ig: "igbų",

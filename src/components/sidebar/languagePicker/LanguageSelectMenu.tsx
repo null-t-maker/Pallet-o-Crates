@@ -1,5 +1,7 @@
 import React from "react";
 import type { Language } from "../../../i18n";
+import type { LanguageReviewStatus } from "../../../i18n-language-review-status";
+import { LanguageStatusBadge } from "./LanguageStatusBadge";
 
 interface LanguageSelectMenuProps {
   languageLabel: string;
@@ -15,6 +17,10 @@ interface LanguageSelectMenuProps {
   onSelectLanguage: (language: Language) => void;
   displayTranslated: (language: Language) => string;
   displayNative: (language: Language) => string;
+  getStatusInfo: (language: Language) => {
+    status: LanguageReviewStatus;
+    label: string | null;
+  };
 }
 
 export const LanguageSelectMenu: React.FC<LanguageSelectMenuProps> = ({
@@ -31,6 +37,7 @@ export const LanguageSelectMenu: React.FC<LanguageSelectMenuProps> = ({
   onSelectLanguage,
   displayTranslated,
   displayNative,
+  getStatusInfo,
 }) => {
   return (
     <div className="language-select-menu">
@@ -77,13 +84,19 @@ export const LanguageSelectMenu: React.FC<LanguageSelectMenuProps> = ({
         {visibleLanguageOrder.map((lang, index) => {
           const isActive = lang === language;
           const isHighlighted = index === languageHighlightIndex;
+          const translatedLabel = displayTranslated(lang);
+          const nativeLabel = displayNative(lang);
+          const statusInfo = getStatusInfo(lang);
+          const optionTitle = statusInfo.label
+            ? `${translatedLabel} (${nativeLabel}) | ${statusInfo.label}`
+            : `${translatedLabel} (${nativeLabel})`;
           return (
             <button
               key={lang}
               type="button"
               role="option"
               aria-selected={isActive}
-              title={`${displayTranslated(lang)} (${displayNative(lang)})`}
+              title={optionTitle}
               className={`language-select-option${isActive ? " is-active" : ""}${isHighlighted ? " is-highlighted" : ""}`}
               ref={(node) => {
                 languageOptionRefs.current[index] = node;
@@ -91,11 +104,18 @@ export const LanguageSelectMenu: React.FC<LanguageSelectMenuProps> = ({
               onMouseEnter={() => setLanguageHighlightIndex(index)}
               onClick={() => onSelectLanguage(lang)}
             >
-              <span className="language-select-primary">
-                {displayTranslated(lang)}
+              <span className="language-select-texts">
+                <span className="language-select-primary">
+                  {translatedLabel}
+                </span>
+                <span className="language-select-native">
+                  ({nativeLabel})
+                </span>
               </span>
-              <span className="language-select-native">
-                ({displayNative(lang)})
+              <span className="language-select-status-slot">
+                {statusInfo.label && (
+                  <LanguageStatusBadge status={statusInfo.status} label={statusInfo.label} />
+                )}
               </span>
             </button>
           );

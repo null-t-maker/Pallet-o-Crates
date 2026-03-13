@@ -7,7 +7,10 @@ type TopbarSaveSamplePanelActionProps = Pick<
   | "t"
   | "topbarPanels"
   | "sampleSave"
+  | "sampleLoad"
+  | "layoutSamplesLabel"
   | "saveLayoutSampleLabel"
+  | "loadLayoutSampleLabel"
   | "sampleFolderLabel"
   | "sampleChooseFolderLabel"
   | "sampleChangeFolderLabel"
@@ -18,13 +21,20 @@ type TopbarSaveSamplePanelActionProps = Pick<
   | "sampleStrategyBothLabel"
   | "sampleSaveActionLabel"
   | "sampleSavingLabel"
+  | "sampleLoadFileLabel"
+  | "sampleReloadFolderLabel"
+  | "sampleLoadActionLabel"
+  | "sampleLoadingLabel"
 >;
 
 export function TopbarSaveSamplePanelAction({
   t,
   topbarPanels,
   sampleSave,
+  sampleLoad,
+  layoutSamplesLabel,
   saveLayoutSampleLabel,
+  loadLayoutSampleLabel,
   sampleFolderLabel,
   sampleChooseFolderLabel,
   sampleChangeFolderLabel,
@@ -35,13 +45,17 @@ export function TopbarSaveSamplePanelAction({
   sampleStrategyBothLabel,
   sampleSaveActionLabel,
   sampleSavingLabel,
+  sampleLoadFileLabel,
+  sampleReloadFolderLabel,
+  sampleLoadActionLabel,
+  sampleLoadingLabel,
 }: TopbarSaveSamplePanelActionProps) {
   return (
     <TopbarActionWithPanel
       wrapperClassName="topbar-save-sample-wrap"
       navRef={topbarPanels.saveSampleNavRef}
       isOpen={topbarPanels.saveSampleOpen}
-      title={saveLayoutSampleLabel}
+      title={layoutSamplesLabel}
       onToggle={topbarPanels.toggleSaveSampleOpen}
       dropdownClassName="save-sample-dropdown"
       dropdownStyle={topbarPanels.saveSampleDropdownStyle}
@@ -49,6 +63,9 @@ export function TopbarSaveSamplePanelAction({
       <SaveSamplePanelContent
         t={t}
         sampleSave={sampleSave}
+        sampleLoad={sampleLoad}
+        saveLayoutSampleLabel={saveLayoutSampleLabel}
+        loadLayoutSampleLabel={loadLayoutSampleLabel}
         sampleFolderLabel={sampleFolderLabel}
         sampleChooseFolderLabel={sampleChooseFolderLabel}
         sampleChangeFolderLabel={sampleChangeFolderLabel}
@@ -59,6 +76,10 @@ export function TopbarSaveSamplePanelAction({
         sampleStrategyBothLabel={sampleStrategyBothLabel}
         sampleSaveActionLabel={sampleSaveActionLabel}
         sampleSavingLabel={sampleSavingLabel}
+        sampleLoadFileLabel={sampleLoadFileLabel}
+        sampleReloadFolderLabel={sampleReloadFolderLabel}
+        sampleLoadActionLabel={sampleLoadActionLabel}
+        sampleLoadingLabel={sampleLoadingLabel}
       />
     </TopbarActionWithPanel>
   );

@@ -102,7 +102,7 @@ export const PAP_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "ormiański",
     hu: "węgierski",
     sw: "suahili",
-    ha: "hausa (łacińskie)",
+    ha: "hausa",
     am: "amharski",
     yo: "joruba",
     ig: "igbo",

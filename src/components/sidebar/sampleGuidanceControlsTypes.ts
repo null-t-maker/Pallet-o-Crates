@@ -6,11 +6,6 @@ export interface SampleGuidanceControlsProps {
   guidanceModeLabel: string;
   guidanceModeOnLabel: string;
   guidanceModeOffLabel: string;
-  templateLockEnabled?: boolean;
-  onTemplateLockEnabledChange?: (enabled: boolean) => void;
-  templateLockLabel: string;
-  templateLockOnLabel: string;
-  templateLockOffLabel: string;
   guidanceStrengthPercent?: number;
   onGuidanceStrengthPercentChange?: (value: number) => void;
   guidanceStrengthLabel: string;

@@ -102,7 +102,7 @@ export const UZ_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "arman",
     hu: "venger",
     sw: "suaxili",
-    ha: "xausa (lotin)",
+    ha: "xausa",
     am: "amxar",
     yo: "yoruba",
     ig: "igbo",

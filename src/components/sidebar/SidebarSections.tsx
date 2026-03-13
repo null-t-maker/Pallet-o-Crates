@@ -7,6 +7,7 @@ import { SidebarCartonListSection } from "./SidebarCartonListSection";
 import type { SidebarSectionsProps } from "./sidebarSectionsTypes";
 
 export const SidebarSections: React.FC<SidebarSectionsProps> = ({
+  workflowMode,
   showLanguageSection,
   showSampleDatabaseSection,
   collapsedSections,
@@ -48,6 +49,7 @@ export const SidebarSections: React.FC<SidebarSectionsProps> = ({
   hasManyCartonRows,
   handleStartEdit,
   handleRemoveCarton,
+  handleToggleCartonEnabled,
   }) => {
   return (
     <div className="sidebar-sections">
@@ -98,6 +100,7 @@ export const SidebarSections: React.FC<SidebarSectionsProps> = ({
       />
 
       <SidebarCartonTypeSection
+        workflowMode={workflowMode}
         collapsedSections={collapsedSections}
         toggleSection={toggleSection}
         t={t}
@@ -118,6 +121,7 @@ export const SidebarSections: React.FC<SidebarSectionsProps> = ({
         t={t}
         handleStartEdit={handleStartEdit}
         handleRemoveCarton={handleRemoveCarton}
+        handleToggleCartonEnabled={handleToggleCartonEnabled}
       />
     </div>
   );

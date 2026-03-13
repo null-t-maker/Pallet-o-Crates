@@ -20,6 +20,7 @@ export function useSidebarState({
   handleEdit: (updated: CartonInput) => void;
   handleStartEdit: (c: CartonInput) => void;
   handleRemoveCarton: (cartonId: string) => void;
+  handleToggleCartonEnabled: (cartonId: string) => void;
   totalCartons: number;
   hasManyCartonRows: boolean;
 } {
@@ -54,6 +55,19 @@ export function useSidebarState({
     setEditing((prev) => (prev?.id === cartonId ? null : prev));
   }, [cartons, setCartons]);
 
+  const handleToggleCartonEnabled = React.useCallback((cartonId: string) => {
+    setCartons(cartons.map((carton) => (
+      carton.id === cartonId
+        ? { ...carton, enabled: carton.enabled === false }
+        : carton
+    )));
+    setEditing((prev) => (
+      prev?.id === cartonId
+        ? { ...prev, enabled: prev.enabled === false }
+        : prev
+    ));
+  }, [cartons, setCartons]);
+
   const totalCartons = cartons.reduce((sum, carton) => sum + carton.quantity, 0);
   const hasManyCartonRows = cartons.length > 5;
 
@@ -66,6 +80,7 @@ export function useSidebarState({
     handleEdit,
     handleStartEdit,
     handleRemoveCarton,
+    handleToggleCartonEnabled,
     totalCartons,
     hasManyCartonRows,
   };

@@ -102,7 +102,7 @@ export const KM_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "អាមេនី",
     hu: "ហុងគ្រី",
     sw: "ស្វាហ៊ីលី",
-    ha: "ហូសា (ឡាតាំង)",
+    ha: "ហូសា",
     am: "អាំហារិក",
     yo: "យរូបា",
     ig: "អ៊ីកបូ",

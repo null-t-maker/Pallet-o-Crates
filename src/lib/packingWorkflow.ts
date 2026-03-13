@@ -1,6 +1,6 @@
 import {
   applySampleGuidance,
-  calculateGuidedWithFallback,
+  calculateGuidedWithFallbackAsync,
 } from "./packingWorkflowGuidance";
 import { tryApplyTemplateLock } from "./packingWorkflowTemplateLock";
 import type { CalculatePackingArgs, CalculatePackingResult } from "./packingWorkflowTypes";
@@ -11,7 +11,9 @@ export async function calculatePacking({
   sampleGuidance,
   sampleTemplateLockEnabled,
   templateLockCandidate,
+  progressReporter,
 }: CalculatePackingArgs): Promise<CalculatePackingResult> {
+  progressReporter?.throwIfCancelled();
   const nextPallet = applySampleGuidance(pallet, sampleGuidance);
   const templateAttempt = await tryApplyTemplateLock({
     pallet,
@@ -19,8 +21,15 @@ export async function calculatePacking({
     nextPallet,
     sampleTemplateLockEnabled,
     templateLockCandidate,
+    progressReporter,
   });
-  const result = templateAttempt.result ?? calculateGuidedWithFallback(nextPallet, cartons, sampleGuidance);
+  progressReporter?.throwIfCancelled();
+  const result = templateAttempt.result ?? await calculateGuidedWithFallbackAsync(
+    nextPallet,
+    cartons,
+    sampleGuidance,
+    progressReporter,
+  );
 
   return {
     result,

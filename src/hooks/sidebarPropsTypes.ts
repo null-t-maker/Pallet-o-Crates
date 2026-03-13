@@ -3,6 +3,7 @@ import type { Language, Translations } from "../i18n";
 import type { CartonInput, MultiPackResult, PackedCarton, PalletInput, SampleGuidanceFilter } from "../lib/packer";
 import type { ScanSampleDatabaseResponse } from "../lib/layoutSamples";
 import type { AppLabels } from "./useAppLabels";
+import type { WorkflowBusyKind } from "./workflowActionsTypes";
 
 export interface UseSidebarPropsArgs {
   pallet: PalletInput;
@@ -15,11 +16,15 @@ export interface UseSidebarPropsArgs {
   labels: AppLabels;
   workflowMode: WorkflowMode;
   result: MultiPackResult | null;
+  generationSeedResult: MultiPackResult | null;
   manualCartons: PackedCarton[];
   handleCalculate: () => void;
+  handleCalculateMissing: () => void;
   handleGenerateManualAgain: () => void;
   handleGenerateManualMore: () => void;
+  workflowBusyKind: WorkflowBusyKind;
   switchWorkflowMode: (mode: WorkflowMode) => void;
+  sampleDatabasePanelVisible: boolean;
   sampleDatabaseFolderPath: string;
   sampleDatabaseData: ScanSampleDatabaseResponse | null;
   sampleDatabaseLoading: boolean;

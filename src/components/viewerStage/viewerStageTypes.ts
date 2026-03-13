@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import type { MultiPackResult, PackedCarton, PalletInput } from "../../lib/packer";
 import type { Translations } from "../../i18n";
 import type { WorkflowMode } from "../Visualizer";
-import type { DiagnosticsSummary } from "../../lib/diagnostics";
+import type { DiagnosticsSummary, DiagnosticsTelemetry } from "../../lib/diagnostics";
 
 export interface ViewerStageProps {
   pallet: PalletInput;
@@ -14,6 +14,8 @@ export interface ViewerStageProps {
   workflowMode: WorkflowMode;
   manualCartons: PackedCarton[];
   onManualCartonUpdate: (id: string, next: Partial<Pick<PackedCarton, "x" | "y" | "z" | "w" | "l" | "h">>) => void;
+  manualShadowModeEnabled: boolean;
+  setManualShadowModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
   maxLayerCount: number;
 
   uiAccessOpen: boolean;
@@ -39,6 +41,16 @@ export interface ViewerStageProps {
   diagnosticsModalStyle: CSSProperties | undefined;
   closeDiagnosticsLabel: string;
   diagnostics: DiagnosticsSummary | null;
+  diagnosticsTelemetry: DiagnosticsTelemetry;
+  diagnosticsRuntimeTelemetryLabel: string;
+  diagnosticsLayoutChecksLabel: string;
+  fpsLabel: string;
+  cpuSystemUtilizationLabel: string;
+  cpuAppUtilizationLabel: string;
+  memorySystemUsedLabel: string;
+  memorySystemTotalLabel: string;
+  workingSetAppLabel: string;
+  privateMemoryAppLabel: string;
   requestedUnitsLabel: string;
   packedUnitsLabel: string;
   overlapCountLabel: string;

@@ -102,7 +102,7 @@ export const EN_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Armenian",
     hu: "Hungarian",
     sw: "Swahili",
-    ha: "Hausa (Latin)",
+    ha: "Hausa",
     am: "Amharic",
     yo: "Yoruba",
     ig: "Igbo",

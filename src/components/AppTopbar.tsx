@@ -23,7 +23,9 @@ export function AppTopbar({
   currentWorkflowLabel,
   workflowGenerationLabel,
   workflowManualLabel,
+  layoutSamplesLabel,
   saveLayoutSampleLabel,
+  loadLayoutSampleLabel,
   sampleFolderLabel,
   sampleChooseFolderLabel,
   sampleChangeFolderLabel,
@@ -34,6 +36,11 @@ export function AppTopbar({
   sampleStrategyBothLabel,
   sampleSaveActionLabel,
   sampleSavingLabel,
+  sampleLoad,
+  sampleLoadFileLabel,
+  sampleReloadFolderLabel,
+  sampleLoadActionLabel,
+  sampleLoadingLabel,
   languageLabel,
   settingsLabel,
   settingsSaveLabel,
@@ -73,7 +80,9 @@ export function AppTopbar({
           currentWorkflowLabel={currentWorkflowLabel}
           workflowGenerationLabel={workflowGenerationLabel}
           workflowManualLabel={workflowManualLabel}
+          layoutSamplesLabel={layoutSamplesLabel}
           saveLayoutSampleLabel={saveLayoutSampleLabel}
+          loadLayoutSampleLabel={loadLayoutSampleLabel}
           sampleFolderLabel={sampleFolderLabel}
           sampleChooseFolderLabel={sampleChooseFolderLabel}
           sampleChangeFolderLabel={sampleChangeFolderLabel}
@@ -84,6 +93,11 @@ export function AppTopbar({
           sampleStrategyBothLabel={sampleStrategyBothLabel}
           sampleSaveActionLabel={sampleSaveActionLabel}
           sampleSavingLabel={sampleSavingLabel}
+          sampleLoad={sampleLoad}
+          sampleLoadFileLabel={sampleLoadFileLabel}
+          sampleReloadFolderLabel={sampleReloadFolderLabel}
+          sampleLoadActionLabel={sampleLoadActionLabel}
+          sampleLoadingLabel={sampleLoadingLabel}
           languageLabel={languageLabel}
           settingsLabel={settingsLabel}
           settingsSaveLabel={settingsSaveLabel}

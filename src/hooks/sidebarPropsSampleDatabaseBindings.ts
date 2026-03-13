@@ -5,6 +5,7 @@ import type {
 
 export function buildSampleDatabaseSidebarBindings({
   workflowMode,
+  sampleDatabasePanelVisible,
   sampleDatabaseFolderPath,
   sampleDatabaseSummary,
   sampleDatabaseLoading,
@@ -29,7 +30,7 @@ export function buildSampleDatabaseSidebarBindings({
   labels,
 }: BuildSampleDatabaseSidebarBindingsArgs): SampleDatabaseSidebarBindings {
   return {
-    showSampleDatabaseSection: workflowMode === "generation",
+    showSampleDatabaseSection: workflowMode === "generation" && sampleDatabasePanelVisible,
     sampleDatabaseFolderPath,
     sampleDatabaseSummary,
     sampleDatabaseLoading,

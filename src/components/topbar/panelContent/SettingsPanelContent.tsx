@@ -29,6 +29,7 @@ export function SettingsPanelContent({
 }: SettingsPanelContentProps) {
   const [uiSectionCollapsed, setUiSectionCollapsed] = useState(false);
   const [diagnosticsSectionCollapsed, setDiagnosticsSectionCollapsed] = useState(false);
+  const [sampleDatabaseSectionCollapsed, setSampleDatabaseSectionCollapsed] = useState(false);
 
   return (
     <div className="section-body settings-panel-body">
@@ -114,6 +115,55 @@ export function SettingsPanelContent({
               >
                 {settings.diagnosticsOpen ? uiAccessCloseLabel : uiAccessOpenLabel}
               </button>
+            </div>
+          )}
+        </section>
+
+        <section className="section-card settings-section-card">
+          <button
+            type="button"
+            className="section-titlebar settings-section-toggle"
+            onClick={() => setSampleDatabaseSectionCollapsed((prev) => !prev)}
+            aria-expanded={!sampleDatabaseSectionCollapsed}
+          >
+            <span className="section-title" title={t.sampleDatabaseLabel ?? "Sample database"}>
+              {t.sampleDatabaseLabel ?? "Sample database"}
+            </span>
+            <span className="section-arrow">
+              {sampleDatabaseSectionCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
+            </span>
+          </button>
+          {!sampleDatabaseSectionCollapsed && (
+            <div className="section-body settings-section-body">
+              <div className="settings-field">
+                <label>{t.sampleDatabaseSectionVisibilityLabel ?? "Section visibility"}</label>
+                <div className="settings-switch-row" role="group" aria-label={t.sampleDatabaseSectionVisibilityLabel ?? "Section visibility"}>
+                  <button
+                    type="button"
+                    className={`settings-switch-btn${settings.sampleDatabasePanelVisible ? " is-active" : ""}`}
+                    aria-pressed={settings.sampleDatabasePanelVisible}
+                    onClick={() => {
+                      if (!settings.sampleDatabasePanelVisible) {
+                        settings.toggleSampleDatabasePanelVisible();
+                      }
+                    }}
+                  >
+                    {t.sampleDatabaseShowSectionLabel ?? "Show"}
+                  </button>
+                  <button
+                    type="button"
+                    className={`settings-switch-btn${!settings.sampleDatabasePanelVisible ? " is-active" : ""}`}
+                    aria-pressed={!settings.sampleDatabasePanelVisible}
+                    onClick={() => {
+                      if (settings.sampleDatabasePanelVisible) {
+                        settings.toggleSampleDatabasePanelVisible();
+                      }
+                    }}
+                  >
+                    {t.sampleDatabaseHideSectionLabel ?? "Hide"}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </section>

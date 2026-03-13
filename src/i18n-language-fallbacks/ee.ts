@@ -102,7 +102,7 @@ export const EE_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "armeniagbe",
     hu: "hungarigbe",
     sw: "swahili",
-    ha: "hausagbe (latingbeŋɔŋlɔ)",
+    ha: "hausagbe",
     am: "amhariagbe",
     yo: "yorubagbe",
     ig: "igbogbe",

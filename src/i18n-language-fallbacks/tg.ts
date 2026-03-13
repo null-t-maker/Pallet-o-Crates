@@ -102,7 +102,7 @@ export const TG_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "арманӣ",
     hu: "маҷорӣ",
     sw: "суоҳилӣ",
-    ha: "ҳауса (Лотинӣ)",
+    ha: "ҳауса",
     am: "амҳарӣ",
     yo: "йоруба",
     ig: "игбо",

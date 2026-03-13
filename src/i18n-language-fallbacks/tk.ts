@@ -102,7 +102,7 @@ export const TK_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "ermeni dili",
     hu: "wenger dili",
     sw: "suahili dili",
-    ha: "hausa dili (Latyn elipbiýi)",
+    ha: "hausa dili",
     am: "amhar dili",
     yo: "ýoruba dili",
     ig: "igbo dili",

@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type { Language, Translations } from "../../i18n";
 import type { UseTopbarPanelsResult } from "../../hooks/useTopbarPanels";
 import type { WorkflowMode } from "../Visualizer";
-import type { SampleSaveControls, SettingsControls } from "./topbarPanelTypes";
+import type { SampleLoadControls, SampleSaveControls, SettingsControls } from "./topbarPanelTypes";
 
 export type TopbarPanels = Pick<
   UseTopbarPanelsResult,
@@ -36,6 +36,7 @@ export interface AppTopbarProps {
   switchWorkflowMode: (mode: WorkflowMode) => void;
   topbarPanels: TopbarPanels;
   sampleSave: SampleSaveControls;
+  sampleLoad: SampleLoadControls;
   settings: SettingsControls;
   refreshAppLabel: string;
   updateCheckTitle: string;
@@ -44,7 +45,9 @@ export interface AppTopbarProps {
   currentWorkflowLabel: string;
   workflowGenerationLabel: string;
   workflowManualLabel: string;
+  layoutSamplesLabel: string;
   saveLayoutSampleLabel: string;
+  loadLayoutSampleLabel: string;
   sampleFolderLabel: string;
   sampleChooseFolderLabel: string;
   sampleChangeFolderLabel: string;
@@ -55,6 +58,10 @@ export interface AppTopbarProps {
   sampleStrategyBothLabel: string;
   sampleSaveActionLabel: string;
   sampleSavingLabel: string;
+  sampleLoadFileLabel: string;
+  sampleReloadFolderLabel: string;
+  sampleLoadActionLabel: string;
+  sampleLoadingLabel: string;
   languageLabel: string;
   settingsLabel: string;
   settingsSaveLabel: string;

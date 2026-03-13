@@ -10,6 +10,7 @@ import {
   resolveVisualizerLabels,
 } from "./visualizerSceneMetrics";
 import { BASE_H, isValidCartonGeometry } from "./visualizerHelpers";
+import { computeManualViewportMaxDim } from "./visualizerManualViewport";
 
 type WorkflowMode = "generation" | "manual";
 
@@ -45,7 +46,18 @@ interface UseVisualizerSceneStateResult {
   manualRotateHorizontalLabel: string;
   manualRotateVerticalXLabel: string;
   manualRotateVerticalYLabel: string;
+  manualShadowModeLabel: string;
+  manualShadowModeOnLabel: string;
+  manualShadowModeOffLabel: string;
+  manualAlignSectionLabel: string;
+  manualAlignXButtonLabel: string;
+  manualAlignYButtonLabel: string;
+  manualAxisInputModeLabel: string;
+  manualAxisInputAutoLabel: string;
+  manualAxisInputManualLabel: string;
+  manualAxisApplyLabel: string;
   manualCollisionHint: string;
+  manualShadowModeBlockedHint: string;
   manualPalletAreaLabel: (width: number, length: number) => string;
   manualClearSelectedCartonAriaLabel: string;
   manualPlacedCartonsLabel: string;
@@ -97,12 +109,17 @@ export function useVisualizerSceneState({
   const footprintLength = footprintBounds.maxY - footprintBounds.minY;
   const sceneCenterX = (footprintBounds.minX + footprintBounds.maxX) / 2;
   const sceneCenterZ = (footprintBounds.minY + footprintBounds.maxY) / 2;
+  const manualViewportMaxDim = useMemo(
+    () => (mode === "manual" ? computeManualViewportMaxDim(pallet, manualCartons) : 0),
+    [manualCartons, mode, pallet],
+  );
 
   const packedHeight = (mode === "manual" ? manualMaxHeight : result?.maxHeight ?? 0) + BASE_H;
   const fallbackHeight = Math.max(pallet.width, pallet.length) * 0.75;
   const maxDim = Math.max(
     footprintWidth,
     footprintLength,
+    manualViewportMaxDim,
     mode === "generation" && !result ? fallbackHeight : packedHeight,
   );
   const dynamicOrbitTargetY = BASE_H + (mode === "manual" ? manualMaxHeight / 2 : (result ? result.maxHeight / 2 : 100));

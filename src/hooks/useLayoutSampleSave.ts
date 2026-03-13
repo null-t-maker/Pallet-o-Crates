@@ -20,6 +20,7 @@ export function useLayoutSampleSave({
   sampleFolderNotSelectedLabel,
   sampleSavedPrefix,
   sampleSaveFailedPrefix,
+  saveSampleBlockedReason,
 }: UseLayoutSampleSaveArgs): UseLayoutSampleSaveResult {
   const [sampleSaveFolderPath, setSampleSaveFolderPath] = useState<string>(getInitialSampleSaveFolderPath);
   const [sampleSaveName, setSampleSaveName] = useState("");
@@ -51,6 +52,7 @@ export function useLayoutSampleSave({
     sampleSaveName,
     sampleSavePackingStyle,
     saveSampleBusy,
+    saveSampleBlockedReason,
     setSampleSaveFolderPath,
     setSaveSampleStatus,
     setSaveSampleBusy,
@@ -64,6 +66,7 @@ export function useLayoutSampleSave({
     sampleSavePackingStyle,
     setSampleSavePackingStyle,
     saveSampleBusy,
+    saveSampleBlockedReason,
     saveSampleStatus,
     setSaveSampleStatus,
     handleChooseSampleSaveFolder,

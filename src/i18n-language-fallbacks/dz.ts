@@ -102,7 +102,7 @@ export const DZ_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "ཨར་མི་ནི་ཡཱན་ཁ",
     hu: "ཧཱང་གྷ་རི་ཡཱན་ཁ",
     sw: "སྭཱ་ཧི་ལི་ཁ",
-    ha: "ཧཝ་ས་ཁ། (ལེ་ཊིན་ཡིག་གུ།)",
+    ha: "ཧཝ་ས་ཁ།",
     am: "ཨམ་ཧ་རིཀ་ཁ",
     yo: "ཡོ་རུ་བ་ཁ",
     ig: "ཨིག་བོ་ཁ",

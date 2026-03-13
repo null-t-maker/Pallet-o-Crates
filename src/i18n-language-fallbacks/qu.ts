@@ -102,7 +102,7 @@ export const QU_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "Armenio Simi",
     hu: "Hungaro Simi",
     sw: "Suajili Simi",
-    ha: "Hausa Simi (Latin Simi)",
+    ha: "Hausa Simi",
     am: "Amarico Simi",
     yo: "Yoruba Simi",
     ig: "Igbo Simi",

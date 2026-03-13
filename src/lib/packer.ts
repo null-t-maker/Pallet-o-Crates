@@ -28,6 +28,7 @@ export type {
   CartonUprightPolicy,
   ExtraPalletMode,
   Layer,
+  ManualSpawnLevel,
   MultiPackResult,
   PackResult,
   PackSampleGuidance,

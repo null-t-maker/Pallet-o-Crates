@@ -7,11 +7,13 @@ type SidebarActionBindingArgs = Pick<
   | "workflowMode"
   | "manualCartons"
   | "result"
+  | "generationSeedResult"
   | "labels"
-  | "t"
   | "handleCalculate"
+  | "handleCalculateMissing"
   | "handleGenerateManualAgain"
   | "handleGenerateManualMore"
+  | "workflowBusyKind"
   | "switchWorkflowMode"
 >;
 
@@ -19,11 +21,13 @@ export function useSidebarActionBindings({
   workflowMode,
   manualCartons,
   result,
+  generationSeedResult,
   labels,
-  t,
   handleCalculate,
+  handleCalculateMissing,
   handleGenerateManualAgain,
   handleGenerateManualMore,
+  workflowBusyKind,
   switchWorkflowMode,
 }: SidebarActionBindingArgs): ReturnType<typeof buildSidebarActionBindings> {
   return useMemo(
@@ -32,22 +36,26 @@ export function useSidebarActionBindings({
         workflowMode,
         manualCartonCount: manualCartons.length,
         result,
+        generationSeedResult,
         labels,
-        t,
         handleCalculate,
+        handleCalculateMissing,
         handleGenerateManualAgain,
         handleGenerateManualMore,
+        workflowBusyKind,
         switchWorkflowMode,
       }),
     [
       handleCalculate,
+      handleCalculateMissing,
       handleGenerateManualAgain,
       handleGenerateManualMore,
       labels,
       manualCartons.length,
       result,
+      generationSeedResult,
+      workflowBusyKind,
       switchWorkflowMode,
-      t,
       workflowMode,
     ],
   );

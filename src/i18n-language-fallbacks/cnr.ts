@@ -102,7 +102,7 @@ export const CNR_LANGUAGE_NAME_FALLBACK: Partial<Record<Language, string>> = {
     hy: "jermenski",
     hu: "mađarski",
     sw: "svahili",
-    ha: "hausa (latinica)",
+    ha: "hausa",
     am: "amharski",
     yo: "joruba",
     ig: "igbo",
