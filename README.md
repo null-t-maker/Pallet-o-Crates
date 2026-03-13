@@ -16,16 +16,16 @@ Pallet-o-Crates is a Tauri desktop tool for generating pallet layouts, switching
     <td><img src="docs/assets/Pallet-o-Crates-02.png" alt="Manual editing difficult case demo" /></td>
   </tr>
   <tr>
-    <td><strong>01</strong>: the same carton set opened in manual mode, intentionally staged off-pallet to show the base editing workspace.</td>
-    <td><strong>02</strong>: a harder manual case built around a real PK35N-A-400 layout, showing how the user can refine or reconstruct a difficult arrangement directly.</td>
+    <td><strong>01</strong>: the same baseline carton set opened in manual mode and staged off-pallet to show the default editing workspace.</td>
+    <td><strong>02</strong>: a harder real-world manual case, showing how a difficult arrangement can be refined directly in the editor.</td>
   </tr>
   <tr>
     <td><img src="docs/assets/Pallet-o-Crates-03.png" alt="Missing-carton generation without sample guidance" /></td>
     <td><img src="docs/assets/Pallet-o-Crates-04.png" alt="Missing-carton generation with sample guidance enabled" /></td>
   </tr>
   <tr>
-    <td><strong>03</strong>: missing cartons generated without sample guidance. Valid demo, but visibly chaotic. This is an honest example of the current heuristic limits.</td>
-    <td><strong>04</strong>: the same follow-up scenario with sample database guidance enabled. Still not perfect, but clearly less chaotic than the unguided pass.</td>
+    <td><strong>03</strong>: follow-up generation that adds only missing cartons without sample guidance. Valid, but visibly chaotic and a fair example of the current heuristic limits.</td>
+    <td><strong>04</strong>: the same follow-up scenario with sample database guidance enabled. Still imperfect, but noticeably calmer than the unguided pass.</td>
   </tr>
 </table>
 
@@ -140,7 +140,7 @@ Start here: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Support
 
-If you find the project useful and want to support ongoing development, you can do that here:
+Optional: if you'd like to leave a small tip or say thanks, you can do that here:
 
 <a href="https://www.buymeacoffee.com/nulltmaker" rel="noopener noreferrer">
   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" width="217" height="60">
