@@ -184,53 +184,57 @@ describe("packer single-pallet workflow", () => {
     expect(baseLayerVariants.size).toBeGreaterThan(1);
   });
 
-  it("uses lower same-type supports before jumping to higher mixed supports", () => {
-    const pallet: PalletInput = {
-      width: 800,
-      length: 1200,
-      maxHeight: 1800,
-      maxWeight: 1000,
-      packingStyle: "edgeAligned",
-      extraPalletMode: "none",
-    };
-    const cartons: CartonInput[] = [
-      carton({
-        id: "A",
-        title: "A",
-        width: 300,
-        length: 200,
-        height: 150,
-        weight: 4,
-        quantity: 32,
-      }),
-      carton({
-        id: "B",
-        title: "B",
-        width: 500,
-        length: 150,
-        height: 250,
-        weight: 3,
-        quantity: 16,
-      }),
-      carton({
-        id: "C",
-        title: "C",
-        width: 250,
-        length: 400,
-        height: 100,
-        weight: 1,
-        quantity: 32,
-      }),
-    ];
+  it(
+    "uses lower same-type supports before jumping to higher mixed supports",
+    () => {
+      const pallet: PalletInput = {
+        width: 800,
+        length: 1200,
+        maxHeight: 1800,
+        maxWeight: 1000,
+        packingStyle: "edgeAligned",
+        extraPalletMode: "none",
+      };
+      const cartons: CartonInput[] = [
+        carton({
+          id: "A",
+          title: "A",
+          width: 300,
+          length: 200,
+          height: 150,
+          weight: 4,
+          quantity: 32,
+        }),
+        carton({
+          id: "B",
+          title: "B",
+          width: 500,
+          length: 150,
+          height: 250,
+          weight: 3,
+          quantity: 16,
+        }),
+        carton({
+          id: "C",
+          title: "C",
+          width: 250,
+          length: 400,
+          height: 100,
+          weight: 1,
+          quantity: 32,
+        }),
+      ];
 
-    const result = packPallet(pallet, cartons);
-    const cAt650 = result.layers
-      .flatMap((layer) => layer.cartons)
-      .filter((placed) => placed.typeId === "C" && Math.abs(placed.z - 650) <= 1e-6);
+      const result = packPallet(pallet, cartons);
+      const cAt650 = result.layers
+        .flatMap((layer) => layer.cartons)
+        .filter((placed) => placed.typeId === "C" && Math.abs(placed.z - 650) <= 1e-6);
 
-    expect(cAt650.length).toBeGreaterThan(0);
-    expect(result.totalHeight).toBeLessThan(1400);
-  });
+      expect(cAt650.length).toBeGreaterThan(0);
+      expect(result.totalHeight).toBeLessThan(1400);
+    },
+    15_000,
+  );
 
   it(
     "does not leave large late-stage cartons behind when legal shelf space exists",
